@@ -1,7 +1,7 @@
 # Python Learning Lab — مختبر تعلّم Python
 
-An Arabic-first, interactive Streamlit platform for learning Python, built from
-`python_learning_platform_blueprint_ar_v3.md`. Roadmap status (§130):
+An Arabic-first, interactive Streamlit platform for learning Python, built from the
+author's platform blueprint (the § numbers in the code refer to it). Roadmap status (§130):
 **Phase A — Foundation** done; **Phase B — Core Python MVP** done (isolated execution,
 code editor, loop/function animations, 20 lectures across tracks 00–09).
 
