@@ -1,0 +1,123 @@
+id: lists
+track: data_types
+order: 4
+title_ar: "القوائم list: تسلسل قابل للتعديل"
+title_en: "Lists: a mutable sequence"
+level: beginner
+estimated_minutes: 40
+prerequisites: [variables-assignment, strings-methods-fstrings]
+objectives:
+  - "إنشاء list والوصول إلى عناصرها بالـindex والـslicing."
+  - "تعديل القائمة في مكانها: append وextend وinsert وremove وpop."
+  - "التمييز بين sort() التي تعدّل وتُعيد None، وsorted() التي تُعيد قائمة جديدة."
+  - "تجنّب فخ القوائم المتداخلة المتشاركة [[0]*3]*3."
+docs_url: "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [list, append, extend, sort, sorted, slice, mutable, alias]
+
+quizzes:
+  q-append:
+    kind: predict
+    question: "ما قيمة `len(x)`؟"
+    code: |
+      x = [1, 2]
+      x.append([3, 4])
+      print(len(x))
+    options: ["`4`", "`3`", "`2`"]
+    answer: 1
+    explanation: |
+      `append` تضيف **عنصرًا واحدًا**، وهنا العنصر هو القائمة `[3, 4]` كاملة:
+      `[1, 2, [3, 4]]`. لإضافة العناصر واحدًا واحدًا استخدم `extend`.
+  q-sort:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      scores = [14, 9, 17]
+      result = scores.sort()
+      print(result)
+    options: ["`[9, 14, 17]`", "`None`", "`[17, 14, 9]`"]
+    answer: 1
+    explanation: |
+      `list.sort()` ترتب القائمة **في مكانها** وتُعيد `None`. القائمة `scores` أصبحت مرتبة،
+      لكن `result` هي `None`. إن أردت قائمة جديدة: `sorted(scores)`.
+  q-exit:
+    kind: exit
+    question: "`grid = [[0] * 3] * 3` ثم `grid[0][0] = 1`. ماذا يحدث؟"
+    options:
+      - "يتغير الصف الأول فقط"
+      - "يتغير العنصر الأول في كل الصفوف الثلاثة"
+      - "`TypeError`"
+    answer: 1
+    explanation: |
+      `* 3` كررت **المرجع** إلى القائمة الداخلية نفسها ثلاث مرات: ثلاثة أسماء لقائمة واحدة.
+      الصحيح: `[[0] * 3 for _ in range(3)]`.
+
+exercises:
+  ex-top3:
+    title: "أعلى ثلاث درجات دون المساس بالأصل"
+    prompt: |
+      أنشئ `top3`: أعلى ثلاث قيم من `scores` مرتبة تنازليًا، **دون** تعديل `scores` نفسها.
+      ثم أنشئ `passed`: عدد الدرجات التي تساوي 10 أو أكثر.
+    starter: |
+      scores = [12, 7, 18, 10, 15, 9]
+
+      top3 = ...
+      passed = ...
+
+      print(top3, passed, scores)
+    solution: |
+      scores = [12, 7, 18, 10, 15, 9]
+
+      top3 = sorted(scores, reverse=True)[:3]
+      passed = len([s for s in scores if s >= 10])
+
+      print(top3, passed, scores)
+    tests: |
+      assert top3 == [18, 15, 12], f"top3 يجب أن يكون [18, 15, 12] وليس {top3}"
+      assert passed == 4, f"passed يجب أن يكون 4 وليس {passed}"
+      assert scores == [12, 7, 18, 10, 15, 9], "لا تعدّل scores؛ استخدم sorted بدل sort"
+    hints:
+      - "`sorted()` تُعيد قائمة جديدة، ولها parameter للترتيب التنازلي. ثم اقتطع أول ثلاثة."
+      - "`sorted(scores, reverse=True)[:3]`. وللعدّ: loop مع عدّاد، أو `len` لقائمة مصفّاة."
+      - "`passed = len([s for s in scores if s >= 10])`"
+
+changes:
+  ch-append-extend:
+    title: "append مقابل extend مقابل +"
+    base: |
+      x = [1, 2]
+      x.append([3, 4])
+      print(x, len(x))
+    base_label: "قبل · append"
+    variants:
+      - label: "extend"
+        code: |
+          x = [1, 2]
+          x.extend([3, 4])
+          print(x, len(x))
+        explain: "`extend` تمر على الـiterable وتضيف كل عنصر منه على حدة."
+      - label: "x + [3, 4]"
+        code: |
+          x = [1, 2]
+          y = x + [3, 4]
+          print(x, y)
+        explain: "`+` لا تعدّل `x`؛ تنشئ قائمة **جديدة**. `append` و`extend` تعدّلان القائمة في مكانها وتُعيدان `None`."
+
+animations:
+  anim-grid:
+    title: "فخ القوائم المتداخلة"
+    code: |
+      row = [0] * 3
+      grid = [row] * 3
+      grid[0][0] = 1
+      print(grid)
+      good = [[0] * 3 for _ in range(3)]
+      good[0][0] = 1
+      print(good)
+    notes:
+      1: "قائمة واحدة من ثلاثة أصفار."
+      2: "`[row] * 3` قائمة خارجية فيها **المرجع نفسه** ثلاث مرات، لا ثلاث نسخ."
+      3: "تعديل `grid[0]` هو تعديل `row` نفسها، وكل الصفوف تشير إليها."
+      5: "الـcomprehension تنشئ قائمة **جديدة** في كل دورة: ثلاث قوائم مستقلة."
+      6: "الآن يتغير الصف الأول فقط."

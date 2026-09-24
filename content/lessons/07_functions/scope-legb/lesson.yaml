@@ -1,0 +1,113 @@
+id: scope-legb
+track: functions
+order: 4
+title_ar: "النطاق Scope وقاعدة LEGB: أين يبحث Python عن الاسم؟"
+title_en: "Scope and the LEGB rule: where Python looks up a name"
+level: intermediate
+estimated_minutes: 35
+prerequisites: [function-parameters]
+objectives:
+  - "فهم أن لكل استدعاء دالة local scope خاصًا به."
+  - "تطبيق قاعدة البحث Local ← Enclosing ← Global ← Built-in."
+  - "فهم UnboundLocalError عند الإسناد إلى اسم عام داخل دالة."
+  - "تجنّب global وتظليل أسماء built-in مثل list وsum."
+docs_url: "https://docs.python.org/3/reference/executionmodel.html#resolution-of-names"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [scope, LEGB, local, global, nonlocal, builtins, UnboundLocalError, shadowing]
+
+quizzes:
+  q-unbound:
+    kind: predict
+    question: "ماذا يحدث؟"
+    code: |
+      count = 0
+
+      def increment():
+          count = count + 1
+          return count
+
+      increment()
+    options:
+      - "يُعيد 1"
+      - "`UnboundLocalError`"
+      - "`NameError`"
+    answer: 1
+    explanation: |
+      وجود إسناد `count = …` في أي مكان داخل الدالة يجعل `count` اسمًا **local** للدالة كلها.
+      فعند قراءة `count + 1` لا يوجد local بعد، فيظهر `UnboundLocalError`.
+  q-shadow:
+    kind: predict
+    question: "ماذا يحدث في السطر الأخير؟"
+    code: |
+      sum = 10
+      print(sum([1, 2, 3]))
+    options: ["يطبع 6", "`TypeError: 'int' object is not callable`", "يطبع 16"]
+    answer: 1
+    explanation: |
+      الاسم العام `sum` صار يشير إلى الرقم 10 و**ظلّل** الدالة built-in. البحث يجد Global قبل
+      Built-in. لا تسمِّ متغيراتك `list` أو `sum` أو `max` أو `id` أو `type`.
+  q-exit:
+    kind: exit
+    question: "بأي ترتيب يبحث Python عن اسم داخل دالة متداخلة؟"
+    options:
+      - "Global ← Local ← Built-in ← Enclosing"
+      - "Local ← Enclosing ← Global ← Built-in"
+      - "Built-in ← Global ← Enclosing ← Local"
+    answer: 1
+    explanation: "LEGB: من الأقرب إلى الأبعد، ويتوقف عند أول مكان يجد فيه الاسم، وإلا `NameError`."
+
+exercises:
+  ex-noglobal:
+    title: "من global إلى return"
+    prompt: |
+      الدالة أدناه تعتمد على متغير عام وتعدّله بـ`global`. أعد كتابتها بحيث تكون **نقية**:
+      تستقبل الرصيد الحالي كـparameter وتُعيد الرصيد الجديد، دون `global`.
+      يجب أن يبقى `balance` العام يساوي 100 بعد استدعاء `deposit(100, 50)`.
+    starter: |
+      balance = 100
+
+      def deposit(amount):
+          global balance
+          balance = balance + amount
+          return balance
+
+      print(deposit(50))
+    solution: |
+      balance = 100
+
+      def deposit(current, amount):
+          return current + amount
+
+      print(deposit(balance, 50))
+    tests: |
+      assert deposit(100, 50) == 150, "deposit(100, 50) يجب أن تُعيد 150"
+      assert deposit(0, 5) == 5
+      assert balance == 100, "الدالة يجب ألا تعدّل المتغير العام"
+      import inspect as _i
+      assert "global" not in _i.getsource(deposit), "لا تستخدم global"
+    hints:
+      - "بدل أن تقرأ الدالة الرصيد من الخارج، مرّره إليها كـargument."
+      - "`def deposit(current, amount):` ثم `return current + amount`."
+      - "الاستدعاء: `new_balance = deposit(balance, 50)`؛ القرار بتحديث الرصيد يعود للـcaller."
+
+animations:
+  anim-legb:
+    title: "كل استدعاء له local scope"
+    code: |
+      rate = 0.1
+
+      def price_with_tax(price):
+          tax = price * rate
+          return price + tax
+
+      a = price_with_tax(100)
+      b = price_with_tax(50)
+      print(a, b)
+    notes:
+      1: "`rate` اسم **global**: معرّف على مستوى الـmodule."
+      3: "`def` تُنشئ الدالة فقط؛ لا يُنفَّذ جسمها الآن."
+      4: "`price` و`tax` أسماء **local**. أما `rate` فغير موجود محليًا فيُبحث عنه في Global."
+      7: "الاستدعاء الأول: frame جديد، `price=100`."
+      8: "الاستدعاء الثاني: frame **مختلف** تمامًا، `price=50`. الـlocals السابقة اختفت."
+      9: "على مستوى الـmodule لا يوجد `tax` ولا `price`: هي لا تعيش خارج الدالة."

@@ -1,0 +1,53 @@
+id: what-is-python
+track: before_python
+order: 4
+kind: theory
+title_ar: "ما Python؟ التاريخ، الفلسفة، نقاط القوة والحدود"
+title_en: "What is Python? History, philosophy, strengths and limits"
+level: beginner
+estimated_minutes: 35
+prerequisites: [programming-languages]
+objectives:
+  - "معرفة أصل Python وتطورها من 0.9 إلى Python 3 ودورة الإصدارات السنوية."
+  - "فهم فلسفة Python كما في Zen of Python (PEP 20)."
+  - "التمييز بين اللغة، والمكتبة القياسية، والحزم الخارجية (PyPI)."
+  - "معرفة مجالات استخدام Python ونقاط قوتها وحدودها الحقيقية."
+docs_url: "https://docs.python.org/3/faq/general.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [python, history, guido van rossum, zen of python, pep, pypi, standard library, theory]
+
+quizzes:
+  q-name:
+    kind: concept
+    question: "من أين جاء اسم Python؟"
+    options:
+      - "من الأفعى، لأن اللغة «مرنة»"
+      - "من البرنامج الكوميدي البريطاني Monty Python's Flying Circus"
+      - "اختصار لـ Programming Yet Taught Hands-On"
+    answer: 1
+    explanation: |
+      اختار Guido van Rossum الاسم لأنه كان من محبي هذا البرنامج، وأراد اسمًا قصيرًا وفريدًا
+      وغامضًا بعض الشيء. لهذا تجد في أمثلة التوثيق كلمات مثل `spam` و`eggs`.
+  q-py2:
+    kind: concept
+    question: "وجدت كودًا قديمًا فيه `print \"hello\"` بلا أقواس. ماذا يعني ذلك؟"
+    options:
+      - "إنه Python 3 حديث"
+      - "إنه Python 2، الذي انتهى دعمه في 1 يناير 2020، ولا يعمل كما هو في Python 3"
+      - "إنه خطأ في أي نسخة"
+    answer: 1
+    explanation: |
+      Python 3.0 (ديسمبر 2008) كسرت التوافق عمدًا لإصلاح أخطاء تصميم قديمة، ومنها جعل `print`
+      دالة. ركّز دائمًا على Python 3.
+  q-exit:
+    kind: exit
+    question: "ما الفرق بين المكتبة القياسية (standard library) وPyPI؟"
+    options:
+      - "لا فرق"
+      - "المكتبة القياسية تأتي مع Python نفسها؛ PyPI مستودع لحزم خارجية تُثبَّت بـpip"
+      - "PyPI جزء من اللغة"
+    answer: 1
+    explanation: |
+      `math` و`json` و`pathlib` موجودة دائمًا («batteries included»). أما `numpy` و`pandas`
+      فحزم خارجية من PyPI تحتاج تثبيتًا في بيئتك.

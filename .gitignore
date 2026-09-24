@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.streamlit/secrets.toml
+app/components/code_editor/frontend/node_modules/
+# editor.bundle.js is committed on purpose: the app runs without Node.
+.claude/

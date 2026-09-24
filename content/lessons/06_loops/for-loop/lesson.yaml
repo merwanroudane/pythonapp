@@ -1,0 +1,114 @@
+id: for-loop
+track: loops
+order: 1
+title_ar: "حلقة for: التكرار على العناصر"
+title_en: "The for loop: iterating over items"
+level: beginner
+estimated_minutes: 35
+prerequisites: [if-elif-else]
+objectives:
+  - "فهم أن for تمر على عناصر iterable واحدًا تلو الآخر وتربط كل عنصر باسم."
+  - "استخدام range وenumerate للحصول على الأرقام والمواقع."
+  - "التحكم في الحلقة بـbreak وcontinue، وفهم else بعد الحلقة."
+  - "تجنّب أخطاء off-by-one وتعديل القائمة أثناء المرور عليها."
+docs_url: "https://docs.python.org/3/tutorial/controlflow.html#for-statements"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [for, loop, range, enumerate, break, continue, iteration]
+
+quizzes:
+  q-range:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      for i in range(1, 4):
+          print(i, end=" ")
+    options: ["`1 2 3 4`", "`1 2 3`", "`0 1 2 3`"]
+    answer: 1
+    explanation: |
+      `range(start, stop)` يبدأ من `start` ويتوقف **قبل** `stop`. لذلك `range(1, 4)`
+      يعطي 1 و2 و3. و`range(n)` يعطي من 0 إلى n-1 أي n عنصرًا بالضبط.
+  q-else:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      for n in [3, 5, 7]:
+          if n % 2 == 0:
+              print("found even")
+              break
+      else:
+          print("no even number")
+    options: ["`found even`", "`no even number`", "لا شيء"]
+    answer: 1
+    explanation: |
+      الـ`else` بعد `for` تُنفَّذ إذا انتهت الحلقة **طبيعيًا بلا `break`**. لم يوجد عدد زوجي،
+      فلم يحدث `break`، فنُفّذت `else`.
+  q-exit:
+    kind: exit
+    question: "ما الفرق بين `break` و`continue`؟"
+    options:
+      - "كلاهما يوقف الحلقة كاملة"
+      - "`break` يُنهي الحلقة كلها، و`continue` يتخطى بقية الدورة الحالية فقط"
+      - "`continue` يُنهي الحلقة، و`break` يتخطى دورة واحدة"
+    answer: 1
+    explanation: "`break` = اخرج من الحلقة الآن. `continue` = انتقل مباشرة إلى العنصر التالي."
+
+exercises:
+  ex-scan:
+    title: "امسح القياسات"
+    prompt: |
+      مرّ على `readings` بحلقة `for` واحدة واحسب:
+
+      - `total_positive`: مجموع القيم الموجبة فقط (تجاهل الصفر والسالب بـ`continue`).
+      - `first_negative`: أول قيمة سالبة تقابلها، ثم أوقف الحلقة بـ`break`.
+        إن لم توجد قيمة سالبة تبقى `None`.
+
+      انتبه: القيم **بعد** أول قيمة سالبة لا تدخل في المجموع لأن الحلقة توقفت.
+    starter: |
+      readings = [4, 0, 7, 2, -3, 5, -1]
+
+      total_positive = 0
+      first_negative = None
+
+      for value in readings:
+          ...
+
+      print(total_positive, first_negative)
+    solution: |
+      readings = [4, 0, 7, 2, -3, 5, -1]
+
+      total_positive = 0
+      first_negative = None
+
+      for value in readings:
+          if value < 0:
+              first_negative = value
+              break
+          if value == 0:
+              continue
+          total_positive += value
+
+      print(total_positive, first_negative)
+    tests: |
+      assert first_negative == -3, f"first_negative يجب أن يكون -3 وليس {first_negative!r}"
+      assert total_positive == 13, f"total_positive يجب أن يكون 13 (4+7+2) وليس {total_positive!r}"
+    hints:
+      - "داخل الحلقة: افحص السالب أولًا (سجّله ثم `break`)، ثم الصفر (`continue`)، ثم أضف."
+      - "`total_positive += value` تعني `total_positive = total_positive + value`."
+      - "`if value < 0: first_negative = value; break` ثم `if value == 0: continue` ثم الإضافة."
+
+animations:
+  anim-sum:
+    title: "حلقة تجمع العناصر"
+    code: |
+      prices = [12, 5, 8]
+      total = 0
+      for p in prices:
+          total = total + p
+      print("total:", total)
+    notes:
+      1: "القائمة هي الـiterable الذي سنمر عليه."
+      2: "نبدأ المجموع من صفر قبل الحلقة، وإلا لن يكون `total` موجودًا."
+      3: "الـ`for` تأخذ العنصر التالي من القائمة وتربط به الاسم `p`. عندما تنتهي العناصر تخرج الحلقة."
+      4: "جسم الحلقة: يُعاد ربط `total` بمجموعه الجديد في كل دورة."
+      5: "بعد انتهاء العناصر يكمل التنفيذ بعد الحلقة مرة واحدة."

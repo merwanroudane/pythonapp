@@ -1,0 +1,142 @@
+id: print-vs-return
+track: functions
+order: 1
+title_ar: "الفرق بين print وreturn"
+title_en: "print vs return"
+level: beginner
+estimated_minutes: 35
+prerequisites: [first-line-print, for-loop]
+objectives:
+  - "التمييز بين stdout (ما يُعرض للإنسان) والقيمة المُعادة (ما يستلمه الكود)."
+  - "فهم الـimplicit None عندما لا تحتوي الدالة return."
+  - "معرفة أن return تُنهي الدالة فورًا."
+  - "فصل الحساب (computation) عن العرض (presentation)."
+docs_url: "https://docs.python.org/3/reference/simple_stmts.html#the-return-statement"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [function, return, print, None, stdout, call frame]
+
+quizzes:
+  q-result:
+    kind: predict
+    question: "ما قيمة `result` بعد التنفيذ؟"
+    code: |
+      def double(x):
+          print(x * 2)
+
+      result = double(5)
+    options: ["`10`", "`None`", "`\"10\"`"]
+    answer: 1
+    explanation: |
+      الدالة **طبعت** 10 على stdout، لكنها لم **تُعِد** شيئًا. كل دالة تنتهي بلا `return`
+      تُعيد `None` ضمنيًا، وهذا ما خُزّن في `result`.
+  q-after-return:
+    kind: predict
+    question: "ماذا يطبع هذا الكود؟"
+    code: |
+      def f():
+          return 1
+          print("after return")
+
+      print(f())
+    options: ["`after return` ثم `1`", "`1` فقط", "`1` ثم `after return`"]
+    answer: 1
+    explanation: |
+      `return` تُنهي الدالة فورًا وتعيد القيمة للـcaller. السطر بعدها **unreachable**
+      ولا يُنفَّذ أبدًا.
+  q-exit:
+    kind: exit
+    question: "دالة تحسب متوسطًا ستُستخدم نتيجته في حسابات لاحقة. ماذا يجب أن تفعل؟"
+    options:
+      - "`print` المتوسط"
+      - "`return` المتوسط، ويطبعه من يحتاج العرض"
+      - "الاثنان دائمًا"
+    answer: 1
+    explanation: |
+      الحساب يُعيد قيمة؛ العرض قرار منفصل يتخذه الـcaller. هكذا تصبح الدالة قابلة لإعادة
+      الاستخدام في تقرير أو اختبار أو pipeline.
+
+exercises:
+  ex-mean:
+    title: "أصلح الدالة لتُعيد القيمة"
+    prompt: |
+      الدالة `mean` تطبع المتوسط بدل أن تُعيده، لذلك `m * 2` يرفع `TypeError`.
+      عدّل الدالة لتُعيد المتوسط بـ`return`، واترك الطباعة للـcaller.
+    starter: |
+      def mean(values):
+          total = 0
+          for v in values:
+              total += v
+          print(total / len(values))
+
+      m = mean([2, 4, 9])
+      print("twice the mean:", m * 2)
+    solution: |
+      def mean(values):
+          total = 0
+          for v in values:
+              total += v
+          return total / len(values)
+
+      m = mean([2, 4, 9])
+      print("twice the mean:", m * 2)
+    tests: |
+      import math as _m
+      import io as _io, contextlib as _cl
+      _buf = _io.StringIO()
+      with _cl.redirect_stdout(_buf):
+          _r = mean([1, 2, 3, 4])
+      assert _r is not None, "mean ما زالت تُعيد None؛ هل استبدلت print بـreturn؟"
+      assert _m.isclose(_r, 2.5), f"mean([1, 2, 3, 4]) يجب أن تُعيد 2.5 وليس {_r!r}"
+      assert _buf.getvalue() == "", "الدالة يجب ألا تطبع شيئًا؛ الطباعة مسؤولية الـcaller"
+    hints:
+      - "الخطأ `TypeError: unsupported operand ... 'NoneType'` يعني أن `m` هي `None`."
+      - "استبدل `print(...)` في آخر الدالة بالكلمة المناسبة التي ترسل القيمة للـcaller."
+      - "`return total / len(values)`"
+
+animations:
+  anim-print:
+    title: "دالة تطبع ولا تُعيد"
+    code: |
+      def double(x):
+          print(x * 2)
+
+      result = double(5)
+      print("result is", result)
+  anim-return:
+    title: "دالة تُعيد قيمة"
+    code: |
+      def double(x):
+          return x * 2
+
+      result = double(5)
+      print("result is", result)
+
+changes:
+  ch-print-return:
+    title: "نفس الدالة، سطر واحد مختلف"
+    base: |
+      def double(x):
+          print(x * 2)
+
+      result = double(5)
+      print("stored:", result)
+    base_label: "قبل · print داخل الدالة"
+    variants:
+      - label: "return"
+        code: |
+          def double(x):
+              return x * 2
+
+          result = double(5)
+          print("stored:", result)
+        explain: "مع `return` تصل القيمة 10 إلى الـcaller وتُخزَّن في `result`. لم يطبع شيء داخل الدالة؛ الطباعة الوحيدة من الـcaller."
+      - label: "الاثنان معًا"
+        code: |
+          def double(x):
+              print("debug:", x * 2)
+              return x * 2
+
+          result = double(5)
+          print("stored:", result)
+        explain: "يمكن أن تطبع الدالة (مثلًا للتشخيص) **وأيضًا** تُعيد قيمة. لكن في الكود النهائي يُفضّل logging بدل print داخل دوال الحساب."

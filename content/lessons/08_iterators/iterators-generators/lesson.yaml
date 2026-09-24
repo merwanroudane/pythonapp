@@ -1,0 +1,111 @@
+id: iterators-generators
+track: iterators
+order: 1
+title_ar: "Iterators وGenerators: قيمة واحدة في كل مرة"
+title_en: "Iterators & generators: one value at a time"
+level: intermediate
+estimated_minutes: 40
+prerequisites: [for-loop, print-vs-return]
+objectives:
+  - "التمييز بين iterable وiterator، واستخدام iter() وnext() وفهم StopIteration."
+  - "كتابة generator function بـyield وفهم التوقف والاستئناف."
+  - "فهم أن الـgenerator يُستهلك مرة واحدة (exhaustion)."
+  - "مقارنة list comprehension بـgenerator expression من ناحية الذاكرة."
+docs_url: "https://docs.python.org/3/tutorial/classes.html#generators"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [iterator, iterable, iter, next, StopIteration, generator, yield, lazy]
+
+quizzes:
+  q-exhaust:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      squares = (n * n for n in range(3))
+      print(list(squares))
+      print(list(squares))
+    options: ["`[0, 1, 4]` ثم `[0, 1, 4]`", "`[0, 1, 4]` ثم `[]`", "`TypeError`"]
+    answer: 1
+    explanation: |
+      الـgenerator يُنتج قيمه **مرة واحدة**. `list` الأولى استهلكته كاملًا، فالثانية لا تجد شيئًا.
+      القائمة `[…]` يمكن المرور عليها عدة مرات؛ الـgenerator `(…)` لا.
+  q-yield:
+    kind: predict
+    question: "ما ترتيب الطباعة؟"
+    code: |
+      def gen():
+          print("A")
+          yield 1
+          print("B")
+          yield 2
+
+      g = gen()
+      print("created")
+      print(next(g))
+    options:
+      - "`A` ثم `created` ثم `1`"
+      - "`created` ثم `A` ثم `1`"
+      - "`created` ثم `A` ثم `B` ثم `1`"
+    answer: 1
+    explanation: |
+      استدعاء `gen()` **لا ينفّذ** الجسم؛ ينشئ generator object فقط. أول `next()` يشغّل الجسم
+      حتى أول `yield` ثم يتوقف هناك، فلا تُطبع `B` بعد.
+  q-exit:
+    kind: exit
+    question: "ماذا يحدث عند استدعاء `next()` على iterator انتهت عناصره؟"
+    options: ["يُعيد None", "يرفع `StopIteration`", "يعود إلى البداية"]
+    answer: 1
+    explanation: "`StopIteration` هو إشارة «انتهيت». حلقة `for` تلتقطها بهدوء وتخرج."
+
+exercises:
+  ex-countdown:
+    title: "generator للعد التنازلي"
+    prompt: |
+      اكتب generator function اسمها `countdown(n)` تُنتج بـ`yield` القيم من `n` نزولًا إلى 1.
+      يجب أن يعطي `list(countdown(3))` القيمة `[3, 2, 1]`، وألا تحتوي الدالة `return` لقائمة.
+    starter: |
+      def countdown(n):
+          result = []
+          while n > 0:
+              result.append(n)
+              n -= 1
+          return result
+
+      print(list(countdown(3)))
+    solution: |
+      def countdown(n):
+          while n > 0:
+              yield n
+              n -= 1
+
+      print(list(countdown(3)))
+    tests: |
+      import inspect as _i
+      assert _i.isgeneratorfunction(countdown), "countdown يجب أن تستخدم yield"
+      assert list(countdown(3)) == [3, 2, 1]
+      assert list(countdown(0)) == []
+      _g = countdown(2)
+      assert next(_g) == 2 and next(_g) == 1
+    hints:
+      - "بدل جمع القيم في قائمة ثم إعادتها، سلّم كل قيمة فور حسابها."
+      - "استبدل `result.append(n)` بـ`yield n`، واحذف القائمة و`return`."
+      - "`while n > 0: yield n; n -= 1`"
+
+animations:
+  anim-yield:
+    title: "yield: توقف ثم استئناف"
+    code: |
+      def numbers():
+          yield 10
+          yield 20
+
+      g = numbers()
+      a = next(g)
+      b = next(g)
+      print(a, b)
+    notes:
+      1: "تعريف generator function: وجود `yield` في الجسم هو ما يجعلها generator."
+      5: "الاستدعاء ينشئ generator object ولا ينفّذ أي سطر من الجسم."
+      6: "أول `next`: يبدأ الجسم ويتوقف عند أول `yield`، ويُسلّم 10."
+      7: "ثاني `next`: يستأنف **من حيث توقف** بالضبط، ويتوقف عند `yield 20`."
+      8: "القيمتان وصلتا واحدة تلو الأخرى، دون أن تُخزَّن قائمة كاملة."

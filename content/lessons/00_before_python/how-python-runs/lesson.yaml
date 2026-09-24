@@ -1,0 +1,57 @@
+id: how-python-runs
+track: before_python
+order: 5
+kind: theory
+title_ar: "كيف يشغّل Python الكود؟ من النص إلى bytecode والآلة الافتراضية"
+title_en: "How Python runs your code: from text to bytecode and the virtual machine"
+level: beginner
+estimated_minutes: 40
+prerequisites: [what-is-python]
+objectives:
+  - "تتبّع مراحل التنفيذ: tokens ← parser ← AST ← compiler ← bytecode ← Python Virtual Machine."
+  - "فهم لماذا يوقف SyntaxError كل شيء قبل أول سطر، بينما يحدث الـruntime error بعد تنفيذ ما قبله."
+  - "التمييز بين CPython وPyPy وMicroPython وPyodide."
+  - "المقارنة بين طرق التشغيل: REPL، script، module، notebook."
+  - "التمييز بين text editor وcode editor وIDE وnotebook."
+docs_url: "https://docs.python.org/3/library/dis.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [interpreter, compiler, bytecode, ast, tokens, cpython, pypy, repl, notebook, ide, theory]
+
+quizzes:
+  q-when:
+    kind: predict
+    question: "ماذا يظهر عند تشغيل هذا الملف؟"
+    code: |
+      print("start")
+      if True print("inside")
+    options:
+      - "`start` ثم `SyntaxError`"
+      - "`SyntaxError` فقط، ولا تُطبع `start`"
+      - "`start` ثم `inside`"
+    answer: 1
+    explanation: |
+      الـparser يقرأ الملف **كاملًا** ويبني منه AST قبل تنفيذ أي سطر. الخطأ في السطر الثاني
+      يمنع بناء البرنامج أصلًا، فلا يُنفَّذ حتى السطر الأول.
+  q-pyc:
+    kind: concept
+    question: "ما ملفات `.pyc` داخل مجلد `__pycache__`؟"
+    options:
+      - "نسخ احتياطية من الكود"
+      - "bytecode مُخزَّن للـmodules المستوردة، حتى لا يُعاد تحويلها في كل مرة"
+      - "ملفات machine code تنفيذية"
+    answer: 1
+    explanation: |
+      عند `import` يحفظ CPython الـbytecode في `__pycache__/*.pyc`. في المرة التالية، إن لم يتغير
+      الملف المصدر، يُحمَّل الـbytecode مباشرة. يمكن حذف هذه الملفات بأمان، ولا توضع في Git.
+  q-exit:
+    kind: exit
+    question: "ما الفرق بين الـnotebook والـscript في طريقة التنفيذ؟"
+    options:
+      - "لا فرق"
+      - "الـscript يُنفَّذ من الأعلى إلى الأسفل في process جديدة؛ الـnotebook خلايا تشترك في kernel واحد يحتفظ بالحالة ويمكن تشغيلها بأي ترتيب"
+      - "الـnotebook لا يستخدم Python"
+    answer: 1
+    explanation: |
+      لهذا قد يعمل notebook عندك ثم يفشل عند زميلك: خلية معرّفة سابقًا بقيت في ذاكرة الـkernel
+      حتى لو حُذفت. `Restart & Run All` هو الاختبار الحقيقي.

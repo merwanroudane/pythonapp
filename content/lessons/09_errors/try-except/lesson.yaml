@@ -1,0 +1,115 @@
+id: try-except
+track: errors
+order: 1
+title_ar: "الاستثناءات: قراءة الـtraceback ومعالجته بـtry/except"
+title_en: "Exceptions: reading tracebacks and handling them with try/except"
+level: beginner_to_intermediate
+estimated_minutes: 40
+prerequisites: [function-parameters]
+objectives:
+  - "التمييز بين syntax error وruntime exception وlogical error وwarning."
+  - "قراءة الـtraceback من الأسفل إلى الأعلى."
+  - "التقاط استثناءات محددة، واستخدام else وfinally."
+  - "رفع استثناء مناسب بـraise مع رسالة واضحة، وتجنّب except العام الصامت."
+docs_url: "https://docs.python.org/3/tutorial/errors.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [exception, try, except, else, finally, raise, traceback, ValueError]
+
+quizzes:
+  q-flow:
+    kind: predict
+    question: "ما ترتيب الطباعة؟"
+    code: |
+      try:
+          print("A")
+          x = int("7")
+      except ValueError:
+          print("B")
+      else:
+          print("C")
+      finally:
+          print("D")
+    options: ["`A B D`", "`A C D`", "`A B C D`"]
+    answer: 1
+    explanation: |
+      لم يحدث استثناء، فتخطّى `except` ونُفّذت `else` (تعمل فقط عند النجاح)، ثم `finally`
+      التي تعمل **دائمًا**.
+  q-read:
+    kind: concept
+    question: "من أين تبدأ قراءة الـtraceback؟"
+    options:
+      - "من السطر الأول: `Traceback (most recent call last)`"
+      - "من السطر الأخير: نوع الاستثناء ورسالته، ثم السطر الذي فوقه مباشرة"
+      - "من منتصفه"
+    answer: 1
+    explanation: |
+      آخر سطر يخبرك **ماذا** حدث (`ValueError: …`)، والإطار الذي فوقه يخبرك **أين** حدث.
+      الأطر الأعلى تُظهر **كيف** وصل التنفيذ إلى هناك (سلسلة الاستدعاءات).
+  q-exit:
+    kind: exit
+    question: "لماذا يُعدّ `except: pass` ممارسة خطيرة؟"
+    options:
+      - "لأنه أبطأ"
+      - "لأنه يبتلع **كل** الأخطاء بصمت، بما فيها الأخطاء البرمجية الحقيقية"
+      - "لأنه يرفع SyntaxError"
+    answer: 1
+    explanation: |
+      يُخفي أخطاء مثل `NameError` أو `KeyError` التي تعني أن الكود نفسه خاطئ، فيستمر البرنامج
+      بنتائج خاطئة. التقط **النوع المتوقع فقط**، وفي أضيق مجال ممكن.
+
+exercises:
+  ex-safe-int:
+    title: "تحويل آمن مع قيمة افتراضية"
+    prompt: |
+      اكتب `to_int(text, default=None)`:
+
+      - تُعيد `int(text)` بعد إزالة المسافات من الطرفين.
+      - إذا كان النص غير صالح للتحويل (`ValueError`) تُعيد `default`.
+      - لا تلتقط أي استثناء آخر: `to_int(None)` يجب أن يرفع `TypeError` كما هو.
+    starter: |
+      def to_int(text, default=None):
+          return int(text)
+
+      print(to_int(" 42 "), to_int("abc"), to_int("x", default=0))
+    solution: |
+      def to_int(text, default=None):
+          try:
+              return int(text.strip())
+          except ValueError:
+              return default
+
+      print(to_int(" 42 "), to_int("abc"), to_int("x", default=0))
+    tests: |
+      assert to_int(" 42 ") == 42
+      assert to_int("abc") is None
+      assert to_int("3.5", default=-1) == -1
+      try:
+          to_int(None)
+      except (TypeError, AttributeError):
+          pass
+      else:
+          raise AssertionError("to_int(None) يجب أن يرفع خطأ، لا أن يُخفيه")
+    hints:
+      - "ضع السطر الذي قد يفشل داخل `try`، والتقط **ValueError فقط**."
+      - "`try: return int(text.strip())` ثم `except ValueError: return default`."
+      - "لا تكتب `except:` أو `except Exception:` هنا، وإلا ستُخفي خطأ `None`."
+
+animations:
+  anim-try:
+    title: "مسار التنفيذ عند حدوث استثناء"
+    code: |
+      values = ["10", "x", "5"]
+      total = 0
+      for v in values:
+          try:
+              total += int(v)
+          except ValueError:
+              print("skip", v)
+      print("total:", total)
+    notes:
+      3: "نمر على القيم؛ بعضها ليس رقمًا."
+      5: "`int(v)` قد يرفع `ValueError`. إن حدث ذلك، **يقفز** التنفيذ فورًا إلى `except`."
+      6: "وُجد handler مناسب لنوع الاستثناء، فيستمر البرنامج بدل أن يتوقف."
+      7: "الحلقة تكمل مع العنصر التالي."
+      8: "المجموع يشمل القيم الصالحة فقط."

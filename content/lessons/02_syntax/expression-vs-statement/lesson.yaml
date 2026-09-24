@@ -1,0 +1,82 @@
+id: expression-vs-statement
+track: syntax
+order: 3
+title_ar: "Expression مقابل Statement، وسر آخر سطر في Notebook"
+title_en: "Expressions vs statements, and the notebook's last line"
+level: beginner
+estimated_minutes: 25
+prerequisites: [strings-quotes-escapes]
+objectives:
+  - "التمييز بين expression (تُنتج قيمة) وstatement (تنفّذ فعلًا)."
+  - "فهم لماذا يعرض Notebook قيمة آخر expression بينما لا يفعل ذلك ملف .py."
+  - "معرفة متى نحتاج print صراحة."
+docs_url: "https://docs.python.org/3/reference/expressions.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [expression, statement, notebook, script, repl, jupyter]
+
+quizzes:
+  q-script:
+    kind: predict
+    question: "هذا الملف `calc.py` يُشغَّل بـ`python calc.py`. ماذا يظهر على الشاشة؟"
+    code: |
+      x = 5
+      x * 2
+    options:
+      - "`10`"
+      - "لا شيء"
+      - "`x * 2`"
+    answer: 1
+    explanation: |
+      في الـscript تُحسب `x * 2` ثم تُهمل قيمتها لأن لا أحد يستخدمها. العرض التلقائي
+      خاصية في REPL وNotebook فقط. لرؤية القيمة في script اكتب `print(x * 2)`.
+  q-middle:
+    kind: predict
+    question: "في خلية Notebook واحدة، ماذا يُعرض تحت الخلية؟"
+    code: |
+      a = 1
+      a + 1
+      a + 2
+    options:
+      - "`2` ثم `3`"
+      - "`3` فقط"
+      - "لا شيء"
+    answer: 1
+    explanation: |
+      الـNotebook يعرض قيمة **آخر** expression في الخلية فقط. `a + 1` في المنتصف تُحسب
+      وتُهمل.
+
+exercises:
+  ex-classify:
+    title: "صنّف الأسطر"
+    prompt: |
+      املأ القاموس `kinds` بحيث تكون قيمة كل مفتاح إما `"expression"` أو `"statement"`.
+      سيتحقق الفحص من إجاباتك باستخدام الـAST الحقيقي لـPython.
+    starter: |
+      kinds = {
+          "2 + 3": ...,
+          "x = 2 + 3": ...,
+          "len('abc')": ...,
+          "import math": ...,
+          "'yes' if 1 < 2 else 'no'": ...,
+          "del x": ...,
+      }
+    solution: |
+      kinds = {
+          "2 + 3": "expression",
+          "x = 2 + 3": "statement",
+          "len('abc')": "expression",
+          "import math": "statement",
+          "'yes' if 1 < 2 else 'no'": "expression",
+          "del x": "statement",
+      }
+    tests: |
+      import ast as _ast
+      for _src, _answer in kinds.items():
+          _node = _ast.parse(_src).body[0]
+          _truth = "expression" if isinstance(_node, _ast.Expr) else "statement"
+          assert _answer == _truth, f"'{_src}' هو {_truth} وليس {_answer!r}"
+    hints:
+      - "اسأل: هل يمكن وضع السطر على يمين `=`؟ إن أمكن فهو expression."
+      - "`x = ...` و`import` و`del` أفعال لا قيم؛ الاستدعاء `len(...)` والـconditional expression قيم."
+      - "ثلاث expressions: `2 + 3`، `len('abc')`، والـconditional expression."

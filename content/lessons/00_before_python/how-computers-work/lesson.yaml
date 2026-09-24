@@ -1,0 +1,54 @@
+id: how-computers-work
+track: before_python
+order: 2
+kind: theory
+title_ar: "كيف يعمل الحاسوب؟ المعالج والذاكرة والبتات والنصوص"
+title_en: "How does a computer work? CPU, memory, bits and text"
+level: beginner
+estimated_minutes: 40
+prerequisites: [what-is-programming]
+objectives:
+  - "وصف دور المعالج CPU والذاكرة RAM والتخزين الدائم وأجهزة الإدخال والإخراج."
+  - "فهم دورة Fetch → Decode → Execute ونموذج von Neumann."
+  - "التمييز بين البرنامج (ملف) والـprocess (برنامج قيد التشغيل) ودور نظام التشغيل."
+  - "فهم البت والبايت والنظام الثنائي."
+  - "فهم كيف تُخزَّن النصوص: الحرف ← code point في Unicode ← بايتات في UTF-8."
+docs_url: "https://docs.python.org/3/howto/unicode.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [cpu, ram, memory, process, operating system, binary, bit, byte, unicode, utf-8, theory]
+
+quizzes:
+  q-ram:
+    kind: concept
+    question: "كتبت تحليلًا طويلًا في برنامج ثم انقطع التيار الكهربائي قبل الحفظ. لماذا ضاع العمل؟"
+    options:
+      - "لأن المعالج حذفه"
+      - "لأنه كان في الـRAM، وهي ذاكرة مؤقتة تفقد محتواها عند انقطاع الكهرباء"
+      - "لأن نظام التشغيل لا يحفظ الملفات"
+    answer: 1
+    explanation: |
+      الـRAM سريعة لكنها **volatile** (مؤقتة). الحفظ يعني نسخ البيانات إلى التخزين الدائم
+      (SSD / قرص صلب) الذي يحتفظ بها بلا كهرباء.
+  q-bytes:
+    kind: predict
+    question: "كم بايتًا يحتاج الحرف العربي «ب» في ترميز UTF-8؟"
+    code: |
+      print(len("ب"), len("ب".encode("utf-8")))
+    options: ["`1 1`", "`1 2`", "`2 2`"]
+    answer: 1
+    explanation: |
+      في Python، `len` على نص تعدّ **الحروف** (code points): حرف واحد. لكن في UTF-8 يُخزَّن هذا
+      الحرف في **بايتين** (`D8 A8`). الحروف اللاتينية الأساسية بايت واحد، والعربية بايتان، والرموز
+      التعبيرية أربعة.
+  q-exit:
+    kind: exit
+    question: "ما الفرق بين البرنامج والـprocess؟"
+    options:
+      - "لا فرق"
+      - "البرنامج ملف تعليمات على القرص؛ الـprocess هو نسخة منه قيد التشغيل في الذاكرة لها حالتها الخاصة"
+      - "الـprocess هو الملف، والبرنامج هو ما يظهر على الشاشة"
+    answer: 1
+    explanation: |
+      يمكن تشغيل البرنامج نفسه عدة مرات في آن واحد: كل تشغيل process مستقل بذاكرته ومتغيراته.
+      هذا ما تفعله هذه المنصة: كل ضغطة Run تنشئ process جديدة لـPython.

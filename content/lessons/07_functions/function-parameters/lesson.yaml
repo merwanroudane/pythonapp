@@ -1,0 +1,107 @@
+id: function-parameters
+track: functions
+order: 2
+title_ar: "الـparameters والـarguments: كيف تصل القيم إلى الدالة"
+title_en: "Parameters & arguments: how values reach a function"
+level: beginner_to_intermediate
+estimated_minutes: 40
+prerequisites: [print-vs-return]
+objectives:
+  - "التمييز بين parameter (في التعريف) وargument (في الاستدعاء)."
+  - "الاستدعاء بـpositional وkeyword arguments، واستخدام القيم الافتراضية."
+  - "كتابة دوال تقبل عددًا متغيرًا من القيم بـ*args و**kwargs."
+  - "فهم keyword-only parameters بعد * ورسائل TypeError المرتبطة."
+docs_url: "https://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [function, parameter, argument, default, keyword, args, kwargs, TypeError]
+
+quizzes:
+  q-bind:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      def f(a, b=2, c=3):
+          return a, b, c
+
+      print(f(1, c=9))
+    options: ["`(1, 9, 3)`", "`(1, 2, 9)`", "`TypeError`"]
+    answer: 1
+    explanation: |
+      `1` يُربط بـ`a` بالموضع، و`c=9` يُربط بالاسم، و`b` يأخذ قيمته الافتراضية 2.
+  q-args:
+    kind: predict
+    question: "ما نوع `args` وقيمته؟"
+    code: |
+      def g(*args, **kwargs):
+          print(type(args).__name__, args, kwargs)
+
+      g(1, 2, x=3)
+    options:
+      - "`list [1, 2] {'x': 3}`"
+      - "`tuple (1, 2) {'x': 3}`"
+      - "`tuple (1, 2, 3) {}`"
+    answer: 1
+    explanation: |
+      `*args` يجمع الـpositional arguments الزائدة في **tuple**، و`**kwargs` يجمع الـkeyword
+      arguments الزائدة في **dict**.
+  q-exit:
+    kind: exit
+    question: "`def h(x, *, scale=1): ...` — أي استدعاء صحيح؟"
+    options: ["`h(5, 10)`", "`h(5, scale=10)`", "`h(x=5, 10)`"]
+    answer: 1
+    explanation: |
+      كل ما بعد `*` هو **keyword-only**: يجب تمريره بالاسم. `h(5, 10)` يرفع `TypeError`، و
+      `h(x=5, 10)` خطأ syntax لأن positional لا يأتي بعد keyword.
+
+exercises:
+  ex-report:
+    title: "دالة ملخص بعدد متغير من الدرجات"
+    prompt: |
+      اكتب `summary(name, *scores, decimals=1)` التي تُعيد نصًا بالشكل:
+      `"Sara: n=3, mean=14.3"` حيث n عدد الدرجات والمتوسط مقرّب بـ`decimals` منازل.
+      إذا لم تُمرَّر أي درجة أعِد `"Sara: no scores"`. اجعل `decimals` keyword-only.
+    starter: |
+      def summary(name, scores, decimals):
+          ...
+
+      print(summary("Sara", 12, 15, 16))
+      print(summary("Omar", 10, 11, decimals=2))
+      print(summary("Lina"))
+    solution: |
+      def summary(name, *scores, decimals=1):
+          if not scores:
+              return f"{name}: no scores"
+          mean = sum(scores) / len(scores)
+          return f"{name}: n={len(scores)}, mean={mean:.{decimals}f}"
+
+      print(summary("Sara", 12, 15, 16))
+      print(summary("Omar", 10, 11, decimals=2))
+      print(summary("Lina"))
+    tests: |
+      assert summary("Sara", 12, 15, 16) == "Sara: n=3, mean=14.3", summary("Sara", 12, 15, 16)
+      assert summary("Omar", 10, 11, decimals=2) == "Omar: n=2, mean=10.50"
+      assert summary("Lina") == "Lina: no scores"
+      import inspect as _i
+      _p = _i.signature(summary).parameters
+      assert _p["decimals"].kind is _i.Parameter.KEYWORD_ONLY, "decimals يجب أن يكون keyword-only"
+    hints:
+      - "`*scores` يجمع كل الدرجات في tuple. وأي parameter بعده يصبح keyword-only تلقائيًا."
+      - "tuple فارغة falsy، فـ`if not scores:` تكشف عدم وجود درجات. والتقريب داخل f-string: `{mean:.{decimals}f}`."
+      - "`def summary(name, *scores, decimals=1):`"
+
+animations:
+  anim-binding:
+    title: "ربط الـarguments بالـparameters"
+    code: |
+      def area(width, height=1, *, unit="m"):
+          value = width * height
+          return f"{value} {unit}2"
+
+      a = area(3, 4)
+      b = area(5, unit="cm")
+      print(a, b)
+    notes:
+      5: "`3` يُربط بـ`width` و`4` بـ`height` حسب الموضع؛ `unit` يأخذ قيمته الافتراضية."
+      6: "`height` غائب فيأخذ 1، و`unit` مُرّر بالاسم لأنه keyword-only."
+      7: "كل استدعاء أنشأ frame مستقلًا بقيمه الخاصة ثم أُغلق."

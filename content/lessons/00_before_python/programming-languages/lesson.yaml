@@ -1,0 +1,63 @@
+id: programming-languages
+track: before_python
+order: 3
+kind: theory
+title_ar: "لغات البرمجة: المستويات، الترجمة، الأنواع، والأنماط"
+title_en: "Programming languages: levels, translation, typing and paradigms"
+level: beginner
+estimated_minutes: 45
+prerequisites: [how-computers-work]
+objectives:
+  - "فهم لغة البرمجة كلغة صورية لها syntax وsemantics."
+  - "التمييز بين machine code وassembly واللغات عالية المستوى."
+  - "المقارنة بين compilation وinterpretation وbytecode + virtual machine وJIT."
+  - "التمييز بين static/dynamic typing وstrong/weak typing."
+  - "التعرف على الأنماط البرمجية: imperative وOOP وfunctional وdeclarative."
+  - "وضع Python في هذه الخريطة ومقارنتها بلغات أخرى يستعملها الباحثون."
+docs_url: "https://docs.python.org/3/reference/introduction.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [programming language, compiler, interpreter, bytecode, JIT, typing, paradigm, theory]
+
+quizzes:
+  q-compiled:
+    kind: concept
+    question: "كيف يمكن وصف CPython (نسخة Python الأشهر) بدقة؟"
+    options:
+      - "لغة compiled مثل C تُنتج ملف machine code"
+      - "تترجم الكود أولًا إلى bytecode، ثم يُنفّذه interpreter (آلة افتراضية)"
+      - "تقرأ الكود حرفًا حرفًا دون أي ترجمة"
+    answer: 1
+    explanation: |
+      وصف Python بأنها «interpreted فقط» تبسيط. CPython يمر بمرحلة **compilation إلى bytecode**
+      ثم تنفّذ **Python Virtual Machine** هذا الـbytecode. المحاضرة القادمة تشرح ذلك خطوة بخطوة.
+  q-typing:
+    kind: predict
+    question: "في Python، ماذا يحدث عند تنفيذ `\"1\" + 1`؟"
+    options:
+      - "`\"11\"` كما في JavaScript"
+      - "`2`"
+      - "`TypeError`"
+    answer: 2
+    explanation: |
+      Python **strongly typed**: لا يحوّل الأنواع ضمنيًا بين نص ورقم. عليك أن تختار صراحة:
+      `int("1") + 1` = 2، أو `"1" + str(1)` = `"11"`. أما JavaScript فـ**weakly typed** وتعطي `"11"`.
+  q-declarative:
+    kind: concept
+    question: "أي لغة **تصريحية (declarative)**: تصف **ما** تريد لا **كيف** تحصل عليه؟"
+    options: ["C", "SQL", "Assembly"]
+    answer: 1
+    explanation: |
+      في SQL تكتب `SELECT name FROM students WHERE score > 15` فتصف النتيجة، ويقرر محرك قاعدة
+      البيانات خطوات الوصول إليها.
+  q-exit:
+    kind: exit
+    question: "أي وصف يطابق Python؟"
+    options:
+      - "static وweak typing، لغة منخفضة المستوى"
+      - "dynamic وstrong typing، عالية المستوى، متعددة الأنماط، تُترجم إلى bytecode"
+      - "لغة functional فقط"
+    answer: 1
+    explanation: |
+      الأنواع تُفحص أثناء التنفيذ (dynamic) ولا تُحوَّل ضمنيًا بين الفئات المختلفة (strong)، وتدعم
+      الأسلوب الإجرائي والكائني والوظيفي معًا.

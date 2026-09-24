@@ -1,0 +1,114 @@
+id: strings-methods-fstrings
+track: data_types
+order: 3
+title_ar: "النصوص في العمل: indexing وslicing والـmethods وf-strings"
+title_en: "Working with strings: indexing, slicing, methods & f-strings"
+level: beginner
+estimated_minutes: 40
+prerequisites: [numbers-and-floats]
+objectives:
+  - "الوصول إلى الحروف بالـindex الموجب والسالب، واقتطاع أجزاء بالـslicing."
+  - "فهم أن str immutable: كل method تُعيد نصًا جديدًا."
+  - "اختيار الـmethod المناسبة حسب المهمة: تنظيف، بحث، استبدال، تقسيم ودمج."
+  - "تنسيق الأرقام والنصوص بـf-strings: المنازل العشرية، العرض، المحاذاة، الفواصل."
+docs_url: "https://docs.python.org/3/library/stdtypes.html#string-methods"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [str, index, slice, strip, split, join, replace, f-string, format]
+
+quizzes:
+  q-slice:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      s = "Python"
+      print(s[1:4], s[-1], s[::-1])
+    options:
+      - "`Pyth n nohtyP`"
+      - "`yth n nohtyP`"
+      - "`yth P Python`"
+    answer: 1
+    explanation: |
+      `s[1:4]` من الموضع 1 حتى **قبل** 4: `y t h`. و`s[-1]` آخر حرف. و`s[::-1]` خطوة -1:
+      النص معكوسًا.
+  q-upper:
+    kind: predict
+    question: "ما قيمة `name` بعد التنفيذ؟"
+    code: |
+      name = "sara"
+      name.upper()
+      print(name)
+    options: ["`SARA`", "`sara`", "`None`"]
+    answer: 1
+    explanation: |
+      النصوص **immutable**. `upper()` أعادت نصًا جديدًا `"SARA"` لكن لم يُخزّنه أحد.
+      الصحيح: `name = name.upper()`.
+  q-exit:
+    kind: exit
+    question: "أي f-string يعطي `  3.14` (عرض 6، منزلتان عشريتان)؟"
+    options: ["`f\"{pi:6.2f}\"`", "`f\"{pi:.6f}\"`", "`f\"{pi:2.6f}\"`"]
+    answer: 0
+    explanation: "في `6.2f` الرقم 6 هو **العرض الكلي** و`.2` عدد المنازل العشرية و`f` تعني fixed-point."
+
+exercises:
+  ex-clean:
+    title: "نظّف الاسم وأنشئ سطر تقرير"
+    prompt: |
+      1. نظّف `raw` لينتج `name` بالشكل `"Sara Ahmed"`: بلا مسافات زائدة في الطرفين،
+         وكل كلمة تبدأ بحرف كبير.
+      2. أنشئ `line` بـf-string بحيث يكون الاسم محاذى لليسار في عرض 12، ثم الدرجة
+         بعرض 6 ومنزلة عشرية واحدة. النتيجة المتوقعة: `"Sara Ahmed    17.5"`.
+    starter: |
+      raw = "   sara AHMED  "
+      score = 17.456
+
+      name = ...
+      line = ...
+
+      print(repr(name))
+      print(repr(line))
+    solution: |
+      raw = "   sara AHMED  "
+      score = 17.456
+
+      name = raw.strip().title()
+      line = f"{name:<12}{score:6.1f}"
+
+      print(repr(name))
+      print(repr(line))
+    tests: |
+      assert name == "Sara Ahmed", f"name يجب أن يكون 'Sara Ahmed' وليس {name!r}"
+      assert line == "Sara Ahmed    17.5", f"line غير مطابق: {line!r}"
+    hints:
+      - "تنظيف الطرفين method، وتكبير أول حرف من كل كلمة method أخرى. يمكن ربطهما بنقطة."
+      - "`raw.strip().title()`. وفي f-string: `:<12` محاذاة يسار بعرض 12، و`:6.1f` للرقم."
+      - "`line = f\"{name:<12}{score:6.1f}\"`"
+
+changes:
+  ch-format:
+    title: "Format spec داخل f-string"
+    base: |
+      x = 1234567.8912
+      print(f"{x}")
+    base_label: "قبل · بلا تنسيق"
+    variants:
+      - label: ":.2f"
+        code: |
+          x = 1234567.8912
+          print(f"{x:.2f}")
+        explain: "`.2f` = منزلتان عشريتان بتقريب fixed-point."
+      - label: ":,.2f"
+        code: |
+          x = 1234567.8912
+          print(f"{x:,.2f}")
+        explain: "الفاصلة `,` تضيف فاصل الآلاف. التنسيق يُنتج **نصًا**؛ القيمة الأصلية لم تتغير."
+      - label: ":>15.1f"
+        code: |
+          x = 1234567.8912
+          print(f"[{x:>15.1f}]")
+        explain: "`>15` محاذاة لليمين داخل عرض 15 حرفًا. الأقواس المربعة فقط لإظهار العرض."
+      - label: ":.1%"
+        code: |
+          ratio = 0.4567
+          print(f"{ratio:.1%}")
+        explain: "`%` يضرب في 100 ويضيف علامة النسبة: مثالي لنتائج الاستبيانات والنسب."

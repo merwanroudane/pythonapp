@@ -1,0 +1,95 @@
+id: while-loop
+track: loops
+order: 2
+title_ar: "حلقة while: كرّر ما دام الشرط صحيحًا"
+title_en: "The while loop: repeat while a condition holds"
+level: beginner
+estimated_minutes: 30
+prerequisites: [for-loop]
+objectives:
+  - "فهم دورة while: فحص الشرط ← الجسم ← تحديث الحالة ← فحص من جديد."
+  - "التمييز بين متى نستخدم for ومتى نستخدم while."
+  - "كتابة حلقة تحقق من المدخلات بنمط while True مع break."
+  - "اكتشاف الحلقة اللانهائية وسببها."
+docs_url: "https://docs.python.org/3/reference/compound_stmts.html#the-while-statement"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [while, loop, break, sentinel, infinite loop, input validation]
+
+quizzes:
+  q-count:
+    kind: predict
+    question: "كم مرة تُطبع `tick`؟"
+    code: |
+      n = 3
+      while n > 0:
+          print("tick")
+          n -= 1
+    options: ["2", "3", "4"]
+    answer: 1
+    explanation: |
+      n = 3، 2، 1 ← ثلاث دورات. عندما يصبح `n = 0` يصبح الشرط `0 > 0` خاطئًا فتتوقف الحلقة.
+  q-exit:
+    kind: exit
+    question: "متى تكون while أنسب من for؟"
+    options:
+      - "عندما أمر على عناصر قائمة معروفة"
+      - "عندما لا أعرف عدد الدورات مسبقًا ويعتمد التوقف على شرط يتغير"
+      - "لا فرق أبدًا"
+    answer: 1
+    explanation: |
+      `for` للمرور على iterable معروف. `while` عندما يكون التوقف مرتبطًا بحالة: «حتى يُدخل
+      المستخدم رقمًا صالحًا»، «حتى يصل الخطأ إلى أقل من tolerance».
+
+exercises:
+  ex-collatz:
+    title: "خطوات Collatz"
+    prompt: |
+      ابدأ من `n = 6`. ما دام `n` لا يساوي 1: إذا كان زوجيًا اقسمه على 2 (`//`)، وإلا
+      اجعله `3 * n + 1`. احسب في `steps` عدد الخطوات حتى تصل إلى 1، واحفظ في `path` كل
+      القيم التي مررت بها بما فيها 6 و1.
+    starter: |
+      n = 6
+      steps = 0
+      path = [n]
+
+      # your while loop here
+
+      print(steps, path)
+    solution: |
+      n = 6
+      steps = 0
+      path = [n]
+
+      while n != 1:
+          if n % 2 == 0:
+              n = n // 2
+          else:
+              n = 3 * n + 1
+          steps += 1
+          path.append(n)
+
+      print(steps, path)
+    tests: |
+      assert path == [6, 3, 10, 5, 16, 8, 4, 2, 1], f"path غير صحيح: {path}"
+      assert steps == 8, f"steps يجب أن يكون 8 وليس {steps}"
+    hints:
+      - "الشرط هو `n != 1`. داخل الحلقة: if/else لتحديث `n`، ثم زِد العداد وأضف `n` إلى المسار."
+      - "`n % 2 == 0` يعني زوجي. لا تنسَ تحديث `n` وإلا صارت الحلقة لانهائية."
+      - "`while n != 1:` ثم `n = n // 2 if n % 2 == 0 else 3 * n + 1`، `steps += 1`، `path.append(n)`"
+
+animations:
+  anim-countdown:
+    title: "فحص ← جسم ← تحديث"
+    code: |
+      n = 3
+      while n > 0:
+          print(n)
+          n = n - 1
+      print("go!")
+    notes:
+      1: "الحالة الابتدائية التي سيعتمد عليها الشرط."
+      2: "يُفحص الشرط قبل **كل** دورة. إن كان خاطئًا من البداية فلن يُنفَّذ الجسم أبدًا."
+      3: "جسم الحلقة."
+      4: "تحديث الحالة: هذا السطر هو ما يجعل الشرط يصبح خاطئًا يومًا ما."
+      5: "بعد أن صار `n > 0` خاطئًا خرجنا من الحلقة."

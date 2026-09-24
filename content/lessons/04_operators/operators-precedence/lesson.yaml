@@ -1,0 +1,112 @@
+id: operators-precedence
+track: operators
+order: 1
+title_ar: "العوامل والأولوية: كيف يحسب Python التعبير"
+title_en: "Operators & precedence: how Python evaluates an expression"
+level: beginner
+estimated_minutes: 30
+prerequisites: [numbers-and-floats]
+objectives:
+  - "استخدام عوامل الحساب والمقارنة والمنطق والعضوية والهوية."
+  - "توقّع ترتيب التنفيذ حسب الأولوية (precedence) واستخدام الأقواس للوضوح."
+  - "فهم المقارنات المتسلسلة مثل 18 <= age < 65."
+  - "تجنّب فخ -2 ** 2 وفخ خلط and/or بلا أقواس."
+docs_url: "https://docs.python.org/3/reference/expressions.html#operator-precedence"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [operators, precedence, comparison, chained, and, or, in, is, power]
+
+quizzes:
+  q-power:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      print(-2 ** 2, (-2) ** 2)
+    options: ["`4 4`", "`-4 4`", "`-4 -4`"]
+    answer: 1
+    explanation: |
+      `**` أعلى أولوية من الإشارة السالبة الأحادية، فيُحسب `-(2 ** 2)` = `-4`.
+      بالأقواس `(-2) ** 2` = `4`.
+  q-mix:
+    kind: predict
+    question: "ما قيمة التعبير؟"
+    code: |
+      print(2 + 3 * 4 ** 2 // 5)
+    options: ["`16`", "`11`", "`18`"]
+    answer: 1
+    explanation: |
+      الترتيب: `4 ** 2` = 16، ثم `3 * 16` = 48، ثم `48 // 5` = 9 (نفس مستوى `*` من اليسار
+      لليمين)، ثم `2 + 9` = 11.
+  q-exit:
+    kind: exit
+    question: "`x = 5`. ما قيمة `1 < x < 10`؟"
+    options: ["`True`", "`False`", "`TypeError`"]
+    answer: 0
+    explanation: "المقارنة المتسلسلة تعني `1 < x and x < 10`، ويُحسب `x` مرة واحدة فقط."
+
+exercises:
+  ex-eligible:
+    title: "شروط الأهلية في تعبير واحد"
+    prompt: |
+      أنشئ ثلاثة متغيرات منطقية (bool) من البيانات المعطاة:
+
+      - `adult`: العمر من 18 إلى أقل من 65 (استخدم مقارنة متسلسلة).
+      - `valid_email`: يحتوي الإيميل على `"@"` **و** لا ينتهي بنقطة.
+      - `eligible`: `adult` صحيح **و** (`valid_email` صحيح **أو** `has_phone` صحيح).
+    starter: |
+      age = 34
+      email = "sara@example.org"
+      has_phone = False
+
+      adult = ...
+      valid_email = ...
+      eligible = ...
+
+      print(adult, valid_email, eligible)
+    solution: |
+      age = 34
+      email = "sara@example.org"
+      has_phone = False
+
+      adult = 18 <= age < 65
+      valid_email = "@" in email and not email.endswith(".")
+      eligible = adult and (valid_email or has_phone)
+
+      print(adult, valid_email, eligible)
+    tests: |
+      assert adult is True, "adult: 18 <= age < 65"
+      assert valid_email is True, "valid_email: '@' in email and not email.endswith('.')"
+      assert eligible is True, "eligible: adult and (valid_email or has_phone)"
+      for _age, _mail, _ph, _want in [(17, "a@b.c", True, False), (40, "bad.", False, False), (40, "bad.", True, True)]:
+          _adult = 18 <= _age < 65
+          _valid = "@" in _mail and not _mail.endswith(".")
+          assert (_adult and (_valid or _ph)) == _want
+    hints:
+      - "`in` تفحص وجود نص داخل نص، و`not` تعكس القيمة المنطقية."
+      - "`18 <= age < 65`. وانتبه: `and` أعلى أولوية من `or`، فاستخدم أقواسًا حول `or`."
+      - "`eligible = adult and (valid_email or has_phone)`"
+
+changes:
+  ch-parens:
+    title: "and / or بلا أقواس"
+    base: |
+      is_admin = False
+      is_owner = False
+      is_active = True
+      print(is_admin or is_owner and is_active)
+    base_label: "قبل · بلا أقواس"
+    variants:
+      - label: "is_admin = True"
+        code: |
+          is_admin = True
+          is_owner = False
+          is_active = False
+          print(is_admin or is_owner and is_active)
+        explain: "`and` تُحسب أولًا: `is_admin or (is_owner and is_active)`. لذلك مدير غير نشط يمر!"
+      - label: "بأقواس صريحة"
+        code: |
+          is_admin = True
+          is_owner = False
+          is_active = False
+          print((is_admin or is_owner) and is_active)
+        explain: "الأقواس تفرض المعنى المقصود: «مدير أو مالك، **وفي الحالتين** نشط». عند الشك، ضع أقواسًا."

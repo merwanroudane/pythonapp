@@ -1,0 +1,114 @@
+id: mutable-default-trap
+track: functions
+order: 3
+title_ar: "فخ القيمة الافتراضية القابلة للتعديل"
+title_en: "The mutable default argument trap"
+level: intermediate
+estimated_minutes: 25
+prerequisites: [function-parameters, lists]
+objectives:
+  - "فهم أن القيمة الافتراضية تُنشأ مرة واحدة عند تعريف الدالة، لا عند كل استدعاء."
+  - "التعرف على عَرَض المشكلة: قائمة «تتذكر» عناصر من استدعاءات سابقة."
+  - "تطبيق نمط None sentinel لإنشاء object جديد في كل استدعاء."
+docs_url: "https://docs.python.org/3/tutorial/controlflow.html#default-argument-values"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [default argument, mutable, list, None, sentinel, gotcha]
+
+quizzes:
+  q-trap:
+    kind: predict
+    question: "ماذا يطبع السطر الأخير؟"
+    code: |
+      def add(item, bucket=[]):
+          bucket.append(item)
+          return bucket
+
+      add(1)
+      add(2)
+      print(add(3))
+    options: ["`[3]`", "`[1, 2, 3]`", "`[1, 2]`"]
+    answer: 1
+    explanation: |
+      الـ`[]` الافتراضية أُنشئت **مرة واحدة** عند `def`. كل استدعاء بلا `bucket` يعدّل
+      **القائمة نفسها**، فتتراكم العناصر.
+  q-exit:
+    kind: exit
+    question: "أي قيمة افتراضية آمنة دائمًا؟"
+    options: ["`items=[]`", "`items=None` ثم إنشاء قائمة داخل الدالة", "`items={}`"]
+    answer: 1
+    explanation: |
+      `None` immutable، فلا شيء يتراكم. داخل الدالة: `if items is None: items = []`.
+      الأنواع immutable (أرقام، نصوص، tuples، None) آمنة كقيم افتراضية.
+
+exercises:
+  ex-fix:
+    title: "أصلح الدالة"
+    prompt: |
+      `log_event` يجب أن تُعيد قائمة **جديدة** في كل استدعاء لا يمرر `events`، وأن تضيف إلى
+      القائمة الممرّرة إن وُجدت. أصلحها بنمط `None`.
+    starter: |
+      def log_event(name, events=[]):
+          events.append(name)
+          return events
+
+      print(log_event("start"))
+      print(log_event("stop"))
+    solution: |
+      def log_event(name, events=None):
+          if events is None:
+              events = []
+          events.append(name)
+          return events
+
+      print(log_event("start"))
+      print(log_event("stop"))
+    tests: |
+      assert log_event("a") == ["a"], "الاستدعاء الأول يجب أن يعيد ['a']"
+      assert log_event("b") == ["b"], "الاستدعاء الثاني يجب ألا يتذكر 'a'"
+      _mine = ["x"]
+      assert log_event("y", _mine) == ["x", "y"] and _mine == ["x", "y"], "يجب الإضافة إلى القائمة الممرّرة"
+      assert log_event.__defaults__ == (None,), "القيمة الافتراضية يجب أن تكون None"
+    hints:
+      - "المشكلة أن `[]` تُنشأ مرة واحدة. ما القيمة الافتراضية التي لا يمكن تعديلها؟"
+      - "اجعل الافتراضي `None`، وأنشئ القائمة **داخل** الدالة عند الحاجة."
+      - "`def log_event(name, events=None):` ثم `if events is None: events = []`"
+
+animations:
+  anim-trap:
+    title: "قائمة افتراضية واحدة لكل الاستدعاءات"
+    code: |
+      def add(item, bucket=[]):
+          bucket.append(item)
+          return bucket
+
+      first = add(1)
+      second = add(2)
+      print(first, second, first is second)
+    notes:
+      1: "تنفيذ `def` يُنشئ الدالة **ويُنشئ معها** القائمة الافتراضية مرة واحدة."
+      5: "الاستدعاء الأول يستخدم تلك القائمة."
+      6: "الاستدعاء الثاني يستخدم **القائمة نفسها** التي تحتوي 1 بالفعل."
+      7: "`first` و`second` اسمان لـobject واحد: `first is second` صحيح."
+
+changes:
+  ch-fix:
+    title: "الإصلاح"
+    base: |
+      def add(item, bucket=[]):
+          bucket.append(item)
+          return bucket
+
+      print(add(1), add(2))
+    base_label: "قبل · bucket=[]"
+    variants:
+      - label: "bucket=None"
+        code: |
+          def add(item, bucket=None):
+              if bucket is None:
+                  bucket = []
+              bucket.append(item)
+              return bucket
+
+          print(add(1), add(2))
+        explain: "في كل استدعاء بلا `bucket` تُنشأ قائمة جديدة داخل الـframe، فلا شيء يتراكم."

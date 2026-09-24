@@ -1,0 +1,111 @@
+id: if-elif-else
+track: conditions
+order: 1
+title_ar: "الشروط: if وelif وelse ومسار التنفيذ"
+title_en: "Conditions: if / elif / else and the path of execution"
+level: beginner
+estimated_minutes: 35
+prerequisites: [numbers-and-floats]
+objectives:
+  - "كتابة if/elif/else وفهم أن فرعًا واحدًا فقط يُنفَّذ."
+  - "فهم أهمية ترتيب الشروط في سلسلة elif."
+  - "فهم truthiness: القيم التي يعتبرها Python True أو False."
+  - "فهم short-circuit في and وor."
+docs_url: "https://docs.python.org/3/tutorial/controlflow.html#if-statements"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [if, elif, else, bool, truthiness, and, or, short-circuit, IndentationError]
+
+quizzes:
+  q-order:
+    kind: predict
+    question: "`score = 95`. ماذا يطبع الكود؟"
+    code: |
+      score = 95
+      if score >= 50:
+          print("pass")
+      elif score >= 90:
+          print("excellent")
+      else:
+          print("fail")
+    options: ["`excellent`", "`pass`", "`pass` ثم `excellent`"]
+    answer: 1
+    explanation: |
+      Python يفحص الشروط **بالترتيب** ويتوقف عند **أول** شرط صحيح. `95 >= 50` صحيح،
+      فيُنفَّذ الفرع الأول ولا يُنظر إلى الباقي. ضع الشرط الأضيق أولًا.
+  q-truthy:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      items = []
+      if items:
+          print("has items")
+      else:
+          print("empty")
+    options: ["`has items`", "`empty`", "`TypeError`"]
+    answer: 1
+    explanation: |
+      القائمة الفارغة **falsy**. القيم falsy: `False`، `None`، `0`، `0.0`، `""`، `[]`،
+      `{}`، `set()`. كل ما عداها تقريبًا truthy.
+  q-exit:
+    kind: exit
+    question: "`x = 0`. هل يرفع `x != 0 and 10 / x > 1` خطأ `ZeroDivisionError`؟"
+    options: ["نعم", "لا، بسبب short-circuit"]
+    answer: 1
+    explanation: |
+      `x != 0` خاطئ، فتعرف `and` أن النتيجة `False` ولا تحسب الطرف الثاني أصلًا.
+
+exercises:
+  ex-label:
+    title: "صنّف درجة الحرارة"
+    prompt: |
+      أكمل جسم الدالة `label_for(t)` لتُعيد (بـ`return`):
+
+      - `"cold"` إذا كانت `t` أقل من 10
+      - `"mild"` إذا كانت من 10 إلى أقل من 25
+      - `"hot"` إذا كانت 25 فأكثر
+
+      لا تقلق من `def` و`return` الآن؛ سنشرحهما في مسار الدوال. ركّز على سلسلة الشروط.
+    starter: |
+      def label_for(t):
+          # write your if / elif / else here
+          return "?"
+
+      print(label_for(3), label_for(18), label_for(30))
+    solution: |
+      def label_for(t):
+          if t < 10:
+              return "cold"
+          elif t < 25:
+              return "mild"
+          else:
+              return "hot"
+
+      print(label_for(3), label_for(18), label_for(30))
+    tests: |
+      for _t, _want in [(-5, "cold"), (9.9, "cold"), (10, "mild"), (24, "mild"), (25, "hot"), (40, "hot")]:
+          _got = label_for(_t)
+          assert _got == _want, f"label_for({_t}) أعادت {_got!r} والمتوقع {_want!r}"
+    hints:
+      - "ثلاث حالات = `if` ثم `elif` ثم `else`. انتبه للحدود: 10 و25."
+      - "إذا فُحص `t < 10` أولًا، فلا حاجة لكتابة `t >= 10` في `elif`."
+      - "`if t < 10: return \"cold\"` ثم `elif t < 25: return \"mild\"` ثم `else: return \"hot\"`"
+
+animations:
+  anim-grade:
+    title: "أي فرع سيُنفَّذ؟"
+    code: |
+      score = 72
+      if score >= 90:
+          grade = "A"
+      elif score >= 70:
+          grade = "B"
+      else:
+          grade = "C"
+      print(grade)
+    notes:
+      1: "ربط `score` بـ72."
+      2: "يُفحص الشرط الأول: `72 >= 90`؟ خطأ، فيُتخطى الـblock كاملًا."
+      4: "يُفحص `72 >= 70`؟ صحيح. سيُنفَّذ هذا الفرع ولن يُفحص `else`."
+      5: "يُنفَّذ جسم الفرع الذي تحقق شرطه فقط."
+      8: "بعد انتهاء سلسلة الشروط يكمل التنفيذ بعدها بشكل طبيعي."

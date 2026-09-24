@@ -1,0 +1,73 @@
+id: which-python
+track: environment
+order: 1
+title_ar: "أي Python يعمل الآن؟ الـinterpreter والبيئة والـkernel"
+title_en: "Which Python is running? Interpreter, environment & kernel"
+level: beginner
+estimated_minutes: 25
+prerequisites: [paths-and-cwd]
+objectives:
+  - "فهم أن الجهاز قد يحوي عدة Python interpreters، ولكل واحد مكتباته."
+  - "معرفة الـinterpreter الذي يشغّل الكود فعلًا عبر sys.executable."
+  - "التمييز بين أوامر الـshell وكود Python."
+  - "فهم لماذا «ثبّتُّ المكتبة لكنها غير موجودة» في الـnotebook."
+docs_url: "https://docs.python.org/3/library/sys.html#sys.executable"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [interpreter, venv, pip, kernel, sys.executable, ModuleNotFoundError]
+
+quizzes:
+  q-where-pip:
+    kind: concept
+    question: "أين يُكتب الأمر `pip install pandas`؟"
+    options:
+      - "داخل Python REPL بعد `>>>`"
+      - "في الـterminal (shell)، ويُفضّل `python -m pip install pandas`"
+      - "في أي مكان؛ Python يفهم أوامر الـshell"
+    answer: 1
+    explanation: |
+      `pip` برنامج يُشغَّل من الـshell، وليس كود Python. داخل REPL سيظهر `SyntaxError`.
+      وفي Jupyter استخدم `%pip install pandas` حتى يُثبَّت في بيئة الـkernel نفسه.
+  q-exit:
+    kind: exit
+    question: "ثبّتت مكتبة في الـterminal ثم ظهر `ModuleNotFoundError` في الـnotebook. ما أول شيء تفحصه؟"
+    options:
+      - "إعادة تثبيت Python بالكامل"
+      - "مقارنة `sys.executable` في الـnotebook مع Python الذي استخدمته في الـterminal"
+      - "إعادة تشغيل الحاسوب"
+    answer: 1
+    explanation: |
+      الغالب أن الـkernel يستخدم interpreter مختلفًا. `sys.executable` يكشف ذلك فورًا.
+
+exercises:
+  ex-env:
+    title: "اكتشف بيئتك برمجيًا"
+    prompt: |
+      أنشئ متغيرين:
+
+      - `version` = نص بالشكل `"3.11"` (الـmajor والـminor فقط) من `sys.version_info`.
+      - `in_venv` = `True` إذا كان الكود يعمل داخل virtual environment، وإلا `False`.
+        التلميح: داخل الـvenv يختلف `sys.prefix` عن `sys.base_prefix`.
+    starter: |
+      import sys
+
+      version = ...
+      in_venv = ...
+
+      print(version, in_venv)
+    solution: |
+      import sys
+
+      version = f"{sys.version_info.major}.{sys.version_info.minor}"
+      in_venv = sys.prefix != sys.base_prefix
+
+      print(version, in_venv)
+    tests: |
+      import sys as _sys
+      assert version == f"{_sys.version_info.major}.{_sys.version_info.minor}", "version يجب أن يكون مثل '3.11'"
+      assert isinstance(in_venv, bool), "in_venv يجب أن يكون True أو False"
+      assert in_venv == (_sys.prefix != _sys.base_prefix), "قارن sys.prefix مع sys.base_prefix"
+    hints:
+      - "`sys.version_info` يحتوي الأجزاء `major` و`minor` كأرقام."
+      - "استخدم f-string: `f\"{a}.{b}\"`، والمقارنة `!=` تعطي bool مباشرة."
+      - "`in_venv = sys.prefix != sys.base_prefix`"

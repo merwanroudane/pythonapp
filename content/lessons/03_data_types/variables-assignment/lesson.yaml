@@ -1,0 +1,130 @@
+id: variables-assignment
+track: data_types
+order: 1
+title_ar: "المتغيرات والإسناد: الاسم ليس صندوقًا"
+title_en: "Variables & assignment: a name is not a box"
+level: beginner
+estimated_minutes: 35
+prerequisites: [expression-vs-statement]
+objectives:
+  - "فهم أن المتغير اسم مرتبط بـobject (name binding)، لا صندوق يحوي نسخة."
+  - "التمييز بين rebinding (إعادة ربط الاسم) وmutation (تعديل الـobject نفسه)."
+  - "توقّع سلوك y = x مع الأنواع immutable والأنواع mutable."
+  - "التمييز بين = و== وis."
+docs_url: "https://docs.python.org/3/reference/simple_stmts.html#assignment-statements"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [variable, assignment, binding, alias, mutable, immutable, id, is]
+
+quizzes:
+  q-box:
+    kind: concept
+    question: "عندما نكتب `x = 10`، ماذا يحدث؟"
+    options:
+      - "يُنشأ صندوق اسمه `x` ويوضع داخله الرقم 10"
+      - "يُنشأ (أو يُستخدم) object قيمته 10، ويُربط الاسم `x` به"
+    answer: 1
+    explanation: |
+      تشبيه الصندوق مفيد في البداية، لكن النموذج الأدق: **الاسم ملصق (label) على object**.
+      سيجعل هذا سلوك `y = x` مع القوائم مفهومًا تمامًا بعد قليل.
+  q-alias:
+    kind: predict
+    question: "ماذا يطبع هذا الكود؟"
+    code: |
+      a = [1, 2]
+      b = a
+      a.append(3)
+      print(b)
+    options: ["`[1, 2]`", "`[1, 2, 3]`", "`AttributeError`"]
+    answer: 1
+    explanation: |
+      `b = a` لم ينسخ القائمة؛ ربط اسمًا ثانيًا **بالقائمة نفسها**. و`append` عدّل ذلك
+      الـobject، فيرى كل من `a` و`b` التغيير.
+  q-exit:
+    kind: exit
+    question: "بعد `x = 10` ثم `y = x` ثم `x = x + 1`، ما قيمة `y`؟"
+    options: ["11", "10", "خطأ"]
+    answer: 1
+    explanation: |
+      `x = x + 1` أنشأ object جديدًا (11) وأعاد ربط `x` به (**rebinding**). أما `y` فما زال
+      مربوطًا بـ10. الأعداد immutable؛ لا شيء «يعدّل» 10 نفسها.
+
+exercises:
+  ex-copy:
+    title: "انسخ بدل أن تربط"
+    prompt: |
+      في الكود أدناه، تعديل `original` يغيّر `backup` أيضًا، وهذا ليس المقصود.
+      عدّل **سطر إنشاء `backup` فقط** بحيث يبقى `backup` مساويًا لـ`[10, 20]` بعد الإضافة.
+    starter: |
+      original = [10, 20]
+      backup = original
+
+      original.append(30)
+      print("original:", original)
+      print("backup  :", backup)
+    solution: |
+      original = [10, 20]
+      backup = original.copy()
+
+      original.append(30)
+      print("original:", original)
+      print("backup  :", backup)
+    tests: |
+      assert original == [10, 20, 30], "لا تغيّر سطر append"
+      assert backup == [10, 20], f"backup يجب أن يبقى [10, 20] لكنه {backup}"
+      assert backup is not original, "backup ما زال نفس الـobject"
+    hints:
+      - "`backup = original` يعطي القائمة نفسها اسمًا ثانيًا. تحتاج قائمة **جديدة** بالقيم نفسها."
+      - "لكل list الدالة `.copy()`، ويمكن أيضًا `list(original)` أو `original[:]`."
+      - "`backup = original.copy()`"
+
+animations:
+  anim-rebind:
+    title: "Rebinding: الأعداد"
+    code: |
+      x = 10
+      y = x
+      x = x + 1
+      print(x, y)
+    notes:
+      1: "يُنشأ object من نوع int قيمته 10، ويُربط به الاسم `x`."
+      2: "`y = x` لا ينسخ شيئًا: يربط الاسم `y` بنفس الـobject الذي يشير إليه `x`."
+      3: "يُحسب `x + 1` فينتج object **جديد** 11، ثم يُعاد ربط `x` به. `y` لم يتغير."
+      4: "`print` تعرض القيمتين: `x` على 11 و`y` ما زال على 10."
+  anim-mutate:
+    title: "Mutation: القوائم"
+    code: |
+      a = [1, 2]
+      b = a
+      a.append(3)
+      print(b)
+    notes:
+      1: "تُنشأ قائمة واحدة ويُربط بها الاسم `a`."
+      2: "الاسم `b` يُربط بالقائمة **نفسها**. قائمة واحدة، اسمان."
+      3: "`append` يعدّل الـobject نفسه (mutation). لم يُعد ربط أي اسم."
+      4: "`b` يرى `[1, 2, 3]` لأنه يشير إلى القائمة التي عُدّلت."
+
+changes:
+  ch-copy:
+    title: "ربط أم نسخ؟"
+    base: |
+      a = [1, 2]
+      b = a
+      a.append(3)
+      print("a =", a, "| b =", b, "| same object?", a is b)
+    base_label: "قبل · b = a"
+    variants:
+      - label: "b = a.copy()"
+        code: |
+          a = [1, 2]
+          b = a.copy()
+          a.append(3)
+          print("a =", a, "| b =", b, "| same object?", a is b)
+        explain: "`.copy()` تنشئ قائمة جديدة بالعناصر نفسها. الآن `a` و`b` objectان مختلفان، فالتعديل على أحدهما لا يظهر في الآخر."
+      - label: "a = a + [3]"
+        code: |
+          a = [1, 2]
+          b = a
+          a = a + [3]
+          print("a =", a, "| b =", b, "| same object?", a is b)
+        explain: "`a + [3]` تنشئ قائمة **جديدة** ثم يُعاد ربط `a` بها (rebinding)، فيبقى `b` على القائمة القديمة. قارن هذا بـ`append` الذي يعدّل القائمة نفسها."

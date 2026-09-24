@@ -1,0 +1,57 @@
+# Bright multicolour light system — blueprint §3.2 / §123 (no pink, no dark UI).
+# Neutral cream surfaces; each knowledge type gets its own distinct hue.
+# primaryColor / linkColor are one shade deeper so they stay >= 4.5:1 on the
+# multicolour background blobs too (app/ui/theme.py BLOB_STRENGTH).
+# Every *TextColor is an "ink": >= 4.5:1 on canvas, white, soft and its own 10% tint.
+# tests/unit/test_theme_contrast.py enforces this — re-run tests after changing a colour.
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "light"
+primaryColor = "#9D5309"
+backgroundColor = "#FFFCF5"
+secondaryBackgroundColor = "#F6F3EA"
+textColor = "#2B2A27"
+linkColor = "#1A6CA0"
+borderColor = "#E4DDCF"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "10px"
+codeBackgroundColor = "#FFFFFF"
+codeTextColor = "#2B2A27"
+dataframeHeaderBackgroundColor = "#F6F3EA"
+
+font = "'IBM Plex Sans Arabic':https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+baseFontSize = 16
+codeFontSize = "0.9rem"
+headingFontWeights = [700, 700, 600, 600, 600, 600]
+
+redColor = "#E0524A"
+redBackgroundColor = "#FCEBE4"
+redTextColor = "#CA2C23"
+orangeColor = "#F28C28"
+orangeBackgroundColor = "#FEF1E0"
+orangeTextColor = "#A7580A"
+yellowColor = "#F4B400"
+yellowBackgroundColor = "#FEF5DC"
+yellowTextColor = "#8B6700"
+greenColor = "#3FAE6A"
+greenBackgroundColor = "#ECF4E7"
+greenTextColor = "#2D7B4B"
+blueColor = "#3AA0E0"
+blueBackgroundColor = "#EBF3F3"
+blueTextColor = "#1B72A9"
+violetColor = "#8B6FE0"
+violetBackgroundColor = "#F3EEF3"
+violetTextColor = "#7352DA"
+grayColor = "#6B665C"
+grayTextColor = "#6B665C"
+
+chartCategoricalColors = ["#F28C28", "#3AA0E0", "#3FAE6A", "#8B6FE0", "#F4B400", "#1FA5A0", "#E0524A"]
+
+[theme.sidebar]
+backgroundColor = "#F6F3EA"
+secondaryBackgroundColor = "#FFFFFF"

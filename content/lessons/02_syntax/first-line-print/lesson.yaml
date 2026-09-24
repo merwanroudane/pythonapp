@@ -1,0 +1,97 @@
+id: first-line-print
+track: syntax
+order: 1
+title_ar: "أول سطر: تشريح print()"
+title_en: "Your first line: anatomy of print()"
+level: beginner
+estimated_minutes: 25
+prerequisites: [which-python]
+objectives:
+  - "تشريح السطر print(\"Hello\") إلى name وcall وargument وstring literal."
+  - "التحكم في الناتج عبر sep وend."
+  - "فهم أن print تكتب إلى stdout وتُعيد None."
+docs_url: "https://docs.python.org/3/library/functions.html#print"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [print, stdout, sep, end, function call, NameError]
+
+quizzes:
+  q-sep-end:
+    kind: predict
+    question: "ما الناتج الدقيق؟"
+    code: |
+      print("a", "b", sep="-", end="!")
+      print("c")
+    options:
+      - "`a-b!` ثم في سطر جديد `c`"
+      - "`a-b!c`"
+      - "`a b-!c`"
+    answer: 1
+    explanation: |
+      `sep` يوضع **بين** القيم، و`end` يوضع في **النهاية** بدل newline الافتراضي.
+      بما أن `end="!"` لا يحتوي `\n`، يُطبع `c` على السطر نفسه.
+  q-exit:
+    kind: exit
+    question: "ماذا تُعيد `print(\"hi\")` إلى من استدعاها؟"
+    options:
+      - "النص `\"hi\"`"
+      - "`None`"
+      - "عدد الحروف المطبوعة"
+    answer: 1
+    explanation: |
+      `print` تعرض نصًا على stdout، لكن قيمتها المُعادة `None`. سنبني على هذا في
+      محاضرة `print` مقابل `return`.
+
+exercises:
+  ex-date:
+    title: "اطبع تاريخًا بثلاث قيم"
+    prompt: |
+      لديك ثلاثة متغيرات. اطبعها **في استدعاء print واحد** بحيث يظهر `2026-09-24`.
+      ثم خزّن في المتغير `used_sep` الفاصل الذي استخدمته.
+    starter: |
+      year, month, day = 2026, "09", 24
+
+      print(year, month, day)
+
+      used_sep = ...
+    solution: |
+      year, month, day = 2026, "09", 24
+
+      print(year, month, day, sep="-")
+
+      used_sep = "-"
+    tests: |
+      assert used_sep == "-", "الفاصل المطلوب هو '-'"
+      import io, contextlib
+      _buf = io.StringIO()
+      with contextlib.redirect_stdout(_buf):
+          print(year, month, day, sep=used_sep)
+      assert _buf.getvalue() == "2026-09-24\n", "يجب أن يكون الناتج 2026-09-24"
+    hints:
+      - "print تضع مسافة بين القيم افتراضيًا. أي parameter يغيّر ذلك؟"
+      - "أضف `sep=\"...\"` كآخر argument."
+      - "`print(year, month, day, sep=\"-\")`"
+
+changes:
+  ch-sep-end:
+    title: "sep وend"
+    base: |
+      print("x", 1, True)
+      print("done")
+    base_label: "قبل · القيم الافتراضية"
+    variants:
+      - label: "sep=\", \""
+        code: |
+          print("x", 1, True, sep=", ")
+          print("done")
+        explain: "`sep` هو ما يوضع بين القيم. الافتراضي مسافة واحدة `' '`."
+      - label: "end=\" | \""
+        code: |
+          print("x", 1, True, end=" | ")
+          print("done")
+        explain: "`end` هو ما يُكتب بعد آخر قيمة. الافتراضي `'\\n'`، لذلك ينتقل الطبع لسطر جديد عادة."
+      - label: "بدون arguments"
+        code: |
+          print()
+          print("done")
+        explain: "`print()` بلا قيم تطبع `end` فقط، أي سطرًا فارغًا."

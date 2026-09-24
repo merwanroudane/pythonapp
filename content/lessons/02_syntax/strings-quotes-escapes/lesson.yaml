@@ -1,0 +1,93 @@
+id: strings-quotes-escapes
+track: syntax
+order: 2
+title_ar: "النصوص: علامات التنصيص والـescape sequences"
+title_en: "Strings: quotes, escape sequences & raw strings"
+level: beginner
+estimated_minutes: 30
+prerequisites: [first-line-print]
+objectives:
+  - "إنشاء strings بعلامات تنصيص مفردة ومزدوجة وثلاثية ومتى نستخدم كلًّا منها."
+  - "فهم escape sequences مثل \\n و\\t و\\\\."
+  - "التمييز بين ما يعرضه print وما يعرضه repr."
+  - "استخدام raw strings ومعرفة حدودها."
+docs_url: "https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [str, quotes, escape, repr, raw string, SyntaxError]
+
+quizzes:
+  q-len:
+    kind: predict
+    question: "كم تساوي `len(s)`؟"
+    code: |
+      s = "a\nb"
+      print(len(s))
+    options: ["4", "3", "2"]
+    answer: 1
+    explanation: |
+      `\n` حرفان في **الكود المصدري** لكنها **حرف واحد** (newline) داخل الـstring.
+      إذن: `a` + newline + `b` = 3 حروف.
+  q-exit:
+    kind: exit
+    question: "أي literal يعطي النص `It's \"ok\"` بلا أخطاء؟"
+    options:
+      - "`'It's \"ok\"'`"
+      - "`\"It's \\\"ok\\\"\"`"
+      - "`\"It's \"ok\"\"`"
+    answer: 1
+    explanation: |
+      الخيار الأول ينتهي عند `It` لأن `'` تغلق النص. الثالث يغلق النص قبل `ok`.
+      الثاني يستخدم علامات مزدوجة للخارج ويهرّب العلامات المزدوجة الداخلية بـ`\"`.
+      بديل أوضح: `'''It's "ok"'''`.
+
+exercises:
+  ex-quote:
+    title: "نص يحتوي النوعين من علامات التنصيص"
+    prompt: |
+      أنشئ المتغير `sentence` بحيث تكون قيمته **بالضبط**:
+
+      ```text
+      She said "it's fine"
+      ```
+
+      ثم أنشئ `two_lines` بحيث إذا طُبع يظهر `first` في سطر و`second` في السطر التالي،
+      مستخدمًا escape sequence وليس triple quotes.
+    starter: |
+      sentence = ...
+      two_lines = ...
+
+      print(sentence)
+      print(two_lines)
+    solution: |
+      sentence = "She said \"it's fine\""
+      two_lines = "first\nsecond"
+
+      print(sentence)
+      print(two_lines)
+    tests: |
+      assert sentence == 'She said "it' + "'" + 's fine"', "راجع علامات التنصيص والمسافات في sentence"
+      assert two_lines == "first" + chr(10) + "second", "two_lines يجب أن تحوي newline واحدة بين الكلمتين"
+    hints:
+      - "النص يحتوي `'` و`\"` معًا؛ اختر علامة خارجية ثم هرّب الأخرى داخلها."
+      - "داخل نص محاط بـ`\"...\"` اكتب `\\\"` للعلامة المزدوجة. والسطر الجديد هو `\\n`."
+      - "`sentence = \"She said \\\"it's fine\\\"\"`"
+
+changes:
+  ch-print-repr:
+    title: "print مقابل repr"
+    base: |
+      s = "Tab:\there\nNew line"
+      print(s)
+    base_label: "قبل · print (للبشر)"
+    variants:
+      - label: "repr (للمبرمج)"
+        code: |
+          s = "Tab:\there\nNew line"
+          print(repr(s))
+        explain: "`repr` يعرض الـstring كما تُكتب في الكود، بعلامات التنصيص وescape sequences ظاهرة. هذا ما تراه في Notebook وفي الـVariable Inspector."
+      - label: "raw string"
+        code: |
+          s = r"Tab:\there\nNew line"
+          print(s)
+        explain: "مع `r` لا تُفسَّر `\\t` و`\\n`؛ تبقى الشرطة العكسية حرفًا عاديًا. مفيد للمسارات والـregex."

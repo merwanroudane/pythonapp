@@ -1,0 +1,117 @@
+id: paths-and-cwd
+track: before_python
+order: 6
+title_ar: "الملفات والمسارات ومجلد العمل الحالي"
+title_en: "Files, paths & the current working directory"
+level: beginner
+estimated_minutes: 25
+prerequisites: [how-python-runs]
+objectives:
+  - "التمييز بين absolute path وrelative path."
+  - "فهم current working directory ولماذا يحدد معنى المسار النسبي."
+  - "تفكيك مسار إلى parent وname وstem وsuffix باستخدام pathlib."
+  - "فهم لماذا يتعارض الرمز \\ في مسارات Windows مع escape sequences."
+docs_url: "https://docs.python.org/3/library/pathlib.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [path, pathlib, cwd, windows, raw string, FileNotFoundError]
+
+quizzes:
+  q-relative:
+    kind: concept
+    question: |
+      البرنامج يعمل من المجلد `C:\Users\sara\project`.
+      إلى أين يشير المسار النسبي `data\raw.csv`؟
+    options:
+      - "`C:\\data\\raw.csv`"
+      - "`C:\\Users\\sara\\project\\data\\raw.csv`"
+      - "إلى المجلد الذي يوجد فيه ملف `.py` دائمًا، مهما كان مجلد العمل"
+    answer: 1
+    explanation: |
+      المسار النسبي يُفسَّر انطلاقًا من **current working directory**، أي المجلد الذي
+      شُغّل منه البرنامج، وليس بالضرورة المجلد الذي يوجد فيه ملف الكود.
+  q-escape:
+    kind: predict
+    question: "ماذا سيطبع هذا السطر؟"
+    code: |
+      print("C:\new\table")
+    options:
+      - "`C:\\new\\table` كما هو مكتوب"
+      - "`C:` ثم سطر جديد، ثم `ew`، ثم مسافة tab، ثم `able`"
+      - "SyntaxError"
+    answer: 1
+    explanation: |
+      داخل string عادية، `\n` تعني newline و`\t` تعني tab. لذلك «اختفت» الحروف `n` و`t`.
+      الحل: `r"C:\new\table"` أو `"C:/new/table"` أو `pathlib`.
+  q-exit:
+    kind: exit
+    question: "أي عبارة صحيحة؟"
+    options:
+      - "المسار المطلق يتغير معناه عندما يتغير مجلد العمل."
+      - "المسار النسبي يتغير معناه عندما يتغير مجلد العمل."
+      - "`suffix` للملف `report.final.pdf` هو `.final.pdf`."
+    answer: 1
+    explanation: |
+      المسار المطلق يبدأ من الجذر فلا يعتمد على مجلد العمل. أما `suffix` فهو آخر امتداد
+      فقط: `.pdf`، و`suffixes` تعطي `['.final', '.pdf']`.
+
+exercises:
+  ex-parts:
+    title: "فكّك المسار"
+    prompt: |
+      لديك المسار أدناه. أنشئ ثلاثة متغيرات:
+
+      - `folder` = اسم المجلد الذي يحتوي الملف مباشرة (نص).
+      - `stem` = اسم الملف بدون امتداد.
+      - `suffix` = الامتداد مع النقطة.
+
+      استخدم خصائص `PureWindowsPath` ولا تكتب القيم يدويًا.
+    starter: |
+      from pathlib import PureWindowsPath
+
+      p = PureWindowsPath(r"C:\Users\sara\project\data\raw.csv")
+
+      folder = ...
+      stem = ...
+      suffix = ...
+    solution: |
+      from pathlib import PureWindowsPath
+
+      p = PureWindowsPath(r"C:\Users\sara\project\data\raw.csv")
+
+      folder = p.parent.name
+      stem = p.stem
+      suffix = p.suffix
+    tests: |
+      assert folder == "data", f"folder يجب أن يكون 'data' وليس {folder!r}"
+      assert stem == "raw", f"stem يجب أن يكون 'raw' وليس {stem!r}"
+      assert suffix == ".csv", f"suffix يجب أن يكون '.csv' وليس {suffix!r}"
+    hints:
+      - "المجلد الذي يحتوي الملف هو parent المسار، ونحتاج اسمه فقط."
+      - "جرّب `p.parent` ثم `.name` عليه. وللملف: `p.stem` و`p.suffix`."
+      - "`folder = p.parent.name`"
+
+changes:
+  ch-separators:
+    title: "ثلاث طرق لكتابة المسار نفسه"
+    base: |
+      path = "C:\new_data\table.csv"
+      print(path)
+    base_label: "قبل · string عادية"
+    variants:
+      - label: "raw string"
+        code: |
+          path = r"C:\new_data\table.csv"
+          print(path)
+        explain: "البادئة `r` تجعل `\\` حرفًا عاديًا عند إنشاء الـliteral، فلا تتحول `\\n` و`\\t` إلى أحرف تحكم."
+      - label: "forward slash"
+        code: |
+          path = "C:/new_data/table.csv"
+          print(path)
+        explain: "Windows يقبل `/` في معظم الـAPIs، ولا توجد escape sequences بالشرطة الأمامية."
+      - label: "pathlib"
+        code: |
+          from pathlib import PureWindowsPath
+          path = PureWindowsPath("C:/") / "new_data" / "table.csv"
+          print(path)
+        explain: "`pathlib` يبني المسار بالعامل `/` ويختار الفاصل الصحيح للنظام، وهو الطريقة الحديثة الموصى بها."

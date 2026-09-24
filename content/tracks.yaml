@@ -1,0 +1,27 @@
+# The 25 tracks of blueprint §3.4. A track appears in the sidebar once it has lessons.
+tracks:
+  - {id: before_python, order: 0, code: "00", icon: ":material/computer:", title_ar: "ما قبل Python", title_en: "Before Python", summary_ar: "البرنامج، الـprocess، الملفات والمسارات، والـterminal."}
+  - {id: environment, order: 1, code: "01", icon: ":material/deployed_code:", title_ar: "بيئة Python", title_en: "Python Environment", summary_ar: "الـinterpreter، البيئات الافتراضية، pip وuv، وJupyter kernel."}
+  - {id: syntax, order: 2, code: "02", icon: ":material/data_object:", title_ar: "أساسيات الصياغة", title_en: "Syntax Foundations", summary_ar: "tokens، expressions وstatements، الإزاحة، النصوص والتعليقات."}
+  - {id: data_types, order: 3, code: "03", icon: ":material/category:", title_ar: "أنواع البيانات", title_en: "Data Types", summary_ar: "الأسماء والـobjects، الأرقام، النصوص، lists وdicts وsets."}
+  - {id: operators, order: 4, code: "04", icon: ":material/calculate:", title_ar: "العوامل والتعابير", title_en: "Operators & Expressions", summary_ar: "الحساب، المقارنة، المنطق، الأولوية، short-circuit."}
+  - {id: conditions, order: 5, code: "05", icon: ":material/alt_route:", title_ar: "الشروط", title_en: "Conditions", summary_ar: "if/elif/else، truthiness، conditional expression، match."}
+  - {id: loops, order: 6, code: "06", icon: ":material/loop:", title_ar: "الحلقات", title_en: "Loops", summary_ar: "for وwhile، range وenumerate وzip، break وcontinue."}
+  - {id: functions, order: 7, code: "07", icon: ":material/function:", title_ar: "الدوال", title_en: "Functions", summary_ar: "التعريف والاستدعاء، return، scope، الدوال كـobjects."}
+  - {id: iterators, order: 8, code: "08", icon: ":material/stream:", title_ar: "Iterators وGenerators", title_en: "Iterators, Generators & Functional Tools", summary_ar: "بروتوكول التكرار، yield، itertools، decorators."}
+  - {id: errors, order: 9, code: "09", icon: ":material/bug_report:", title_ar: "الأخطاء والتصحيح", title_en: "Errors, Warnings & Debugging", summary_ar: "tracebacks، try/except، warnings، debugger."}
+  - {id: modules, order: 10, code: "10", icon: ":material/inventory_2:", title_ar: "Modules وPackages", title_en: "Modules, Packages & Imports", summary_ar: "import، namespaces، __name__، بنية المشروع."}
+  - {id: files, order: 11, code: "11", icon: ":material/folder_open:", title_ar: "الملفات وصيغ البيانات", title_en: "Files, Paths & Data Formats", summary_ar: "open وwith، pathlib، CSV وJSON وParquet."}
+  - {id: regex, order: 12, code: "12", icon: ":material/manage_search:", title_ar: "التعابير النمطية", title_en: "Regular Expressions", summary_ar: "Regex Lab بصري: patterns، groups، re.sub."}
+  - {id: oop, order: 13, code: "13", icon: ":material/account_tree:", title_ar: "البرمجة كائنية التوجه", title_en: "OOP", summary_ar: "classes وinstances، inheritance وcomposition، dataclasses."}
+  - {id: stdlib, order: 14, code: "14", icon: ":material/library_books:", title_ar: "المكتبة القياسية", title_en: "Standard Library", summary_ar: "خريطة الـmodules حسب المهمة: collections، datetime، logging…"}
+  - {id: quality, order: 15, code: "15", icon: ":material/verified:", title_ar: "جودة الكود والاختبار", title_en: "Code Quality & Testing", summary_ar: "Ruff، typing، pytest، logging، profiling."}
+  - {id: numpy, order: 16, code: "16", icon: ":material/grid_on:", title_ar: "NumPy", title_en: "NumPy", summary_ar: "ndarray، shape وdtype، broadcasting، vectorization."}
+  - {id: pandas, order: 17, code: "17", icon: ":material/table_chart:", title_ar: "pandas", title_en: "pandas", summary_ar: "Series وDataFrame، التنظيف، groupby، merge، reshape."}
+  - {id: visualization, order: 18, code: "18", icon: ":material/insert_chart:", title_ar: "تصوير البيانات", title_en: "Data Visualization", summary_ar: "من السؤال إلى الرسم: Matplotlib ثم Seaborn/Plotly/Altair."}
+  - {id: databases, order: 19, code: "19", icon: ":material/database:", title_ar: "قواعد البيانات", title_en: "Databases", summary_ar: "SQL، sqlite3، SQLAlchemy، DuckDB."}
+  - {id: images, order: 20, code: "20", icon: ":material/image:", title_ar: "الصور", title_en: "Images", summary_ar: "pixels وchannels، Pillow، OpenCV، الصور كـarrays."}
+  - {id: web, order: 21, code: "21", icon: ":material/public:", title_ar: "بيانات الويب والـAPI", title_en: "Web/API Data", summary_ar: "HTTP، requests، JSON، HTML وBeautiful Soup."}
+  - {id: advanced, order: 22, code: "22", icon: ":material/rocket_launch:", title_ar: "Python المتقدم", title_en: "Advanced Python", summary_ar: "copying، hashability، protocols، async، الذاكرة."}
+  - {id: packaging, order: 23, code: "23", icon: ":material/package_2:", title_ar: "الحزم والمشاريع", title_en: "Packaging & Projects", summary_ar: "pyproject.toml، src layout، النشر، Git، CLI."}
+  - {id: capstone, order: 24, code: "24", icon: ":material/emoji_events:", title_ar: "المشاريع الختامية", title_en: "Capstone Labs", summary_ar: "مشاريع تجمع كل ما سبق في سياق بحثي."}

@@ -1,0 +1,104 @@
+id: dicts
+track: data_types
+order: 5
+title_ar: "القواميس dict: من المفتاح إلى القيمة"
+title_en: "Dictionaries: from key to value"
+level: beginner
+estimated_minutes: 40
+prerequisites: [lists]
+objectives:
+  - "فهم الـdict كـmapping من مفاتيح فريدة إلى قيم."
+  - "القراءة بـ[] وبـget() ومعرفة متى نريد KeyError فعلًا."
+  - "الإضافة والتعديل والحذف والمرور على items()."
+  - "بناء عدّاد تكرارات بنمط get(key, 0) + 1."
+docs_url: "https://docs.python.org/3/tutorial/datastructures.html#dictionaries"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [dict, key, value, get, items, KeyError, counting]
+
+quizzes:
+  q-in:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      ages = {"Sara": 30, "Omar": 25}
+      print("Sara" in ages, 30 in ages)
+    options: ["`True True`", "`True False`", "`False True`"]
+    answer: 1
+    explanation: |
+      `in` على dict يبحث في **المفاتيح** فقط. للبحث في القيم: `30 in ages.values()`.
+  q-overwrite:
+    kind: predict
+    question: "ما قيمة `d`؟"
+    code: |
+      d = {"a": 1, "b": 2, "a": 3}
+      print(d)
+    options: ["`{'a': 1, 'b': 2, 'a': 3}`", "`{'a': 3, 'b': 2}`", "`KeyError`"]
+    answer: 1
+    explanation: |
+      المفاتيح **فريدة**. المفتاح المكرر يُبقي آخر قيمة، ويحتفظ بموضعه الأول في الترتيب.
+  q-exit:
+    kind: exit
+    question: "متى تفضّل `d[key]` على `d.get(key)`؟"
+    options:
+      - "دائمًا، لأنها أسرع"
+      - "عندما يكون المفتاح **مطلوبًا** وغيابه خطأ يجب أن يظهر فورًا"
+      - "عندما يكون المفتاح نصًا"
+    answer: 1
+    explanation: |
+      `get` تُعيد `None` بصمت، فقد تُخفي خطأً وتنتشر `None` في حساباتك. إذا كان غياب المفتاح
+      يعني أن البيانات معطوبة، فليظهر `KeyError` مبكرًا.
+
+exercises:
+  ex-count:
+    title: "عدّ تكرار الإجابات"
+    prompt: |
+      مرّ على `answers` وابنِ `counts`: قاموس مفتاحه الإجابة وقيمته عدد مرات ظهورها.
+      ثم أنشئ `most_common`: الإجابة الأكثر تكرارًا.
+    starter: |
+      answers = ["yes", "no", "yes", "maybe", "yes", "no"]
+
+      counts = {}
+      for a in answers:
+          ...
+
+      most_common = ...
+      print(counts, most_common)
+    solution: |
+      answers = ["yes", "no", "yes", "maybe", "yes", "no"]
+
+      counts = {}
+      for a in answers:
+          counts[a] = counts.get(a, 0) + 1
+
+      most_common = max(counts, key=counts.get)
+      print(counts, most_common)
+    tests: |
+      assert counts == {"yes": 3, "no": 2, "maybe": 1}, f"counts غير صحيح: {counts}"
+      assert most_common == "yes", f"most_common يجب أن يكون 'yes' وليس {most_common!r}"
+    hints:
+      - "في كل دورة: اقرأ العدد الحالي (أو 0 إن لم يوجد) ثم أضف 1 واكتبه في القاموس."
+      - "`counts.get(a, 0)` تُعيد 0 للمفتاح الجديد. وللأكثر تكرارًا: `max` مع `key=`."
+      - "`counts[a] = counts.get(a, 0) + 1` ثم `max(counts, key=counts.get)`"
+
+changes:
+  ch-get:
+    title: "[] مقابل get"
+    base: |
+      config = {"alpha": 0.05}
+      print(config["alpha"])
+      print(config["n_boot"])
+    base_label: "قبل · config[key]"
+    variants:
+      - label: "get(key)"
+        code: |
+          config = {"alpha": 0.05}
+          print(config.get("alpha"))
+          print(config.get("n_boot"))
+        explain: "`get` تُعيد `None` بدل رفع `KeyError`. مريح، لكنه قد يُخفي مفتاحًا مفقودًا."
+      - label: "get(key, default)"
+        code: |
+          config = {"alpha": 0.05}
+          n_boot = config.get("n_boot", 499)
+          print(n_boot)
+        explain: "قيمة افتراضية صريحة: هذا هو الاستخدام الأمثل لـ`get`، عندما يكون للغياب معنى معروف."
