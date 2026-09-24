@@ -84,6 +84,8 @@ print("data.csv exists here?", Path("data.csv").exists())
 ما يحدث عندما تشغّل script من مجلد مختلف عن مجلد بياناتك.
 :::
 
+:::animation id="anim-paths":::
+
 ## مشكلة الشرطة المائلة العكسية `\` في Windows
 
 :::quiz id="q-escape":::

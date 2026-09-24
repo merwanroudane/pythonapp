@@ -89,6 +89,8 @@ print(age + 1)  # TypeError: can only concatenate str (not "int") to str
 print(int("3.7"))
 :::
 
+:::animation id="anim-floats":::
+
 :::research
 في البيانات الحقيقية تأتي الأرقام أحيانًا كنصوص: `"1,234.5"` أو `" 42 "` أو `"NA"`.
 قبل أي تحليل: افحص الأنواع، نظّف النصوص، ثم حوّل. وعند مقارنة نتائج نموذجين إحصائيين

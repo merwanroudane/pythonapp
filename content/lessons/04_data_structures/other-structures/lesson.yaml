@@ -96,3 +96,51 @@ exercises:
       - "`defaultdict(list)` تنشئ قائمة فارغة تلقائيًا لأي مفتاح جديد، فتكفي `by_city[city].append(name)`."
       - "`Counter(...)` يقبل أي iterable من القيم. و`most_common(1)` تُعيد `[('Oran', 3)]`."
       - "`top_city = city_counts.most_common(1)[0][0]`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-other:
+    title: range وdeque وCounter وdefaultdict وnamedtuple وbytes
+    code: |
+      from collections import Counter, defaultdict, deque, namedtuple
+
+      r = range(0, 10, 3)
+      as_list = list(r)
+      queue = deque(["a", "b"])
+      queue.append("c")
+      queue.appendleft("z")
+      first = queue.popleft()
+      votes = Counter(["yes", "no", "yes", "yes"])
+      groups = defaultdict(list)
+      groups["DZ"].append("Oran")
+      groups["DZ"].append("Setif")
+      Point = namedtuple("Point", ["x", "y"])
+      p = Point(3, 4)
+      data = "مرحبا".encode("utf-8")
+      print(as_list, queue, first, votes.most_common(1), dict(groups), p.x, len(data))
+    notes:
+      3:
+        what: '`range(start, stop, step)` **لا يخزّن** الأرقام: يحفظ ثلاثة أعداد فقط ويحسب كل عنصر عند الطلب.'
+        theory: '`range(10**9)` لا يحجز مليار عدد في الذاكرة. هذه فكرة **التقييم الكسول (lazy evaluation)** التي تتكرر في generators وiterators. و`list(r)` هي التي تُنشئ العناصر فعليًا: `[0, 3, 6, 9]`.'
+      5:
+        what: '`deque` (double-ended queue): طابور يُضاف إليه ويُسحب منه من **الطرفين** بسرعة.'
+        theory: 'في list تكون `insert(0, x)` و`pop(0)` بطيئتين على القوائم الكبيرة، لأن كل العناصر تُزاح خطوة. أما deque فمبنية ككتل مترابطة، فالطرفان متساويان في السرعة: O(1).'
+      7:
+        what: 'إضافة إلى **اليسار**: `deque([''z'', ''a'', ''b'', ''c''])`.'
+      8:
+        what: 'سحب من اليسار: من دخل أولًا يخرج أولًا (FIFO).'
+      9:
+        what: '`Counter` يعدّ التكرارات: `{''yes'': 3, ''no'': 1}`.'
+      10:
+        what: '`defaultdict(list)`: إن طُلب مفتاح غير موجود يُنشأ تلقائيًا بقيمة `list()` فارغة بدل رفع `KeyError`.'
+        parts:
+        - [defaultdict, dict بقيمة افتراضية]
+        - [(list), '**الدالة** التي تُستدعى لصنع القيمة الافتراضية (بلا أقواس)']
+      11:
+        what: المفتاح `"DZ"` غير موجود، فيُنشأ بقائمة فارغة ثم تُضاف إليها `"Oran"`. في dict عادي كان هذا سيرفع `KeyError`.
+      13:
+        what: '`namedtuple` يصنع **نوعًا جديدًا**: tuple لعناصره أسماء.'
+        theory: '`p.x` أوضح من `p[0]`، ويبقى الـobject tuple كاملًا: immutable وخفيف ويمكن فكّه `x, y = p`. وللسجلات الأغنى (قيم افتراضية، methods) استعمل `@dataclass`.'
+      15:
+        what: '`encode` تحوّل النص إلى **bytes**، أي أرقام من 0 إلى 255. كل حرف عربي يحتاج 2 bytes في UTF-8، فالطول 10 لا 5.'
+        theory: '`str` حروف (Unicode)، و`bytes` أرقام خام كما تُخزَّن على القرص أو تُرسل عبر الشبكة. والجسر بينهما **ترميز (encoding)** مثل UTF-8: `encode` من نص إلى bytes، و`decode` العكس.'

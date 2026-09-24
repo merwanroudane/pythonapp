@@ -144,6 +144,8 @@ if __name__ == "__main__":     # runs as a script, not when imported
     main(["survey.csv", "--sep", ";", "--verbose"])
 :::
 
+:::animation id="anim-cli":::
+
 :::quiz id="q-semver":::
 
 :::rule

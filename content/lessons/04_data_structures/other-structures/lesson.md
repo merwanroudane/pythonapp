@@ -113,6 +113,8 @@ print(dz.code, dz.gdp_growth, dz[1])
 print(dz._asdict())
 :::
 
+:::animation id="anim-other":::
+
 :::research
 `Counter` هو أسرع طريق لجدول تكرارات متغير فئوي (frequency table) قبل pandas، و`defaultdict(list)`
 هو نمط «group by» اليدوي. وستجد الفكرتين نفسيهما في pandas: `value_counts()` و`groupby()`.

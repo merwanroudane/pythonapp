@@ -151,3 +151,59 @@ exercises:
       - "ثلاث طبقات: `retry(times)` تعيد `decorator(func)` التي تعيد `wrapper(*args, **kwargs)`."
       - "داخل `wrapper`: حلقة `for _ in range(times)` فيها `try: return func(...)` و`except ValueError as exc: last_error = exc`."
       - "بعد الحلقة: `raise last_error`. وضع `@functools.wraps(func)` فوق `def wrapper`."
+
+# --- step-by-step command animations ---
+animations:
+  anim-decorator:
+    title: 'decorator تحت المجهر: من التعريف إلى الاستدعاء'
+    code: |
+      import functools
+
+
+      def log_calls(func):
+          @functools.wraps(func)
+          def wrapper(*args):
+              print("calling", func.__name__, args)
+              result = func(*args)
+              print("returned", result)
+              return result
+
+          return wrapper
+
+
+      @log_calls
+      def area(w, h):
+          return w * h
+
+
+      total = area(3, 4)
+      print(total, area.__name__)
+    notes:
+      4:
+        what: 'نعرّف **decorator**: دالة تأخذ دالة (`func`) وتعيد دالة جديدة. التعريف وحده لا ينفّذ جسمها.'
+        theory: 'هذا ممكن لأن الدوال في Python **objects من الدرجة الأولى**: تُمرَّر كمعاملات، وتُعاد من دوال، وتُخزَّن في متغيرات. والدالة التي تأخذ دالة أو تعيدها تسمى **higher-order function**.'
+      5:
+        what: داخل الـdecorator ننشئ `wrapper`، و`functools.wraps` تنسخ إليها اسم الدالة الأصلية وتوثيقها (`__name__`، `__doc__`).
+      7:
+        what: 'سلوك يُضاف **قبل** الدالة الأصلية: نسجّل اسمها ومعاملاتها.'
+        parts:
+        - ['*args', 'يجمع كل المعاملات الموضعية في tuple: `(3, 4)`، فيعمل الـwrapper مع أي دالة']
+        - [func.__name__, اسم الدالة الأصلية المحفوظة في الـclosure]
+      8:
+        what: 'نستدعي الدالة **الأصلية**، ونمرّر المعاملات كما وصلت: `*args` هنا تفكّ الـtuple إلى `3, 4`.'
+      10:
+        what: نعيد النتيجة إلى المستدعي. لو نسينا هذا السطر لأعادت `area` القيمة `None`!
+      12:
+        what: نعيد الدالة الداخلية **دون استدعائها** (بلا أقواس). وهي تحمل معها `func` في closure.
+        theory: 'الـ**closure**: `wrapper` تتذكر `func` من نطاق `log_calls` حتى بعد انتهاء `log_calls` وإغلاق الـframe الخاص بها. القيمة محفوظة في «خلية» (cell) مرتبطة بالدالة: `area.__closure__[0].cell_contents`.'
+      15:
+        what: 'هنا تحدث الفكرة كلها: بعد إنشاء `area`، يستدعي Python فورًا `log_calls(area)` ويربط الاسم `area` **بما أعادته**.'
+        parts:
+        - ['@log_calls', اختصار لـ`area = log_calls(area)` بعد التعريف مباشرة]
+        theory: 'الـ`@` مجرد **سكّر نحوي (syntactic sugar)**. بعد هذا السطر لم يعد الاسم `area` يشير إلى الدالة الأصلية بل إلى `wrapper`، والأصلية محفوظة داخل الـclosure باسم `func`. تابع الـcall stack: ستدخل الآن إلى `log_calls`.'
+      17:
+        what: الدالة الأصلية تعمل كما هي تمامًا، ولا تعرف أنها مغلّفة.
+      20:
+        what: 'نستدعي `area`... لكنها الآن `wrapper`! راقب الـcall stack: أولًا `wrapper(3, 4)`، ثم بداخلها `area` الأصلية.'
+      21:
+        what: '`area.__name__` تطبع `area` لا `wrapper`، بفضل `functools.wraps`.'

@@ -51,3 +51,35 @@ quizzes:
     explanation: |
       `math` و`json` و`pathlib` موجودة دائمًا («batteries included»). أما `numpy` و`pandas`
       فحزم خارجية من PyPI تحتاج تثبيتًا في بيئتك.
+
+# --- step-by-step command animations ---
+animations:
+  anim-batteries:
+    title: اللغة والمكتبة القياسية في خمسة أسطر
+    code: |
+      import datetime
+      import statistics
+      import sys
+
+      major, minor = sys.version_info.major, sys.version_info.minor
+      scores = [12, 15, 18]
+      mean = statistics.mean(scores)
+      spread = statistics.stdev(scores)
+      days = datetime.date(2026, 10, 1) - datetime.date(2026, 9, 24)
+      everything_is_object = isinstance(len, object) and isinstance(3, object)
+      print(major, minor, mean, spread, days.days, everything_is_object)
+    notes:
+      1:
+        what: '`import` يجلب وحدة من **المكتبة القياسية**: متاحة فور تثبيت Python، بلا pip.'
+        theory: 'في Python ثلاث طبقات: **اللغة** (الصياغة والأنواع)، و**المكتبة القياسية** (مئات الوحدات الجاهزة: تواريخ، إحصاء، ملفات، شبكة)، و**النظام البيئي** على PyPI (numpy، pandas…) الذي تثبّته بـpip.'
+      5:
+        what: نسأل الـinterpreter عن إصداره. تصدر نسخة رئيسية جديدة كل سنة تقريبًا (3.11، 3.12، 3.13…).
+      7:
+        what: 'إحصاء وصفي في سطر واحد: المتوسط 15.'
+      8:
+        what: 'الانحراف المعياري للعينة: 3.0. والوضوح هنا من فلسفة اللغة: «Readability counts».'
+      9:
+        what: 'طرح تاريخين يعطي مدة (`timedelta`) من 7 أيام: الأنواع تعبّر عن معنى المجال.'
+      10:
+        what: 'في Python **كل شيء object**: الأعداد، والنصوص، وحتى الدوال مثل `len`.'
+        theory: 'هذا التوحيد من أسباب بساطة اللغة: لكل قيمة نوع وخصائص وmethods، ويمكن تمرير أي شيء، حتى دالة، كقيمة. سترى أثره في الدوال والـdecorators والبرمجة الكائنية.'

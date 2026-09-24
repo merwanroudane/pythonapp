@@ -66,6 +66,8 @@ print(*objects, sep=" ", end="\n", file=None, flush=False)
 
 ## الأخطاء الأولى
 
+:::animation id="anim-print":::
+
 :::mistake
 ```python
 Print("Hello")      # NameError: name 'Print' is not defined

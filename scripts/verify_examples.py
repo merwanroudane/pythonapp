@@ -71,6 +71,16 @@ def main() -> int:
             result = run_code(anim.code, trace=True)
             if result.status != "ok" or not result.trace or not result.trace.steps:
                 failures.append(f"[{meta.id}] animation '{anim_id}' did not trace cleanly")
+            elif result.trace.truncated:
+                failures.append(f"[{meta.id}] animation '{anim_id}' exceeds the trace step limit")
+            elif anim.source == "trace":
+                # A note on a line the tracer never stops at (a continuation line, a
+                # branch not taken) would silently never be shown.
+                executed = {s.line for s in result.trace.steps}
+                for line_no in sorted(set(anim.notes) - executed):
+                    failures.append(
+                        f"[{meta.id}] animation '{anim_id}': note on line {line_no} never runs"
+                    )
         for ch_id, change in meta.changes.items():
             for code in [change.base, *(v.code for v in change.variants)]:
                 checked += 1

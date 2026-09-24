@@ -60,6 +60,8 @@ print(m.groupdict())
 
 :::quiz id="q-greedy":::
 
+:::animation id="anim-regex":::
+
 :::rule
 - اكتب الأنماط دائمًا بـ**raw strings**: `r"\d+"`.
 - ابدأ بنمط بسيط واختبره على أمثلة حقيقية، ثم أضف التعقيد تدريجيًا.

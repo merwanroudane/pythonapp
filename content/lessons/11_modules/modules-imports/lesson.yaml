@@ -97,3 +97,65 @@ exercises:
       - "أضف دالة `spread` إلى النص المكتوب في الملف، مع الإزاحة الصحيحة `\\n    `."
       - "`sys.path.insert(0, \".\")` تجعل Python يبحث في المجلد الحالي أولًا، ثم `import stats_tools as st`."
       - "`m = st.mean([2, 4, 9])` و`r = st.spread([2, 4, 9])`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-import:
+    title: ماذا يحدث عند import؟ خطوة بخطوة
+    code: |
+      from pathlib import Path
+      import sys
+
+      Path("geo.py").write_text(
+          "PI = 3.14159\n"
+          "def circle_area(r):\n"
+          "    return PI * r * r\n",
+          encoding="utf-8",
+      )
+      sys.path.insert(0, ".")
+      import geo
+      area = geo.circle_area(2)
+      from geo import PI
+      cached = "geo" in sys.modules
+      import geo as g
+      same = g is geo
+      print(area, PI, cached, same)
+    notes:
+      4:
+        what: نكتب ملفًا اسمه `geo.py` في المجلد الحالي. أي ملف `.py` هو **module** يمكن استيراده.
+        parts:
+        - [Path("geo.py"), مسار الملف داخل مجلد العمل الحالي (cwd)]
+        - [.write_text(...), يكتب النص كاملًا في الملف، وينشئه إن لم يكن موجودًا]
+        theory: 'الـmodule ليس شيئًا سحريًا: هو **ملف كود عادي**. اسمه هو اسم الملف بلا `.py`، وكل ما يعرّفه (متغيرات، دوال، classes) يصبح **attributes** على الـmodule object بعد استيراده.'
+      10:
+        what: نضيف المجلد الحالي `"."` إلى **بداية** قائمة الأماكن التي يبحث فيها `import`.
+        parts:
+        - [sys.path, قائمة مجلدات يبحث فيها `import` بالترتيب، ويتوقف عند أول تطابق]
+        - ['.insert(0, ".")', يضع المجلد الحالي في الموضع 0، أي أولًا]
+        theory: هذا الملعب يشغّل Python بالخيار `-I` (isolated mode) الذي يستبعد مجلد السكربت من `sys.path` لأسباب أمنية، لذلك نضيفه يدويًا. في سكربت عادي على جهازك يكون مجلد السكربت في `sys.path[0]` تلقائيًا.
+      11:
+        what: 'أول `import`: يجد Python الملف `geo.py`، **ينفّذه مرة واحدة** من أوله إلى آخره، ثم يربط الاسم `geo` بالـmodule object.'
+        parts:
+        - [import, statement الاستيراد (كلمة محجوزة)]
+        - [geo, اسم الـmodule = اسم الملف بلا `.py`، ويصبح اسمًا في الـnamespace الحالي]
+        theory: 'ثلاث مراحل: **find** (البحث في `sys.path`) ← **load** (تنفيذ الملف داخل namespace جديد خاص به) ← **bind** (ربط الاسم هنا). ويُخزَّن الـmodule في `sys.modules` حتى لا يُنفَّذ مرة ثانية. لاحظ أن `geo` لا يظهر في جدول Globals لأن الأداة تُخفي الـmodules.'
+      12:
+        what: 'نصل إلى الدالة عبر **النقطة**: `geo.circle_area` تعني «الاسم `circle_area` داخل namespace الـmodule `geo`».'
+        parts:
+        - [geo., ادخل إلى namespace الـmodule]
+        - [circle_area(2), استدعِ الدالة المعرّفة في `geo.py` بالمعامل 2]
+        theory: 'كل module له **namespace مستقل**. لذلك يمكن أن يوجد `circle_area` في ملفين مختلفين دون تعارض: `geo.circle_area` و`shapes.circle_area` اسمان مختلفان.'
+      13:
+        what: '`from ... import` يربط الاسم `PI` **مباشرة** في الـnamespace الحالي، فلا نحتاج كتابة `geo.` قبله.'
+        parts:
+        - [from geo, من الـmodule `geo`، وهو موجود في `sys.modules` فلا يُنفَّذ ثانية]
+        - [import PI, اربط الاسم `PI` هنا بالقيمة نفسها التي في `geo`]
+        theory: '`from geo import PI` لا «ينسخ» الـmodule: هو `import` عادي، ثم إسناد `PI = geo.PI`. تجنب `from geo import *` لأنه يملأ الـnamespace بأسماء لا تعرف مصدرها.'
+      14:
+        what: '`sys.modules` قاموس فيه كل الـmodules المستوردة. وجود `"geo"` فيه هو سبب عدم تنفيذ الملف مرة ثانية.'
+      15:
+        what: '`as` يعطي الـmodule **اسمًا مستعارًا** (alias)، كما في `import numpy as np`.'
+        parts:
+        - [as g, اسم بديل أقصر للـobject نفسه]
+      16:
+        what: '`is` يقارن **الهوية**: `True` لأن `g` و`geo` اسمان لـmodule object واحد في الذاكرة، لا نسختان.'

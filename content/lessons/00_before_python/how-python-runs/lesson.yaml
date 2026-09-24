@@ -55,3 +55,50 @@ quizzes:
     explanation: |
       لهذا قد يعمل notebook عندك ثم يفشل عند زميلك: خلية معرّفة سابقًا بقيت في ذاكرة الـkernel
       حتى لو حُذفت. `Restart & Run All` هو الاختبار الحقيقي.
+
+# --- step-by-step command animations ---
+animations:
+  anim-pipeline:
+    title: 'رحلة سطر واحد: من نص إلى نتيجة'
+    code: |
+      import ast
+      import dis
+
+      source = "total = price * 2"
+      tree = ast.parse(source)
+      statement = tree.body[0]
+      code = compile(tree, "<demo>", "exec")
+      names = code.co_names
+      instructions = [ins.opname for ins in dis.get_instructions(code)]
+      namespace = {"price": 21}
+      exec(code, namespace)
+      total = namespace["total"]
+      print(names, total)
+      print(instructions)
+    notes:
+      4:
+        what: 'الكود بالنسبة إلى Python في البداية مجرد **نص** (`str`): سلسلة حروف لم يُفهم منها شيء بعد.'
+      5:
+        what: 'مرحلتان معًا: **tokenizing** يقطع النص إلى كلمات (`total`، `=`، `price`، `*`، `2`)، ثم **parsing** يبني منها **شجرة بناء مجردة (AST)** حسب قواعد اللغة.'
+        parts:
+        - [ast.parse, نص ← شجرة]
+        - ['Module(body=[...])', 'جذر الشجرة: قائمة statements']
+        theory: 'هنا يُكتشف **SyntaxError**: إن لم تطابق الكلمات قواعد اللغة (قوس ناقص، `:` منسية) توقف كل شيء **قبل تنفيذ أي سطر**. لذلك خطأ صياغة في السطر 100 يمنع السطر 1 من العمل.'
+      6:
+        what: 'أول statement في الشجرة: عقدة `Assign` لها **هدف** هو `total`، و**قيمة** هي عقدة `BinOp` (ضرب `price` في `2`).'
+        theory: 'الشجرة تُظهر البنية المنطقية التي تخفيها الكتابة الخطية: الأولويات والأقواس تُحسم هنا. فـ`a + b * c` تصبح `BinOp(a, +, BinOp(b, *, c))`.'
+      7:
+        what: '**الترجمة**: من الشجرة إلى **bytecode**، تعليمات بسيطة لآلة افتراضية، محفوظة في **code object**.'
+        parts:
+        - ['compile(tree, "<demo>", "exec")', شجرة ← code object]
+        - ['"exec"', وضع statements، مقابل `"eval"` لتعبير واحد]
+        theory: 'CPython لا ينفّذ النص سطرًا سطرًا مباشرة: يترجم الملف كله أولًا إلى bytecode، ثم **الآلة الافتراضية (PVM)** تنفّذه. وملفات `.pyc` في `__pycache__` هي هذا الـbytecode محفوظًا لتسريع الاستيراد التالي.'
+      8:
+        what: الـcode object يعرف **الأسماء** التي يستعملها (`price`، `total`) والثوابت (`2`)، لكنه لا يعرف قيمها بعد.
+      9:
+        what: 'قائمة التعليمات: حمّل `price`، حمّل الثابت 2، اضرب، خزّن في `total`. أسماؤها الدقيقة تختلف بين نسخ Python.'
+      10:
+        what: 'بيئة التنفيذ: قاموس يربط الأسماء بالقيم، وفيه `price` = 21.'
+      11:
+        what: '**التنفيذ**: الآلة الافتراضية تمر على التعليمات واحدة واحدة داخل هذا الـnamespace. الآن فقط صار `total` = 42.'
+        theory: 'هنا تقع أخطاء **وقت التشغيل (runtime)**: لو لم يوجد `price` لرفعت الآلة `NameError`، وتكون الأسطر السابقة قد نُفّذت. هذا هو الفرق الجوهري: SyntaxError **قبل** التنفيذ، والـruntime errors **أثناءه**.'

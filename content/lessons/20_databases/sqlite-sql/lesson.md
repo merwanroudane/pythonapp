@@ -85,6 +85,8 @@ for row in con.execute(query):
     print(row)
 :::
 
+:::animation id="anim-sql":::
+
 :::quiz id="q-where-having":::
 
 ## الأمان: الاستعلامات ذات المعاملات

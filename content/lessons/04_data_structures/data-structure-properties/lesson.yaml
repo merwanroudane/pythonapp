@@ -144,3 +144,47 @@ changes:
           t = tuple(xs)
           print(t, hash(t) is not None)
         explain: "يحفظ الترتيب والتكرار، ويكسب **الثبات والـhashability**: يصلح الآن مفتاحًا في dict."
+
+# --- step-by-step command animations ---
+animations:
+  anim-props:
+    title: 'الترتيب والتكرار والتعديل والـhash: جرّبها أمرًا أمرًا'
+    code: |
+      point = (3, 4)
+      tags = ["a", "b"]
+      lookup = {point: "home"}
+      tags_hashable = True
+      try:
+          hash(tags)
+      except TypeError:
+          tags_hashable = False
+      ordered = list({"b": 1, "a": 2})
+      unique = set([3, 1, 3, 2, 1])
+      dup_count = [3, 1, 3].count(3)
+      frozen = frozenset(unique)
+      same_after = sorted(unique) == [1, 2, 3]
+      print(lookup, tags_hashable, ordered, unique, dup_count, frozen, same_after)
+    notes:
+      1:
+        what: 'tuple: **مرتّب**، يقبل التكرار، و**غير قابل للتعديل (immutable)**.'
+        theory: 'خصائص البنية تجيب عن أسئلة عملية: هل يهم الترتيب؟ هل يُسمح بالتكرار؟ هل يمكن التعديل بعد الإنشاء؟ هل تصلح مفتاحًا في dict؟ وإجاباتها هي التي تحدد البنية المناسبة لمشكلتك.'
+      2:
+        what: 'list: مرتّبة، تقبل التكرار، و**قابلة للتعديل (mutable)**.'
+      3:
+        what: 'الـtuple يصلح **مفتاحًا** في dict لأنه **hashable**: له قيمة hash ثابتة طوال حياته.'
+        theory: 'الـdict والـset يعتمدان على **جدول تجزئة (hash table)**: يحوّلان المفتاح إلى رقم (hash) يحدد مكانه في الذاكرة. لو تغيّر المفتاح بعد إدخاله لتغيّر الـhash وضاع مكانه، لذلك يجب أن تكون المفاتيح immutable.'
+      6:
+        what: 'نحاول حساب hash لقائمة... فتُرفع `TypeError: unhashable type: ''list''` وتقفز Python إلى `except`.'
+      8:
+        what: 'القائمة mutable، إذن غير hashable: لا تصلح مفتاحًا في dict ولا عنصرًا في set.'
+      9:
+        what: 'الـdict **يحفظ ترتيب الإدخال** (مضمون منذ Python 3.7): `[''b'', ''a'']` لا ترتيبًا أبجديًا.'
+      10:
+        what: 'set: **بلا تكرار وبلا ترتيب مضمون**. التحويل إليه يحذف المكرر: `{1, 2, 3}`.'
+        theory: 'التحويل بين البنى يحفظ أشياء ويضيّع أخرى: من list إلى set تضيع التكرارات والترتيب الأصلي. اسأل قبل كل تحويل: ماذا سأفقد؟'
+      11:
+        what: 'في list يبقى التكرار: `3` ظهرت مرتين.'
+      12:
+        what: '`frozenset` نسخة **immutable** من set، فهي hashable وتصلح مفتاحًا أو عنصرًا في set آخر.'
+      13:
+        what: '`sorted` تعيد **قائمة** مرتبة من أي iterable: الترتيب يُفرض عند الحاجة، لا يُفترض.'

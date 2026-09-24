@@ -46,6 +46,7 @@ class TraceStep(BaseModel):
     frames: list[dict[str, Any]] = Field(default_factory=list)
     stdout: str = ""
     return_value: str | None = None
+    previews: dict[str, str] = Field(default_factory=dict)  # multi-line reprs that changed
 
 
 class Trace(BaseModel):

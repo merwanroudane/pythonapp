@@ -41,6 +41,8 @@ for value in [0, 1, "", "0", "False", [], [0], None, 0.0, 0j]:
 
 :::quiz id="q-false-string":::
 
+:::animation id="anim-bool":::
+
 :::mistake
 ```python
 answer = input("Continue? ")     # the user types: no

@@ -102,3 +102,47 @@ changes:
           n_boot = config.get("n_boot", 499)
           print(n_boot)
         explain: "قيمة افتراضية صريحة: هذا هو الاستخدام الأمثل لـ`get`، عندما يكون للغياب معنى معروف."
+
+# --- step-by-step command animations ---
+animations:
+  anim-dict:
+    title: 'dict: إضافة، استبدال، قراءة آمنة، ونمط العدّ'
+    code: |
+      ages = {"Sara": 30, "Omar": 17}
+      ages["Lina"] = 45
+      ages["Omar"] = 18
+      sara = ages["Sara"]
+      adam = ages.get("Adam", "unknown")
+      has_lina = "Lina" in ages
+      words = "the cat and the hat the end".split()
+      counts = {}
+      for w in words:
+          counts[w] = counts.get(w, 0) + 1
+      keys = list(ages.keys())
+      pairs = list(ages.items())
+      print(counts, keys, pairs, sara, adam, has_lina)
+    notes:
+      1:
+        what: 'dict: كل **مفتاح** يشير إلى **قيمة**. المفاتيح فريدة، أما القيم فيمكن أن تتكرر.'
+        theory: 'الـdict **جدول تجزئة (hash table)**: يحسب `hash("Sara")` فيعرف مباشرة في أي «درج» تقع القيمة، بدل البحث في كل العناصر. لذلك القراءة والكتابة سريعتان مهما كبر الـdict، ولذلك يجب أن تكون المفاتيح hashable.'
+      2:
+        what: 'مفتاح جديد: يُضاف زوج جديد في آخر ترتيب الإدخال.'
+      3:
+        what: 'مفتاح موجود: **تُستبدل** القيمة ولا يُضاف شيء، فلا يمكن أن يوجد مفتاحان متساويان.'
+      4:
+        what: القراءة بالأقواس سريعة، لكنها ترفع `KeyError` إن لم يوجد المفتاح.
+      5:
+        what: 'القراءة الآمنة: `get(key, default)` تعيد القيمة الافتراضية عند غياب المفتاح.'
+        parts:
+        - ['get("Adam", "unknown")', المفتاح، ثم ما يُعاد إن غاب]
+      6:
+        what: '`in` على dict يفحص **المفاتيح** لا القيم.'
+      8:
+        what: 'نمط العدّ: قاموس فارغ نملؤه أثناء المرور على الكلمات.'
+      10:
+        what: 'لكل كلمة: اقرأ عدّها الحالي (0 إن لم تُرَ من قبل)، أضف 1، واكتبه. راقب `counts` يكبر مع كل دورة.'
+        theory: 'هذا أشهر نمط في معالجة البيانات: **التجميع بمفتاح**. نسخته الجاهزة `collections.Counter(words)`، وتعميمه هو `groupby` في pandas وفي SQL.'
+      11:
+        what: '`keys()` نظرة (view) على المفاتيح بترتيب الإدخال.'
+      12:
+        what: '`items()` أزواج `(مفتاح، قيمة)`، ونمر عليها عادة بـ`for name, age in ages.items():`.'

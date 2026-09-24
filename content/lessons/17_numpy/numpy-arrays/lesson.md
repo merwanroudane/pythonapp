@@ -89,6 +89,8 @@ import numpy as np
 np.ones((5, 3)) + np.ones(5)             # trailing dimensions 3 and 5 do not match
 :::
 
+:::animation id="anim-numpy":::
+
 :::quiz id="q-axis":::
 
 ## الأقنعة المنطقية (boolean masks)

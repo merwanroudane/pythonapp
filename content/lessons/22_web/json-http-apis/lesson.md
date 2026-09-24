@@ -83,6 +83,8 @@ print(df)
 print(df.dropna(subset=["value"]).groupby("country.name")["value"].mean())
 :::
 
+:::animation id="anim-web":::
+
 ## استخراج بيانات من HTML
 
 عندما لا يوجد API، تكون البيانات داخل HTML مصمم للعرض. المحلل القياسي `html.parser` يمر على الوسوم:

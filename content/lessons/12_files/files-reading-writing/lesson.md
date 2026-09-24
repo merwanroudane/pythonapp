@@ -43,6 +43,8 @@ with open("notes.txt", encoding="utf-8") as f:
         print(number, line.rstrip("\n"))
 :::
 
+:::animation id="anim-files":::
+
 :::quiz id="q-mode":::
 
 :::concept

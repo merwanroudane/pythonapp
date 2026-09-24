@@ -47,9 +47,19 @@ class Exercise(BaseModel):
     mode: RunMode = "script"
 
 
+class CommandNote(BaseModel):
+    """Step-by-step explanation of one command (the line about to run in an animation)."""
+
+    what: str  # what this command does, in one or two sentences
+    parts: list[tuple[str, str]] = Field(default_factory=list)  # anatomy: (code piece, meaning)
+    theory: str = ""  # the concept behind it: why it works this way
+
+
 class AnimationStep(BaseModel):
     line: int
     note: str = ""
+    parts: list[tuple[str, str]] = Field(default_factory=list)
+    theory: str = ""
     state: dict[str, str] = Field(default_factory=dict)
     stdout: str = ""
 
@@ -59,7 +69,8 @@ class Animation(BaseModel):
     code: str
     source: Literal["trace", "authored"] = "trace"
     steps: list[AnimationStep] = Field(default_factory=list)
-    notes: dict[int, str] = Field(default_factory=dict)  # line -> explanation (trace mode)
+    # line -> explanation (trace mode): a sentence, or a CommandNote with anatomy and theory
+    notes: dict[int, str | CommandNote] = Field(default_factory=dict)
 
 
 class Variant(BaseModel):

@@ -71,3 +71,41 @@ exercises:
       - "`sys.version_info` يحتوي الأجزاء `major` و`minor` كأرقام."
       - "استخدم f-string: `f\"{a}.{b}\"`، والمقارنة `!=` تعطي bool مباشرة."
       - "`in_venv = sys.prefix != sys.base_prefix`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-which:
+    title: أي Python يشغّل كودي؟ اسأله بنفسه
+    code: |
+      import platform
+      import sys
+      import sysconfig
+
+      exe = sys.executable
+      version = sys.version_info[:3]
+      impl = platform.python_implementation()
+      prefix = sys.prefix
+      in_venv = sys.prefix != sys.base_prefix
+      site = sysconfig.get_paths()["purelib"]
+      first_paths = sys.path[:3]
+      print(exe, version, impl, in_venv, sep="\n")
+    notes:
+      5:
+        what: المسار الكامل لملف الـinterpreter الذي **يشغّل هذا الكود الآن**. هذا هو الجواب الحاسم على «أي Python؟».
+        theory: قد يوجد على الجهاز عدة Pythons (من python.org، من Anaconda، في بيئات افتراضية). الأمر `python` في الـterminal يختار أولها في **PATH**، وقد لا يكون هو الذي يستعمله محررك. أما `sys.executable` فلا يخطئ.
+      6:
+        what: '`version_info` الإصدار كـtuple قابل للمقارنة، فيمكن كتابة `if sys.version_info >= (3, 11):`.'
+        parts:
+        - [sys.version_info, '`(major, minor, micro, ...)`']
+        - ['[:3]', أول ثلاثة أجزاء بالـslicing]
+      7:
+        what: 'التطبيق (implementation): غالبًا `CPython`، المكتوب بلغة C وهو المرجعي. وتوجد تطبيقات أخرى مثل PyPy.'
+      8:
+        what: 'مجلد البيئة الحالية: فيه المكتبات المثبتة لهذا الـinterpreter.'
+      9:
+        what: داخل بيئة افتراضية يختلف `sys.prefix` (البيئة) عن `sys.base_prefix` (الـPython الأصلي الذي أُنشئت منه).
+        theory: البيئة الافتراضية (venv) مجلد فيه interpreter خفيف ومجلد مكتبات **خاص به**، فيثبّت كل مشروع إصداراته دون أن يؤثر في غيره. و«تفعيلها» لا يفعل أكثر من وضعها أولًا في PATH.
+      10:
+        what: 'مجلد `site-packages`: هنا يضع `pip install` المكتبات لهذا الـinterpreter تحديدًا. لذلك استعمل `python -m pip` ليثبّت للـinterpreter نفسه الذي تشغّله.'
+      11:
+        what: أول الأماكن التي يبحث فيها `import` عن الـmodules، بالترتيب.

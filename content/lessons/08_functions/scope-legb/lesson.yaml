@@ -91,9 +91,10 @@ exercises:
       - "`def deposit(current, amount):` ثم `return current + amount`."
       - "الاستدعاء: `new_balance = deposit(balance, 50)`؛ القرار بتحديث الرصيد يعود للـcaller."
 
+# --- step-by-step command animations ---
 animations:
   anim-legb:
-    title: "كل استدعاء له local scope"
+    title: كل استدعاء له local scope
     code: |
       rate = 0.1
 
@@ -105,9 +106,17 @@ animations:
       b = price_with_tax(50)
       print(a, b)
     notes:
-      1: "`rate` اسم **global**: معرّف على مستوى الـmodule."
-      3: "`def` تُنشئ الدالة فقط؛ لا يُنفَّذ جسمها الآن."
-      4: "`price` و`tax` أسماء **local**. أما `rate` فغير موجود محليًا فيُبحث عنه في Global."
-      7: "الاستدعاء الأول: frame جديد، `price=100`."
-      8: "الاستدعاء الثاني: frame **مختلف** تمامًا، `price=50`. الـlocals السابقة اختفت."
-      9: "على مستوى الـmodule لا يوجد `tax` ولا `price`: هي لا تعيش خارج الدالة."
+      1:
+        what: '`rate` اسم **global**: معرّف على مستوى الـmodule.'
+        theory: '**LEGB** ترتيب البحث عن أي اسم: **L**ocal (الدالة الحالية) ← **E**nclosing (الدوال المحيطة) ← **G**lobal (الـmodule) ← **B**uilt-in (`print`، `len`…). أول مكان يوجد فيه الاسم يفوز.'
+      3: '`def` تُنشئ الدالة فقط؛ لا يُنفَّذ جسمها الآن.'
+      4:
+        what: '`price` و`tax` أسماء **local**، أما `rate` فغير موجود محليًا فيُبحث عنه في Global.'
+        parts:
+        - [price, parameter ← local]
+        - [tax =, إسناد داخل الدالة ← local جديد]
+        - [rate, غير موجود محليًا ← يُوجد في Global]
+        theory: 'القاعدة الحاسمة: **أي إسناد** لاسم داخل الدالة يجعله local في الدالة كلها. لو كتبنا `rate = rate + 1` داخلها لرفعت `UnboundLocalError`، لأن `rate` صار local قبل أن تُسند له قيمة.'
+      7: 'الاستدعاء الأول: frame جديد فيه `price=100`.'
+      8: 'الاستدعاء الثاني: frame **مختلف** تمامًا فيه `price=50`، والـlocals السابقة اختفت.'
+      9: 'على مستوى الـmodule لا يوجد `tax` ولا `price`: إنهما لا تعيشان خارج الدالة.'

@@ -52,3 +52,40 @@ quizzes:
     explanation: |
       يمكن تشغيل البرنامج نفسه عدة مرات في آن واحد: كل تشغيل process مستقل بذاكرته ومتغيراته.
       هذا ما تفعله هذه المنصة: كل ضغطة Run تنشئ process جديدة لـPython.
+
+# --- step-by-step command animations ---
+animations:
+  anim-bits:
+    title: من الأعداد والحروف إلى bits وbytes
+    code: |
+      n = 13
+      binary = bin(n)
+      back = int("1101", 2)
+      one_byte = 2 ** 8
+      bits_needed = n.bit_length()
+      code_point = ord("A")
+      arabic_point = ord("ب")
+      utf8 = "ب".encode("utf-8")
+      n_bytes = len(utf8)
+      decoded = utf8.decode("utf-8")
+      print(binary, back, one_byte, bits_needed, code_point, arabic_point, utf8, n_bytes, decoded)
+    notes:
+      2:
+        what: '`bin` تعرض العدد بالنظام **الثنائي**: `0b1101` = 8 + 4 + 0 + 1 = 13.'
+        theory: 'الحاسوب يخزّن كل شيء في دوائر لها حالتان (تيار أو لا تيار)، أي **bit** قيمته 0 أو 1. والنظام الثنائي يمثّل الأعداد بقوى 2 كما يمثّلها العشري بقوى 10: 1101 = 1×8 + 1×4 + 0×2 + 1×1.'
+      3:
+        what: '`int(نص، الأساس)` الاتجاه العكسي: من ثنائي إلى عدد.'
+      4:
+        what: '**byte** = 8 bits، فيمثّل 2⁸ = 256 قيمة (من 0 إلى 255). ولهذا تظهر 255 في الألوان وفي `uint8`.'
+      5:
+        what: '`bit_length()` عدد الـbits اللازمة لتمثيل 13: أربعة.'
+      6:
+        what: '`ord` تعطي رقم الحرف في **Unicode** (code point): `A` = 65.'
+        theory: 'النص ليس حروفًا في الذاكرة بل **أرقام**: Unicode جدول عالمي يعطي كل حرف في كل لغة رقمًا فريدًا. ثم يأتي **الترميز (encoding)** ليحوّل هذه الأرقام إلى bytes.'
+      7:
+        what: الحرف العربي «ب» رقمه 1576 في Unicode.
+      8:
+        what: '`encode("utf-8")` تحوّل الحرف إلى bytes. الحرف العربي يحتاج **2 bytes**: `b''\xd8\xa8''`.'
+        theory: 'UTF-8 ترميز **متغير الطول**: الحروف اللاتينية 1 byte (متوافقة مع ASCII القديم)، والعربية 2، والصينية 3، والـemoji 4. لذلك `len(text)` يعدّ الحروف، و`len(text.encode())` يعدّ الـbytes.'
+      10:
+        what: '`decode` العكس: من bytes إلى نص **بالترميز نفسه**. ترميز خاطئ يعطي حروفًا مشوّهة (mojibake).'

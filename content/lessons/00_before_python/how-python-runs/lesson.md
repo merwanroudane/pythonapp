@@ -69,6 +69,8 @@ dis.dis(compile(source, "<demo>", "exec"))
 «اضرب»، «خزّن في `total`».
 :::
 
+:::animation id="anim-pipeline":::
+
 ## 3. متى يظهر كل نوع من الأخطاء؟
 
 :::quiz id="q-when":::

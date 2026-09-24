@@ -41,6 +41,8 @@ print(math.sqrt(-4))
 
 :::change id="ch-polar":::
 
+:::animation id="anim-complex":::
+
 :::mistake
 ```python
 z = 3 + j          # NameError: name 'j' is not defined

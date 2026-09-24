@@ -83,6 +83,8 @@ print(slow_sum(200_000))
 print(slow_sum.__name__)        # 'wrapper'! the identity was lost
 :::
 
+:::animation id="anim-decorator":::
+
 :::quiz id="q-sugar":::
 
 ## functools.wraps وdecorators بمعاملات

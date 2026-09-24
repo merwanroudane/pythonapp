@@ -102,3 +102,50 @@ exercises:
       - "التصفية: `df[df[\"age\"] >= 18]`. والقيم المفقودة: `df[\"income\"].isna().sum()`."
       - "`adults.groupby(\"city\")[\"income\"].mean()` ثم `.sort_values(ascending=False)`."
       - "عمود جديد: `df[\"income_k\"] = df[\"income\"] / 1000`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-pandas:
+    title: جدول واحد، خمسة أوامر pandas
+    code: |
+      import pandas as pd
+
+      df = pd.DataFrame({
+          "city": ["Oran", "Algiers", "Oran", "Setif"],
+          "income": [42000, 38000, 58000, None],
+      })
+      df["income_k"] = df["income"] / 1000
+      rich = df[df["income"] > 40000]
+      missing = df["income"].isna().sum()
+      groups = df.groupby("city")["income"].mean()
+      ranked = groups.sort_values(ascending=False)
+      print(ranked)
+    notes:
+      3:
+        what: 'من قاموس إلى جدول: كل مفتاح يصبح **عمودًا**، وكل قائمة قيم ذلك العمود، ويُضاف **index** تلقائي: 0، 1، 2، 3.'
+        parts:
+        - ['pd.DataFrame({...})', بناء جدول من dict of lists]
+        - [None, قيمة مفقودة؛ تصبح `NaN` في عمود رقمي]
+        theory: الـDataFrame مجموعة **أعمدة**، كل عمود Series بنوع واحد، وكلها تتشارك index واحدًا. لذلك نفكر في pandas **عمودًا عمودًا** لا صفًا صفًا. ولاحظ أن `income` صار `float64` لأن `NaN` نفسها قيمة float.
+      7:
+        what: 'عمود جديد محسوب: القسمة تُطبَّق على العمود كله دفعة واحدة (vectorized)، و`NaN / 1000` تبقى `NaN`.'
+        parts:
+        - ['df["income_k"] =', الإسناد إلى عمود غير موجود **ينشئه**]
+        - ['df["income"] / 1000', Series ÷ رقم ← Series جديدة بالطول نفسه]
+      8:
+        what: 'التصفية على مرحلتين: الشرط ينتج Series منطقية، ثم `df[...]` يُبقي الصفوف التي قيمتها `True`.'
+        parts:
+        - ['df["income"] > 40000', True/False لكل صف (و`NaN > 40000` تعطي False)]
+        - ['df[mask]', اختيار الصفوف حيث True]
+        theory: 'الـindex الأصلي **يبقى** (0 و2): إنه هوية الصف لا رقم ترتيبه، وهذا ما يسمح بمحاذاة الجداول ودمجها لاحقًا. استخدم `reset_index(drop=True)` إن أردت ترقيمًا جديدًا.'
+      9:
+        what: '`isna()` تعطي True للقيم المفقودة، و`sum()` تعدّها: قيمة واحدة هنا.'
+      10:
+        what: '**split → apply → combine**: نقسم الصفوف حسب المدينة، نحسب متوسط الدخل في كل مجموعة، ونجمع النتائج في Series index-ها أسماء المدن.'
+        parts:
+        - [groupby("city"), 'split: مجموعة لكل قيمة مختلفة من `city`']
+        - ['["income"]', العمود الذي نلخّصه]
+        - [.mean(), 'apply + combine: متوسط كل مجموعة']
+        theory: 'Setif متوسطها `NaN` لأن قيمتها الوحيدة مفقودة: دوال التجميع **تتجاهل** `NaN`، فإن لم يبقَ شيء كانت النتيجة مفقودة. والمجموعات مرتبة أبجديًا افتراضيًا.'
+      11:
+        what: '`sort_values(ascending=False)` ترتيب تنازلي حسب القيم، والـ`NaN` توضع في النهاية دائمًا.'

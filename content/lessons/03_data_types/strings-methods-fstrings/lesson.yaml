@@ -112,3 +112,52 @@ changes:
           ratio = 0.4567
           print(f"{ratio:.1%}")
         explain: "`%` يضرب في 100 ويضيف علامة النسبة: مثالي لنتائج الاستبيانات والنسب."
+
+# --- step-by-step command animations ---
+animations:
+  anim-strmethods:
+    title: تنظيف نص وتنسيقه، method بعد method
+    code: |
+      raw = "  Sara BENALI  "
+      clean = raw.strip()
+      title = clean.title()
+      first = clean[0]
+      last_name = clean.split()[1]
+      unchanged = raw
+      words = "data,science,python".split(",")
+      joined = " | ".join(words)
+      found = joined.find("python")
+      price = 1234.5
+      label = f"{title}: {price:,.2f} DZD ({len(words)} tags)"
+      print(label)
+    notes:
+      1:
+        what: 'نص فيه مسافات زائدة وحالة أحرف غير موحدة: هكذا تبدو البيانات الحقيقية.'
+      2:
+        what: '`strip()` تعيد نصًا **جديدًا** بلا مسافات في الطرفين، و`raw` نفسه لم يتغير.'
+        theory: 'الـstr **immutable**: لا method تعدّل النص في مكانه، كلها تعيد نصًا جديدًا. لذلك يجب الإسناد: `s = s.strip()`. أما كتابة `s.strip()` وحدها فلا تغيّر شيئًا.'
+      3:
+        what: '`title()` تجعل أول حرف من كل كلمة كبيرًا والباقي صغيرًا: `Sara Benali`.'
+      4:
+        what: 'الفهرسة: النص **تسلسل** حروف، أولها في الموضع 0.'
+        parts:
+        - ['clean[0]', أول حرف]
+        - ['clean[-1]', (للمقارنة) آخر حرف]
+      5:
+        what: '`split()` تقسم على المسافات إلى `[''Sara'', ''BENALI'']`، ثم `[1]` تأخذ العنصر الثاني.'
+        theory: 'هذا **تسلسل عمليات (chaining)**: كل خطوة تعيد قيمة نطبق عليها التالية. اقرأها من اليسار إلى اليمين.'
+      6:
+        what: 'الدليل: `raw` ما زال كما هو بمسافاته، بعد كل تلك العمليات.'
+      7:
+        what: '`split(",")` بفاصل محدد: سطر CSV بسيط ← قائمة نصوص.'
+      8:
+        what: '`join` العكس: يلصق عناصر قائمة نصوص بفاصل. لاحظ أن الفاصل هو الـobject: `" | ".join(words)`.'
+      9:
+        what: '`find` تعيد موضع أول ظهور، أو `-1` إن لم يوجد.'
+      11:
+        what: '**f-string**: كل `{expression}` يُحسب ويُدرج في النص، وبعد `:` تأتي **مواصفة تنسيق** تتحكم في الشكل.'
+        parts:
+        - ['{title}', قيمة متغير]
+        - ['{price:,.2f}', '`,` فاصل الآلاف و`.2f` رقمان بعد الفاصلة: `1,234.50`']
+        - ['{len(words)}', أي expression، حتى استدعاء دالة]
+        theory: 'التنسيق **للعرض فقط**: `f"{x:.2f}"` نص، والقيمة `x` لم تتغير. احسب بالأرقام، ونسّق في النهاية عند العرض.'

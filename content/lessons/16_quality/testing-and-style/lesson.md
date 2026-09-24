@@ -71,6 +71,8 @@ for test in (test_mean_basic, test_mean_single, test_mean_empty_raises):
     print("PASSED", test.__name__)
 :::
 
+:::animation id="anim-tests":::
+
 :::concept
 أداة **pytest** تبحث تلقائيًا عن الملفات `test_*.py` والدوال `test_*` وتشغّلها كلها وتلخّص النتيجة،
 وتعرض عند الفشل القيم الفعلية مقابل المتوقعة. الشكل الذي كتبناه هنا هو بالضبط ما يقرؤه pytest:

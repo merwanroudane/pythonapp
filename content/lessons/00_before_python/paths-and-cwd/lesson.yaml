@@ -115,3 +115,55 @@ changes:
           path = PureWindowsPath("C:/") / "new_data" / "table.csv"
           print(path)
         explain: "`pathlib` يبني المسار بالعامل `/` ويختار الفاصل الصحيح للنظام، وهو الطريقة الحديثة الموصى بها."
+
+# --- step-by-step command animations ---
+animations:
+  anim-paths:
+    title: من مسار نسبي إلى ملف حقيقي على القرص
+    code: |
+      from pathlib import Path
+
+      cwd = Path.cwd()
+      data_dir = Path("data")
+      data_dir.mkdir(exist_ok=True)
+      target = data_dir / "raw" / "survey.csv"
+      full = target.resolve()
+      parts = target.parts
+      name, stem, suffix = target.name, target.stem, target.suffix
+      exists = target.exists()
+      target.parent.mkdir(parents=True, exist_ok=True)
+      target.write_text("id,age\n1,34\n", encoding="utf-8")
+      print(target.as_posix(), name, stem, suffix, exists, target.exists())
+    notes:
+      3:
+        what: 'نسأل نظام التشغيل: ما **مجلد العمل الحالي (cwd)** لهذه العملية؟ منه تنطلق كل المسارات النسبية.'
+        parts:
+        - [Path.cwd(), current working directory]
+        theory: 'كل process (برنامج قيد التشغيل) له cwd خاص به، **يرثه** من البرنامج الذي شغّله: الـterminal أو الـIDE. لذلك قد يعمل `open("data.csv")` من مجلد ويفشل من آخر: الكود نفسه، والـcwd مختلف.'
+      4:
+        what: 'مسار **نسبي**: لا يبدأ بحرف قرص ولا بـ`/`، فمعناه «المجلد `data` داخل الـcwd». وإنشاء Path لا يلمس القرص.'
+      5:
+        what: 'الآن نلمس القرص فعلًا: ننشئ المجلد. و`exist_ok=True` تعني «لا تعترض إن كان موجودًا».'
+      6:
+        what: العامل `/` بين Path ونص **يبني مسارًا** بالفاصل الصحيح لنظام التشغيل.
+        parts:
+        - [data_dir / "raw", ضمّ مجلد إلى المسار]
+        - [/ "survey.csv", ثم اسم الملف]
+        theory: 'لهذا نستخدم pathlib بدل تركيب النصوص يدويًا: الفاصل `\` يعمل في Windows فقط، و`/` في Path يعمل في كل الأنظمة. والمسار هنا ما زال **وصفًا**: الملف غير موجود بعد.'
+      7:
+        what: '`resolve()` تحوّل المسار النسبي إلى **مطلق**: الـcwd + المسار النسبي، مع حذف `..` و`.`.'
+        theory: المسار **المطلق** يبدأ من جذر نظام الملفات فيعني الشيء نفسه من أي cwd. والمسار **النسبي** أقصر ويجعل المشروع قابلًا للنقل بين الأجهزة، لكنه يعتمد على الـcwd.
+      8:
+        what: '`parts` تفكك المسار إلى أجزائه: `(''data'', ''raw'', ''survey.csv'')`.'
+      9:
+        what: أجزاء اسم الملف.
+        parts:
+        - [name, '`''survey.csv''`: الاسم كاملًا']
+        - [stem, '`''survey''`: بلا امتداد']
+        - [suffix, '`''.csv''`: الامتداد، وهو عُرف لا يضمن محتوى الملف']
+      10:
+        what: 'نسأل القرص: هل الملف موجود؟ الجواب `False` لأننا لم ننشئه بعد.'
+      11:
+        what: '`parent` المجلد الحاوي (`data/raw`)، و`parents=True` تنشئ كل المجلدات الناقصة في الطريق.'
+      12:
+        what: 'نكتب الملف فعليًا. في المخرجات: `exists` بقي `False` لأنه أُخذ قبل الإنشاء، أما `target.exists()` الآن فتعطي `True`.'

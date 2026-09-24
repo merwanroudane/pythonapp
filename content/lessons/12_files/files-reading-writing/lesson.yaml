@@ -104,3 +104,58 @@ exercises:
       - "`csv.DictReader(f)` تُعيد كل صف كقاموس مفاتيحه أسماء الأعمدة. القيم **نصوص**: حوّلها بـ`float`."
       - "افتح الملف بـ`with open(\"grades.csv\", newline=\"\", encoding=\"utf-8\") as f:` ثم مرّ على الصفوف."
       - "للكتابة: `with open(\"summary.json\", \"w\", encoding=\"utf-8\") as f: json.dump(summary, f)`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-files:
+    title: 'دورة حياة ملف: فتح، كتابة، إغلاق، قراءة'
+    code: |
+      from pathlib import Path
+
+      path = Path("notes.txt")
+      with open(path, "w", encoding="utf-8") as f:
+          f.write("line one\n")
+          f.write("line two\n")
+      closed = f.closed
+      with open(path, encoding="utf-8") as f:
+          text = f.read()
+          again = f.read()
+      lines = text.splitlines()
+      size = path.stat().st_size
+      print(closed, lines, repr(again), size)
+    notes:
+      3:
+        what: ننشئ **Path object** يصف مكان الملف. هذا **لا ينشئ** الملف بعد؛ إنه مجرد عنوان.
+        parts:
+        - [Path(...), 'من `pathlib`: مسار كـobject له methods مثل `.exists()` و`.stat()` والعامل `/`']
+        - ['"notes.txt"', 'مسار **نسبي**: يُفسَّر بالنسبة إلى مجلد العمل الحالي (cwd)']
+      4:
+        what: نفتح الملف **للكتابة**. الوضع `"w"` ينشئ الملف، أو **يمسح محتواه** إن كان موجودًا.
+        parts:
+        - [with ... as f, 'context manager: يغلق الملف تلقائيًا عند الخروج من الكتلة، حتى لو حدث خطأ']
+        - ['open(path, "w")', يطلب من نظام التشغيل فتح الملف، ويعيد **file object** نسميه `f`]
+        - [encoding="utf-8", قاعدة تحويل الحروف إلى bytes؛ اذكرها دائمًا، خاصة مع العربية]
+        theory: 'الملف على القرص تسلسل من **bytes**. الوضع النصي يضيف طبقة ترميز: تعطيه `str` فيحوّلها إلى bytes بـUTF-8. ونظام التشغيل يمنح كل ملف مفتوح «مقبضًا» (file descriptor) وعددها محدود، لذا يجب الإغلاق دائمًا، وهذا ما يضمنه `with`.'
+      5:
+        what: '`write` يضع النص في **buffer** بالذاكرة، ويُنقل إلى القرص عند امتلائه أو عند الإغلاق. وهو **لا يضيف سطرًا جديدًا** من تلقاء نفسه، لذلك كتبنا `\n` في آخر النص.'
+        parts:
+        - ['"line one\n"', '9 حروف: 8 حروف مرئية + حرف السطر الجديد']
+      7:
+        what: 'خرجنا من كتلة `with` فأُغلق الملف تلقائيًا: `f.closed` قيمتها `True`، والبيانات صارت على القرص.'
+        theory: '`with` يستدعي `f.__enter__()` عند الدخول و`f.__exit__()` عند الخروج مهما حدث. هذا **بروتوكول context manager**، وتستخدمه أيضًا الاتصالات بقواعد البيانات والأقفال (locks).'
+      8:
+        what: نفتح الملف نفسه **للقراءة**. بلا وضع صريح، الافتراضي هو `"r"` (قراءة نص).
+      9:
+        what: '`read()` تقرأ الملف **كله** نصًا واحدًا، ويتقدم «موضع القراءة» إلى النهاية.'
+        parts:
+        - [f.read(), كل المحتوى كـ`str` واحد]
+        theory: الـfile object يحتفظ بـ**موضع (position)** مثل مؤشر الكتابة في محرر نصوص. كل قراءة تبدأ منه وتحرّكه. للملفات الضخمة لا تقرأ كل شيء دفعة واحدة، بل كرر `for line in f:` لتقرأ سطرًا سطرًا بذاكرة ثابتة.
+      10:
+        what: 'قراءة ثانية تعيد نصًا **فارغًا** `''''`: الموضع في نهاية الملف ولم يبقَ شيء. (`f.seek(0)` يعيده إلى البداية.)'
+      11:
+        what: '`splitlines()` تقسم النص إلى قائمة أسطر **بلا** `\n` في آخرها.'
+      12:
+        what: '`stat()` تسأل نظام الملفات عن معلومات الملف (metadata)، و`st_size` حجمه بالـbytes: 9 + 9 = 18.'
+        parts:
+        - [path.stat(), 'معلومات الملف: الحجم، تاريخ التعديل، الصلاحيات']
+        - [.st_size, الحجم بالـbytes]

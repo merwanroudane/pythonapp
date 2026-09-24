@@ -34,9 +34,10 @@ streamlit run streamlit_app.py
 | Variable inspector with aliasing / mutability, memory and backend badges (§5.2, §87) | `app/ui/output_panel.py` |
 | Rule-based Arabic error explanations (§86) | `app/execution/explain.py` |
 | Step-by-step execution: loop panel, call-stack frames, Play/Pause/Speed (§7.2, §8.4, §8.12, §90) | `app/ui/stepper.py`, `app/ui/loop_view.py` |
+| Command-by-command explanations in every lecture: what the line does, its anatomy, the theory behind it, and what it changed (full DataFrame / array previews) | `app/ui/stepper.py`, `lesson.yaml` `animations` |
 | Predict-first quizzes, exercises with hidden checks and graded hints (§76) | `app/ui/quiz.py`, `app/ui/exercise.py` |
 | Change & Observe before/after (§2.10) | `app/ui/change.py` |
-| Dashboard: progress, continue, search, 25-track roadmap, errors faced (§4) | `app_pages/home.py` |
+| Dashboard: progress, continue, search, 26-track roadmap, errors faced (§4) | `app_pages/home.py` |
 | Type Lab: every property of any value, probed inside the runner (§117) | `app/ui/property_lab.py`, `app/execution/probe.py` |
 | Content validation + example verification (§101) | `scripts/` |
 
@@ -112,6 +113,23 @@ right
 :::
 ```
 
+An animation traces real code and explains the commands line by line. A note is either a
+sentence or a command explanation with anatomy and theory:
+
+```yaml
+animations:
+  a1:
+    title: "..."
+    code: |
+      df = pd.read_csv("data.csv")
+    notes:
+      1:
+        what: "What this command does."
+        parts:
+          - ["pd.read_csv(...)", "what this piece means"]
+        theory: "Why it works this way."
+```
+
 Then check it:
 
 ```bash
@@ -121,10 +139,10 @@ python -m pytest
 ```
 
 `verify_examples.py` runs every example, animation and variant (feeding `inputs=` to
-`input()`), checks each `expect=`, and checks that each exercise's reference solution
-passes while its starter code does not.
+`input()`), checks each `expect=`, checks that every animation note sits on a line that
+actually runs, and checks that each exercise's reference solution passes while its
+starter code does not.
 
 ## Next (Phase C)
 
-Modules/files/regex/OOP tracks, notebook simulator, debugger visualizer,
-decorators/closures, API explorer.
+More lectures per track, notebook simulator, debugger visualizer, API explorer.

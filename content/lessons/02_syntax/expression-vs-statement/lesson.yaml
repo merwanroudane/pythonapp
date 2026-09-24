@@ -80,3 +80,38 @@ exercises:
       - "اسأل: هل يمكن وضع السطر على يمين `=`؟ إن أمكن فهو expression."
       - "`x = ...` و`import` و`del` أفعال لا قيم؛ الاستدعاء `len(...)` والـconditional expression قيم."
       - "ثلاث expressions: `2 + 3`، `len('abc')`، والـconditional expression."
+
+# --- step-by-step command animations ---
+animations:
+  anim-expr:
+    title: expression له قيمة، statement يفعل شيئًا
+    code: |
+      x = 3
+      y = x * 2 + 1
+      x + y
+      label = "big" if y > 5 else "small"
+      result = print("side effect")
+      kind = type(result)
+      if y > 5:
+          y = y - 10
+      print(x, y, label, result, kind)
+    notes:
+      1:
+        what: '**statement إسناد**: لا قيمة له، بل **يفعل** شيئًا: يربط الاسم `x` بالقيمة 3.'
+        theory: 'الـ**statement** وحدة تنفيذ: إسناد، `if`، `for`، `def`، `import`. والـ**expression** جزء له **قيمة**: `3`، `x * 2 + 1`، `f(x)`. القاعدة: تضع expression حيث تُنتظر قيمة، ولا يمكن وضع statement هناك، فـ`print(x = 3)` ليس إسنادًا.'
+      2:
+        what: الطرف الأيمن **expression** يُقيَّم أولًا إلى قيمة (7)، ثم يربط الإسناد `y` بها.
+        parts:
+        - [x * 2 + 1, 'expression: يُحسب ← 7']
+        - [y =, statement الإسناد يستقبل القيمة]
+      3:
+        what: 'expression وحده في سطر: يُحسب (10) ثم **يُرمى** لأن لا شيء يستقبله. في notebook يُعرض لأنه آخر سطر في الخلية؛ في سكربت لا يظهر شيء.'
+      4:
+        what: '**conditional expression**: `A if شرط else B` له قيمة، فيمكن إسناده مباشرة.'
+      5:
+        what: '`print` تكتب على الشاشة (أثر جانبي)، ثم **تعيد** `None`. فاستدعاؤها expression قيمته `None`.'
+        theory: 'فرّق بين **القيمة** و**الأثر الجانبي**: ما يظهر على الشاشة ليس قيمة يمكن استعمالها لاحقًا. لهذا تحتاج الدوال `return` لا `print` حين تريد نتيجتها.'
+      6:
+        what: '`type(None)` هو `NoneType`.'
+      7:
+        what: '`if` **statement مركّب**: يقيّم الشرط (expression منطقي)، ثم ينفّذ الكتلة المزاحة إن كان صحيحًا. ولا يمكن إسناده: `z = if ...` خطأ صياغة.'

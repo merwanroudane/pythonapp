@@ -94,3 +94,39 @@ exercises:
       - "`fig, ax = plt.subplots(1, 2)` تعطي Axes اثنين: `ax[0]` و`ax[1]`."
       - "`ax[0].plot(years, gdp_growth)` ثم `ax[0].set_title(...)` و`ax[0].set_ylabel(\"%\")`."
       - "`ax[1].bar(countries, population)` ثم `ax[1].set_title(\"Population\")`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-plot:
+    title: كيف يُبنى رسم Matplotlib قطعة قطعة
+    code: |
+      import matplotlib.pyplot as plt
+
+      years = [2020, 2021, 2022, 2023]
+      growth = [-5.1, 3.4, 3.6, 4.1]
+      fig, ax = plt.subplots(figsize=(5, 3))
+      lines = ax.plot(years, growth, marker="o")
+      ax.set_title("GDP growth")
+      ax.set_ylabel("%")
+      n_lines = len(ax.get_lines())
+      print(type(fig).__name__, type(ax).__name__, n_lines)
+    notes:
+      5:
+        what: ننشئ **Figure** (الصفحة) فيها **Axes** واحد (منطقة الرسم)، ونفك الـtuple الناتج إلى اسمين.
+        parts:
+        - [plt.subplots(...), 'يعيد tuple: `(Figure, Axes)`']
+        - ['figsize=(5, 3)', 'الحجم بالبوصة: عرض × ارتفاع']
+        - ['fig, ax =', tuple unpacking]
+        theory: 'بنية Matplotlib هرمية: **Figure ← Axes ← عناصر** (خطوط Line2D، نصوص، محاور). كل شيء object تعدّله بـmethods، ولذلك `ax.set_title(...)` أوضح من `plt.title(...)`: تعرف بالضبط أي رسم تعدّل.'
+      6:
+        what: '`plot` يضيف **خطًا** (Line2D object) إلى الـAxes: x من `years` وy من `growth`، مع دائرة عند كل نقطة.'
+        parts:
+        - ['ax.plot(x, y)', خط يصل النقاط بالترتيب]
+        - [marker="o", شكل العلامة عند كل نقطة]
+        theory: 'لم يُرسم شيء على الشاشة بعد: Matplotlib تبني **وصفًا** للرسم في الذاكرة، ثم يُرسم فعليًا (render) عند العرض أو الحفظ. في هذا الملعب يُلتقط كل Figure بعد التنفيذ ويظهر في تبويب Figures.'
+      7:
+        what: 'عنوان الرسم. راقب «ما فعله السطر» في الخطوة التالية: تمثيل `ax` صار يتضمن العنوان.'
+      8:
+        what: 'تسمية المحور الرأسي مع وحدته. قاعدة: كل محور له تسمية ووحدة.'
+      9:
+        what: 'نسأل الـAxes عن محتواه: `get_lines()` قائمة الخطوط المرسومة فيه، وهي خط واحد.'

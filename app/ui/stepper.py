@@ -7,11 +7,12 @@ Play/Pause · Step back/forward · Reset · Speed · current-line highlight · s
 
 from __future__ import annotations
 
+import ast
 from dataclasses import dataclass, field
 
 import streamlit as st
 
-from app.curriculum.schema import Animation
+from app.curriculum.schema import Animation, CommandNote
 from app.execution.client import run_code
 from app.execution.models import RunResult
 from app.ui.bidi import ltr
@@ -30,20 +31,73 @@ class Step:
     stack: list[str] = field(default_factory=list)
     stdout: str = ""
     frames: list[dict] = field(default_factory=list)  # [{"name", "locals"}], outermost first
+    parts: list[tuple[str, str]] = field(default_factory=list)  # command anatomy
+    theory: str = ""
+    previews: dict[str, str] = field(default_factory=dict)  # full reprs of changed values
 
 
-def steps_from_run(result: RunResult, notes: dict[int, str] | None = None) -> list[Step]:
+def statement_starts(code: str) -> dict[int, int]:
+    """Continuation line -> first line of its statement (or of a compound header), so a
+    statement written over several lines is one step instead of one per line."""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return {}
+    starts: dict[int, int] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.stmt):
+            continue
+        body = getattr(node, "body", None)
+        if isinstance(body, list) and body and isinstance(body[0], ast.stmt):
+            last = body[0].lineno - 1  # only the header of if/for/def/with/...
+        else:
+            last = node.end_lineno or node.lineno
+        for line in range(node.lineno + 1, last + 1):
+            starts.setdefault(line, node.lineno)
+    return starts
+
+
+def steps_from_run(
+    result: RunResult,
+    notes: dict[int, str | CommandNote] | None = None,
+    code: str | None = None,
+) -> list[Step]:
     notes = notes or {}
+    starts = statement_starts(code) if code else {}
     steps: list[Step] = []
     for s in result.trace.steps if result.trace else []:
+        line = starts.get(s.line, s.line) if s.event == "line" else s.line
+        if s.event == "line" and steps:
+            last = steps[-1]
+            same_state = (last.globals, last.locals, last.stdout) == (s.globals, s.locals, s.stdout)
+            if last.line == line and last.frame == s.frame and same_state:
+                continue  # another line of the statement already shown: nothing new
         if s.event == "call":
             args = ", ".join(f"{k}={v}" for k, v in s.locals.items())
             note = f"استدعاء `{s.frame}({args})`: يُنشأ call frame جديد."
         elif s.event == "return":
             note = f"`{s.frame}` تُعيد `{s.return_value}` إلى الـcaller ويُغلق الـframe."
         else:
-            note = notes.get(s.line, "")
-        steps.append(Step(s.line, note, s.globals, s.locals, s.frame, s.stack, s.stdout, s.frames))
+            note = notes.get(line, "")
+        parts: list[tuple[str, str]] = []
+        theory = ""
+        if isinstance(note, CommandNote):
+            note, parts, theory = note.what, note.parts, note.theory
+        steps.append(
+            Step(
+                line,
+                note,
+                s.globals,
+                s.locals,
+                s.frame,
+                s.stack,
+                s.stdout,
+                s.frames,
+                parts=list(parts),
+                theory=theory,
+                previews=s.previews,
+            )
+        )
     final_globals = {v.name: v.repr for v in result.variables}
     if result.exception:
         end_note = f"توقف التنفيذ بسبب `{result.exception.type}: {result.exception.message}`"
@@ -54,7 +108,10 @@ def steps_from_run(result: RunResult, notes: dict[int, str] | None = None) -> li
 
 
 def steps_from_authored(anim: Animation) -> list[Step]:
-    return [Step(s.line, s.note, dict(s.state), stdout=s.stdout) for s in anim.steps]
+    return [
+        Step(s.line, s.note, dict(s.state), stdout=s.stdout, parts=list(s.parts), theory=s.theory)
+        for s in anim.steps
+    ]
 
 
 @st.cache_data(max_entries=256, show_spinner=False)
@@ -65,7 +122,7 @@ def _traced(code: str) -> RunResult:
 def steps_for_animation(anim: Animation) -> list[Step]:
     if anim.source == "authored":
         return steps_from_authored(anim)
-    return steps_from_run(_traced(anim.code), anim.notes)
+    return steps_from_run(_traced(anim.code), anim.notes, anim.code)
 
 
 def _code_with_marker(code: str, line: int | None) -> str:
@@ -123,6 +180,57 @@ def _render_frames(step: Step, prev: Step) -> None:
             )
             if rows:
                 st.dataframe(rows, hide_index=True)
+
+
+def _code_span(piece: str) -> str:
+    fence = "``" if "`" in piece else "`"
+    return f"{fence}{piece}{fence}" if fence == "`" else f"{fence} {piece} {fence}"
+
+
+def _render_command(step: Step, key: str) -> None:
+    """The explanation of the command about to run: what it does, its parts, the theory."""
+    if not (step.note or step.parts or step.theory):
+        return
+    with st.container(border=True, key=f"card-concept-cmd-{key}"):
+        with st.container(key=f"cardtitle-cmd-{key}"):
+            where = f" · السطر {step.line}" if step.line is not None else ""
+            label = "الأمر الحالي" if step.line is not None else "النهاية"
+            st.markdown(f":material/terminal: {label}{where}")
+        if step.note:
+            st.markdown(step.note)
+        if step.parts:
+            st.markdown("**تشريح الأمر · Anatomy**")
+            st.markdown("\n".join(f"- {_code_span(p)}: {m}" for p, m in step.parts))
+    if step.theory:
+        with st.container(border=True, key=f"card-theory-cmdtheory-{key}"):
+            with st.container(key=f"cardtitle-cmdtheory-{key}"):
+                st.markdown(":material/school: النظرية · لماذا يعمل هكذا؟")
+            st.markdown(step.theory)
+
+
+def _render_effect(step: Step, prev: Step, first: bool, key: str) -> None:
+    """What the previous line did: the values it created or changed, and what it printed."""
+    if first:
+        return
+    before = {**prev.globals, **prev.locals}
+    now = {**step.globals, **step.locals}
+    changed = [n for n, v in now.items() if before.get(n) != v or n in step.previews]
+    printed = step.stdout[len(prev.stdout) :] if step.stdout.startswith(prev.stdout) else ""
+    if not changed and not printed:
+        return
+    with st.container(border=True, key=f"card-practice-effect-{key}"):
+        with st.container(key=f"cardtitle-effect-{key}"):
+            what = f"ما فعله السطر {prev.line}" if prev.line is not None else "ما حدث"
+            st.markdown(f":material/done_all: {what}")
+        for name in changed[:4]:
+            status = "جديد" if name not in before else "تغيّر"
+            st.caption(f"`{name}` · {status}")
+            st.code(step.previews.get(name) or now[name], language="text")
+        if len(changed) > 4:
+            st.caption(f"و{len(changed) - 4} أسماء أخرى في جدول Globals.")
+        if printed:
+            st.caption("طُبع على الشاشة:")
+            st.code(printed, language="text")
 
 
 def render_stepper(code: str, steps: list[Step], key: str, title: str | None = None) -> None:
@@ -206,9 +314,9 @@ def render_stepper(code: str, steps: list[Step], key: str, title: str | None = N
                 st.code(_code_with_marker(code, step.line), language="python", line_numbers=True)
                 if step.line is not None:
                     st.caption(f"السطر {step.line} هو الذي **سيُنفَّذ الآن** (◀).")
+                _render_effect(step, prev, i == 0, key)
             with state_col:
-                if step.note:
-                    st.info(step.note, icon=":material/info:")
+                _render_command(step, key)
                 if (loop := loop_state(code, steps, i)) is not None:
                     _render_loop(loop)
                 st.markdown("**Globals**")

@@ -81,6 +81,8 @@ print(type(x).__name__)
 print(int("1") + 1, "1" + str(1))   # strong: you convert explicitly
 :::
 
+:::animation id="anim-typing":::
+
 :::quiz id="q-typing":::
 
 :::code mode="script" expect="TypeError"

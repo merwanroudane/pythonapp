@@ -2,6 +2,7 @@
 
 from app.curriculum.blocks import KNOWN_TYPES
 from app.curriculum.loader import load_curriculum
+from app.curriculum.schema import CommandNote
 from app.curriculum.validation import validate
 
 
@@ -31,3 +32,18 @@ def test_every_lesson_meets_the_minimum_lecture_standard():
         else:
             assert "theory" in types, f"{lesson.meta.id}: theory lecture without theory blocks"
         assert lesson.meta.last_verified, f"{lesson.meta.id}: no last_verified date"
+
+
+def test_every_lesson_explains_its_commands_step_by_step():
+    """Each lecture has a step-by-step animation whose key commands carry an explanation
+    with anatomy or theory, not only a one-line note."""
+    for lesson in load_curriculum().lessons.values():
+        types = {b.type for b in lesson.blocks}
+        assert "animation" in types, f"{lesson.meta.id}: no step-by-step animation"
+        rich = [
+            note
+            for anim in lesson.meta.animations.values()
+            for note in anim.notes.values()
+            if isinstance(note, CommandNote) and (note.parts or note.theory)
+        ]
+        assert rich, f"{lesson.meta.id}: animation notes lack anatomy/theory"

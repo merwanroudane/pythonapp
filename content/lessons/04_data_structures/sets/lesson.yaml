@@ -119,3 +119,42 @@ changes:
           chess_club = {"Omar", "Adam"}
           print(math_club ^ chess_club)
         explain: "`^` ما في إحداهما فقط، لا في كلتيهما."
+
+# --- step-by-step command animations ---
+animations:
+  anim-sets:
+    title: 'موجتان من استبيان: عمليات المجموعات'
+    code: |
+      wave1 = {"Sara", "Omar", "Lina", "Adam"}
+      wave2 = {"Lina", "Adam", "Rami"}
+      both = wave1 & wave2
+      either = wave1 | wave2
+      dropped = wave1 - wave2
+      joined = wave2 - wave1
+      only_one = wave1 ^ wave2
+      wave2.add("Sara")
+      size_after_first = len(wave2)
+      wave2.add("Sara")
+      is_sub = {"Lina"} <= wave1
+      print(sorted(both), len(either), sorted(dropped), sorted(joined), sorted(only_one))
+      print(size_after_first, len(wave2), is_sub)
+    notes:
+      1:
+        what: 'set: مجموعة عناصر **فريدة**، وهنا هي المشاركون في الموجة الأولى من استبيان.'
+        theory: 'الـset في Python هو **المجموعة الرياضية**: لا ترتيب ولا تكرار، وعملياته هي عمليات نظرية المجموعات. وقد يختلف ترتيب عرضه بين تشغيل وآخر لأنه يتبع قيم الـhash لا ترتيب الإدخال.'
+      3:
+        what: '**التقاطع** `&`: من شارك في الموجتين (أو `wave1.intersection(wave2)`).'
+      4:
+        what: '**الاتحاد** `|`: كل من شارك في إحداهما على الأقل، دون تكرار.'
+      5:
+        what: '**الفرق** `-`: في الأولى وليس في الثانية، أي من **انسحب** (attrition). الترتيب مهم: `A - B` لا يساوي `B - A`.'
+      6:
+        what: 'والعكس: من انضم في الموجة الثانية.'
+      7:
+        what: '**الفرق المتماثل** `^`: في واحدة فقط منهما، أي الاتحاد ناقص التقاطع.'
+      8:
+        what: '`add` تضيف عنصرًا جديدًا: الحجم يصبح 4.'
+      10:
+        what: 'إضافته مرة ثانية **لا تفعل شيئًا**: الحجم يبقى 4. التفرّد مضمون تلقائيًا.'
+      11:
+        what: '`<=` **مجموعة جزئية (subset)**: هل كل عناصر اليسار موجودة في اليمين؟'

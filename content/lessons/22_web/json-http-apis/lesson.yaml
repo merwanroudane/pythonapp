@@ -108,3 +108,57 @@ exercises:
       - "`payload = json.loads(raw)` و`null` في JSON تصبح `None`."
       - "السجلات المتداخلة: `rec[\"country\"][\"id\"]`. صفِّ بـ`if rec[\"value\"] is not None` ثم `sorted(...)`."
       - "`meta[\"base\"] + \"?\" + urlencode({\"indicator\": ..., \"page\": meta[\"page\"] + 1})`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-web:
+    title: 'من URL إلى بيانات: بناء الطلب وتحليل الاستجابة'
+    code: |
+      import json
+      from urllib.parse import parse_qs, urlencode, urlparse
+
+      base = "https://api.example.org/v1/data"
+      query = urlencode({"country": "DZ", "q": "GDP growth", "page": 2})
+      url = base + "?" + query
+      parts = urlparse(url)
+      params = parse_qs(parts.query)
+      body = '{"page": 2, "data": [{"year": 2023, "value": 4.1}, {"year": 2022, "value": null}]}'
+      payload = json.loads(body)
+      values = []
+      for rec in payload["data"]:
+          if rec["value"] is not None:
+              values.append(rec["value"])
+      reply = json.dumps({"ok": True, "n": len(values)})
+      print(url, params, values, reply, sep="\n")
+    notes:
+      5:
+        what: '`urlencode` يحوّل قاموس معاملات إلى **query string**: أزواج `key=value` مربوطة بـ`&`، مع ترميز المسافات والرموز الخاصة.'
+        parts:
+        - ['urlencode({...})', dict ← `country=DZ&q=GDP+growth&page=2`]
+        - [GDP growth, المسافة تُرمَّز `+` لأن الـURL لا يقبل المسافات]
+        theory: 'للـURL قواعد صارمة: حروف معينة فقط مسموحة، والباقي يُرمَّز بـ**percent-encoding** (الحرف العربي «ا» يصبح `%D8%A7`). لذلك لا تركّب الـquery يدويًا بالـf-strings: استخدم `urlencode`، أو `params=` في مكتبة requests.'
+      6:
+        what: الـURL الكامل = القاعدة + `?` + الـquery. هذا ما يرسله العميل في سطر طلب `GET`.
+      7:
+        what: '`urlparse` تفكك الـURL إلى أجزائه المسماة.'
+        parts:
+        - [scheme, '`https`: البروتوكول']
+        - [netloc, '`api.example.org`: الخادم']
+        - [path, '`/v1/data`: المورد المطلوب']
+        - [query, 'كل ما بعد `?`']
+        theory: 'هيكل الـURL: `scheme://netloc/path?query#fragment`. الخادم يستعمل الـpath ليعرف **أي مورد** تطلب، والـquery ليعرف **أي خيارات**: تصفية، رقم صفحة، لغة.'
+      8:
+        what: '`parse_qs` العملية العكسية: من query string إلى قاموس. والقيم **قوائم** لأن المفتاح قد يتكرر مثل `?tag=a&tag=b`.'
+      9:
+        what: 'هذا ما قد يعيده الخادم في **body** الاستجابة: نص JSON. لاحظ أنه ما زال **نصًا** (`str`) لا قاموسًا.'
+      10:
+        what: '`json.loads` تحلّل (parse) نص JSON إلى objects في Python.'
+        parts:
+        - ['object {…}', يصبح `dict`]
+        - ['array […]', يصبح `list`]
+        - [null / true, يصبحان `None` / `True`]
+        theory: 'JSON صيغة **نصية مستقلة عن اللغات**: أي برنامج بأي لغة يقرأها ويكتبها، لذلك صارت لغة الـAPIs المشتركة. لكنها أفقر من Python: لا tuple ولا set ولا تواريخ، والمفاتيح نصوص دائمًا.'
+      12:
+        what: نمر على السجلات واحدًا واحدًا. بيانات الـAPIs كثيرًا ما تحتوي `null`، فنتعامل معها **صراحة**.
+      15:
+        what: '`json.dumps` الاتجاه المعاكس: من Python إلى نص JSON، وهو ما ترسله في body طلب `POST`. لاحظ أن `True` تصبح `true`.'

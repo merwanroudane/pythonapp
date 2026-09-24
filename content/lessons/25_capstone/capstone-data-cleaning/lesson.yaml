@@ -121,3 +121,54 @@ exercises:
       - "ابدأ بـ`df = raw.copy()`. للنصوص: `.str.strip().str.title()` ثم `.replace({\"Alger\": \"Algiers\"})`."
       - "`age = pd.to_numeric(df[\"age\"], errors=\"coerce\")` ثم `age.where(age.between(0, 120))`."
       - "`df[\"income\"].str.replace(\",\", \"\", regex=False)` ثم `pd.to_numeric(..., errors=\"coerce\")`، والتاريخ `pd.to_datetime(..., format=\"%Y-%m-%d\", errors=\"coerce\")`، وأخيرًا `drop_duplicates(subset=\"id\").reset_index(drop=True)`."
+
+# --- step-by-step command animations ---
+animations:
+  anim-clean:
+    title: خط التنظيف أمر بأمر
+    code: |
+      import pandas as pd
+
+      raw = pd.DataFrame({
+          "id": [1, 2, 2, 3],
+          "age": ["34", "n/a", "n/a", "151"],
+          "city": [" oran ", "ALGIERS", "ALGIERS", "Alger"],
+      })
+      df = raw.copy()
+      df["city"] = df["city"].str.strip().str.title()
+      df["city"] = df["city"].replace({"Alger": "Algiers"})
+      age = pd.to_numeric(df["age"], errors="coerce")
+      df["age"] = age.where(age.between(0, 120))
+      df = df.drop_duplicates(subset="id").reset_index(drop=True)
+      assert df["id"].is_unique
+      print(df)
+    notes:
+      3:
+        what: 'بيانات خام «واقعية»: مسافات زائدة، حالة أحرف غير موحدة، تهجئتان لمدينة واحدة، نص `"n/a"` بدل رقم، عمر مستحيل، وصف مكرر.'
+      8:
+        what: نعمل على **نسخة**. الخام يبقى كما هو لنقارن به ونعيد التشغيل متى شئنا.
+        theory: 'مبدأ أساسي في البحث القابل لإعادة الإنتاج: **البيانات الخام للقراءة فقط**. كل تعديل يمر عبر كود يمكن مراجعته، فأي شخص يشغّل الكود نفسه على الخام نفسه يحصل على النتيجة نفسها.'
+      9:
+        what: '`.str` تفتح عمليات النصوص على العمود كله دفعة واحدة.'
+        parts:
+        - [.str, 'accessor: يطبّق methods الـ`str` على كل خلية']
+        - [.strip(), '`" oran "` ← `"oran"`']
+        - [.title(), '`"oran"` ← `"Oran"`، و`"ALGIERS"` ← `"Algiers"`']
+      10:
+        what: 'نوحّد التهجئات بقاموس صريح: كل `Alger` تصبح `Algiers`. والقاموس نفسه **توثيق** لقرارات التنظيف.'
+      11:
+        what: '`to_numeric` تحوّل النصوص إلى أرقام، و`errors="coerce"` تجعل ما لا يمكن تحويله (`"n/a"`) **مفقودًا** بدل رفع خطأ.'
+        parts:
+        - [pd.to_numeric(...), نص ← رقم]
+        - [errors="coerce", غير القابل للتحويل ← `NaN`]
+      12:
+        what: '`where(شرط)` تُبقي القيمة حيث الشرط صحيح وتضع `NaN` في غيرها: العمر 151 مستحيل فيصبح مفقودًا.'
+        theory: 'لا تخمّن القيمة «الصحيحة»: هل 151 خطأ في 15 أم في 51؟ القيمة المستحيلة تصبح **مفقودة**، ويُسجَّل عددها، ثم يُعالَج الفقد بقرار صريح (حذف، تعويض) يُذكر في قسم البيانات من الورقة.'
+      13:
+        what: نحذف الصفوف المكررة حسب `id` (يبقى الأول)، ثم نعيد ترقيم الـindex من 0.
+        parts:
+        - [subset="id", التكرار يُحدَّد بهذا العمود وحده]
+        - [reset_index(drop=True), index جديد متتابع، ويُرمى القديم]
+      14:
+        what: '**تحقق** قبل المتابعة: لو لم تكن المعرّفات فريدة لتوقف البرنامج فورًا بدل نشر أرقام خاطئة.'
+        theory: 'الـ`assert` هنا «حارس» للبيانات: يحوّل افتراضاتك (كل مشارك مرة واحدة، الأعمار بين 0 و120) إلى شروط تُفحص في **كل تشغيل**، خاصة حين تصل نسخة جديدة من البيانات.'

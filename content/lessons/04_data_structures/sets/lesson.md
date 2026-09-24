@@ -64,6 +64,8 @@ t_set = timeit.timeit(lambda: 99_999 in ids_set, number=200)
 print(f"list: {t_list * 1000:.2f} ms   set: {t_set * 1000:.3f} ms")
 :::
 
+:::animation id="anim-sets":::
+
 :::mistake
 - `s = {}` ثم `s.add(1)`: `{}` **dict** فارغ، والمجموعة الفارغة `set()`.
 - `{[1, 2], [3]}`: `TypeError: unhashable type: 'list'`؛ استخدم tuples: `{(1, 2), (3,)}`.

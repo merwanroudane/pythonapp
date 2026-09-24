@@ -94,24 +94,6 @@ exercises:
       - "استبدل `print(...)` في آخر الدالة بالكلمة المناسبة التي ترسل القيمة للـcaller."
       - "`return total / len(values)`"
 
-animations:
-  anim-print:
-    title: "دالة تطبع ولا تُعيد"
-    code: |
-      def double(x):
-          print(x * 2)
-
-      result = double(5)
-      print("result is", result)
-  anim-return:
-    title: "دالة تُعيد قيمة"
-    code: |
-      def double(x):
-          return x * 2
-
-      result = double(5)
-      print("result is", result)
-
 changes:
   ch-print-return:
     title: "نفس الدالة، سطر واحد مختلف"
@@ -140,3 +122,39 @@ changes:
           result = double(5)
           print("stored:", result)
         explain: "يمكن أن تطبع الدالة (مثلًا للتشخيص) **وأيضًا** تُعيد قيمة. لكن في الكود النهائي يُفضّل logging بدل print داخل دوال الحساب."
+
+# --- step-by-step command animations ---
+animations:
+  anim-print:
+    title: دالة تطبع ولا تُعيد
+    code: |
+      def double(x):
+          print(x * 2)
+
+      result = double(5)
+      print("result is", result)
+    notes:
+      1: '`def` يُنشئ الدالة ويربطها بالاسم `double`؛ جسمها لا يُنفَّذ الآن.'
+      2:
+        what: 'داخل الدالة: `print` **تعرض** `10` على الشاشة... لكنها لا تُسلّم شيئًا للمستدعي.'
+        theory: 'الشاشة ليست متغيرًا: ما يُطبع يذهب إلى stdout ولا يستطيع البرنامج استعماله بعد ذلك. والدالة هنا تنتهي بلا `return`، فتعيد `None` ضمنيًا.'
+      4: 'نستدعي الدالة ونستقبل ما **تعيده** في `result`. راقب الـcall stack: frame جديد لـ`double` فيه `x=5`.'
+      5: '`result` هو `None`! الـ10 ظهرت على الشاشة لكنها لم تصل إلى `result`.'
+  anim-return:
+    title: دالة تُعيد قيمة
+    code: |
+      def double(x):
+          return x * 2
+
+      result = double(5)
+      print("result is", result)
+    notes:
+      1: '`def` يُنشئ الدالة ويربطها بالاسم `double`؛ جسمها لا يُنفَّذ الآن.'
+      2:
+        what: '`return` **تُنهي** الدالة فورًا و**تُسلّم** القيمة `10` للمستدعي، ولا شيء يُطبع هنا.'
+        parts:
+        - [return, أنهِ الدالة وأعد القيمة]
+        - [x * 2, القيمة المُعادة، تُحسب أولًا]
+        theory: 'القيمة المُعادة تحلّ محل **استدعاء الدالة** في التعبير: `double(5)` يصبح حرفيًا `10`، فيمكن إسناده أو جمعه أو تمريره لدالة أخرى. وهذا ما يجعل الدوال قابلة للتركيب: `double(double(5))`.'
+      4: نستدعي الدالة، فتُربط قيمتها المُعادة بـ`result`.
+      5: '`result` = 10: القيمة وصلت فعلًا ويمكن استعمالها. القاعدة: الدالة **تحسب وتعيد**، والطباعة مكانها في النهاية عند المستدعي.'

@@ -46,6 +46,8 @@ print("prefix    :", sys.prefix)
 print("in a venv?:", sys.prefix != sys.base_prefix)
 :::
 
+:::animation id="anim-which":::
+
 :::rule
 عند أي مشكلة `ModuleNotFoundError`: شغّل `import sys; print(sys.executable)` في المكان
 الذي فشل فيه الـimport، ثم ثبّت المكتبة لذلك الـinterpreter تحديدًا:

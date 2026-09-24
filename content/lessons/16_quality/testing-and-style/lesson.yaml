@@ -98,3 +98,53 @@ exercises:
       - "كل اختبار دالة بلا parameters تحتوي `assert normalize(...) == [...]`."
       - "الحالة `[3, 3]` تجعل `hi - lo` صفرًا. افحصها قبل القسمة وأعِد قائمة أصفار."
       - "`if hi == lo: return [0.0 for _ in values]`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-tests:
+    title: ماذا يفعل pytest فعلًا؟ مشغّل اختبارات مصغّر
+    code: |
+      def celsius_to_f(c):
+          return c * 9 / 5 + 32
+
+
+      def test_freezing():
+          assert celsius_to_f(0) == 32
+
+
+      def test_body_temperature():
+          assert celsius_to_f(37) == 98
+
+
+      results = {}
+      for test in [test_freezing, test_body_temperature]:
+          try:
+              test()
+              results[test.__name__] = "passed"
+          except AssertionError:
+              results[test.__name__] = "FAILED"
+      print(results)
+    notes:
+      1:
+        what: '`def` يُنشئ الدالة التي نريد اختبارها ويربطها بالاسم. جسمها **لا يُنفَّذ** الآن.'
+      5:
+        what: 'دالة اختبار: اسمها يبدأ بـ`test_`، بلا معاملات، وفيها `assert`.'
+        theory: 'هذا عقد pytest: يبحث في الملفات `test_*.py` عن الدوال `test_*` ويستدعيها واحدة واحدة. الاختبار **ينجح** إن انتهى بلا exception، و**يفشل** إن رفع خطأ.'
+      6:
+        what: '`assert` يقيّم الشرط: إن كان `True` لا يحدث شيء، وإن كان `False` يرفع `AssertionError`.'
+        parts:
+        - [assert, «يجب أن يكون هذا صحيحًا»]
+        - [celsius_to_f(0), النتيجة **الفعلية**]
+        - [== 32, النتيجة **المتوقعة**، محسوبة بطريقة مستقلة (الماء يتجمد عند 32°F)]
+        theory: 'الاختبار الجيد يقارن نتيجة فعلية بنتيجة متوقعة **معروفة مسبقًا**: حالات حدية، أمثلة من المراجع، خصائص يجب أن تصح دائمًا. اختبار يحسب المتوقع بالكود نفسه لا يختبر شيئًا.'
+      10:
+        what: '37°C تساوي 98.6°F لا 98، فالشرط `False` ويُرفع `AssertionError`: ستقفز Python إلى `except`.'
+      14:
+        what: 'نفعل يدويًا ما يفعله pytest: نمر على دوال الاختبار. الدوال objects، فيمكن وضعها في قائمة.'
+      16:
+        what: 'نستدعي دالة الاختبار الحالية. راقب الـcall stack: دالة الاختبار ستستدعي `celsius_to_f`.'
+      17:
+        what: وصلنا إلى هنا فقط لأن الاختبار **لم يرفع خطأ**. و`__name__` اسم الدالة كنص.
+      18:
+        what: التقطنا الفشل وسجّلناه بدل أن يتوقف البرنامج، كما يفعل pytest ليكمل بقية الاختبارات.
+        theory: 'لاحظ أن الخطأ هنا **في الاختبار** لا في الدالة: القيمة المتوقعة خاطئة. الاختبار الفاشل يعني «هناك تناقض بين الكود وتوقعك»، والتحقيق يحدد أيهما على خطأ.'

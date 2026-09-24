@@ -74,23 +74,6 @@ exercises:
       - "اجعل الافتراضي `None`، وأنشئ القائمة **داخل** الدالة عند الحاجة."
       - "`def log_event(name, events=None):` ثم `if events is None: events = []`"
 
-animations:
-  anim-trap:
-    title: "قائمة افتراضية واحدة لكل الاستدعاءات"
-    code: |
-      def add(item, bucket=[]):
-          bucket.append(item)
-          return bucket
-
-      first = add(1)
-      second = add(2)
-      print(first, second, first is second)
-    notes:
-      1: "تنفيذ `def` يُنشئ الدالة **ويُنشئ معها** القائمة الافتراضية مرة واحدة."
-      5: "الاستدعاء الأول يستخدم تلك القائمة."
-      6: "الاستدعاء الثاني يستخدم **القائمة نفسها** التي تحتوي 1 بالفعل."
-      7: "`first` و`second` اسمان لـobject واحد: `first is second` صحيح."
-
 changes:
   ch-fix:
     title: "الإصلاح"
@@ -112,3 +95,26 @@ changes:
 
           print(add(1), add(2))
         explain: "في كل استدعاء بلا `bucket` تُنشأ قائمة جديدة داخل الـframe، فلا شيء يتراكم."
+
+# --- step-by-step command animations ---
+animations:
+  anim-trap:
+    title: قائمة افتراضية واحدة لكل الاستدعاءات
+    code: |
+      def add(item, bucket=[]):
+          bucket.append(item)
+          return bucket
+
+      first = add(1)
+      second = add(2)
+      print(first, second, first is second)
+    notes:
+      1:
+        what: تنفيذ `def` يُنشئ الدالة **ويُنشئ معها** القائمة الافتراضية `[]` **مرة واحدة**، وتُحفظ داخل الدالة.
+        theory: القيم الافتراضية تُقيَّم **عند التعريف** لا عند كل استدعاء، وتُخزَّن في `add.__defaults__`. مع قيمة immutable (رقم، `None`) لا مشكلة؛ أما مع mutable (list، dict) فتتشارك كل الاستدعاءات object واحدًا.
+      2: '`append` تعدّل القائمة الافتراضية نفسها **في مكانها**.'
+      5: 'الاستدعاء الأول يستخدم تلك القائمة: `[1]`.'
+      6: الاستدعاء الثاني يستخدم **القائمة نفسها** التي تحتوي 1 بالفعل، فتصبح `[1, 2]`.
+      7:
+        what: '`first` و`second` اسمان لـobject واحد: `first is second` صحيح.'
+        theory: 'الإصلاح المعياري: `def add(item, bucket=None):` ثم `if bucket is None: bucket = []` داخل الجسم، فتُنشأ قائمة جديدة في كل استدعاء.'

@@ -90,9 +90,10 @@ exercises:
       - "tuple فارغة falsy، فـ`if not scores:` تكشف عدم وجود درجات. والتقريب داخل f-string: `{mean:.{decimals}f}`."
       - "`def summary(name, *scores, decimals=1):`"
 
+# --- step-by-step command animations ---
 animations:
   anim-binding:
-    title: "ربط الـarguments بالـparameters"
+    title: ربط الـarguments بالـparameters
     code: |
       def area(width, height=1, *, unit="m"):
           value = width * height
@@ -102,6 +103,15 @@ animations:
       b = area(5, unit="cm")
       print(a, b)
     notes:
-      5: "`3` يُربط بـ`width` و`4` بـ`height` حسب الموضع؛ `unit` يأخذ قيمته الافتراضية."
-      6: "`height` غائب فيأخذ 1، و`unit` مُرّر بالاسم لأنه keyword-only."
-      7: "كل استدعاء أنشأ frame مستقلًا بقيمه الخاصة ثم أُغلق."
+      1:
+        what: تعريف الدالة يحدد **parameters** من ثلاثة أنواع.
+        parts:
+        - [width, موضعي إلزامي]
+        - [height=1, له قيمة افتراضية، فهو اختياري]
+        - ['*', 'كل ما بعدها **keyword-only**: يُمرَّر بالاسم فقط']
+        - [unit="m", keyword-only بقيمة افتراضية]
+        theory: 'الـ**parameter** اسم في تعريف الدالة، والـ**argument** قيمة في الاستدعاء. عند الاستدعاء تربط Python الـarguments بالـparameters: الموضعية بالترتيب أولًا، ثم المسماة بأسمائها، ثم تملأ الباقي بالقيم الافتراضية. وأي تعارض (قيمتان للاسم نفسه، أو إلزامي ناقص) يرفع `TypeError`.'
+      2: داخل الـframe صارت الـparameters متغيرات local عادية بقيمها المربوطة.
+      5: '`3` يُربط بـ`width` و`4` بـ`height` حسب الموضع، و`unit` يأخذ قيمته الافتراضية.'
+      6: '`height` غائب فيأخذ 1، و`unit` مُرّر بالاسم لأنه keyword-only.'
+      7: كل استدعاء أنشأ frame مستقلًا بقيمه الخاصة ثم أُغلق.

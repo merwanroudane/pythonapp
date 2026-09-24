@@ -112,9 +112,10 @@ exercises:
       - "في `deposit`: `if amount <= 0: raise ValueError(...)` ثم `self.balance += amount`."
       - "`def __repr__(self): return f\"Account({self.owner!r}, {self.balance})\"`"
 
+# --- step-by-step command animations ---
 animations:
   anim-instance:
-    title: "إنشاء instance واستدعاء method"
+    title: إنشاء instance واستدعاء method
     code: |
       class Point:
           def __init__(self, x, y):
@@ -128,7 +129,21 @@ animations:
       q = p.shifted(10)
       print(p.x, q.x)
     notes:
-      1: "تنفيذ `class` يُنشئ الـclass object ويعرّف methods فيه؛ لا instance بعد."
-      9: "`Point(1, 2)` تُنشئ object فارغًا ثم تستدعي `__init__` لتملأه: `self` هو الـobject الجديد."
-      10: "`p.shifted(10)`: الـinstance `p` يصل كـ`self`، وتُنشأ نقطة جديدة؛ `p` لم يتغير."
-      11: "لكل instance حالته الخاصة: `p.x` و`q.x` مختلفان."
+      1:
+        what: تنفيذ `class` يُنشئ الـclass object ويعرّف فيه الـmethods؛ لا instance بعد.
+        theory: 'الـ**class** قالب (blueprint) يصف نوعًا جديدًا: ما البيانات التي يحملها كل object (attributes) وما يستطيع فعله (methods). والـ**instance** object حقيقي مصنوع من القالب، ولكلٍّ حالته الخاصة.'
+      2:
+        what: 'داخل جسم الـclass نعرّف `__init__`: الـ**constructor** الذي يُستدعى تلقائيًا عند إنشاء كل object.'
+        parts:
+        - [self, 'الـobject الجاري إنشاؤه: يُمرَّر تلقائيًا كأول معامل']
+        - ['x, y', 'الـarguments التي نمررها في `Point(1, 2)`']
+      3:
+        what: '`self.x = x`: نخزّن القيمة **على الـobject نفسه** كـattribute. `self.x` يعيش ما عاش الـobject، أما `x` فمتغير local يختفي بانتهاء الدالة.'
+        parts:
+        - [self.x, attribute على الـinstance]
+        - [= x, قيمة الـparameter]
+      9: '`Point(1, 2)` تُنشئ object فارغًا ثم تستدعي `__init__` لتملأه، و`self` هو الـobject الجديد.'
+      10:
+        what: '`p.shifted(10)`: الـinstance `p` يصل كـ`self`، وتُنشأ نقطة جديدة، و`p` لم يتغير.'
+        theory: '`p.shifted(10)` هي في الحقيقة `Point.shifted(p, 10)`: تمرر Python الـinstance كأول argument تلقائيًا، وهذا هو `self`. لا سحر هنا: الـmethod دالة عادية معرّفة داخل الـclass.'
+      11: 'لكل instance حالته الخاصة: `p.x` و`q.x` مختلفان.'

@@ -73,6 +73,8 @@ print(greet("Sara"), "helpers" in sys.modules)
 في مشروعك العادي، مجلد السكربت الذي تشغّله موجود في `sys.path` تلقائيًا.
 :::
 
+:::animation id="anim-import":::
+
 ## `if __name__ == "__main__"`
 
 :::code mode="script"

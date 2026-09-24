@@ -82,6 +82,8 @@ print(students[0]["name"], students[0]["courses"][1])
 print(len(students), "rows,", len(students[0]), "columns")
 :::
 
+:::animation id="anim-overview":::
+
 :::research
 عندما تصمم بيانات مشروعك (قبل pandas)، البنية تعكس المعنى: قائمة المشاهدات `list`، معرّفات فريدة
 للمشاركين `set`، إعدادات النموذج `dict`، وإحداثيات أو (سنة، دولة) كمفتاح مركّب `tuple`:

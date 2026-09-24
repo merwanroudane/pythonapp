@@ -65,6 +65,8 @@ print((date(2026, 12, 31) - start).days, "days left in the year")
 | `strftime` | تاريخ ← نص (format) | |
 :::
 
+:::animation id="anim-stdlib":::
+
 ## itertools وfunctools والقياس
 
 :::code mode="script"

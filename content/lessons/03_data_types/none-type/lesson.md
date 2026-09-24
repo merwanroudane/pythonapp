@@ -55,6 +55,8 @@ scores = [14, 9, 17].sort()
 scores.append(20)
 :::
 
+:::animation id="anim-none":::
+
 ## None كقيمة افتراضية وكقيمة مفقودة
 
 :::code mode="script"

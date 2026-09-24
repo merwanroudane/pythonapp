@@ -81,3 +81,44 @@ exercises:
       - "`bool(\"False\")` تعطي True! لا تستعمل `bool()` على النص؛ قارن النص المنظّف بمجموعة القيم المقبولة."
       - "`a.strip().lower() in {\"yes\", \"y\", \"1\", \"true\"}` تعطي bool مباشرة. ثم `sum(consent)`."
       - "`consent = [a.strip().lower() in {\"yes\", \"y\", \"1\", \"true\"} for a in answers]`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-bool:
+    title: bool وtruthiness والعدّ بالقيم المنطقية
+    code: |
+      is_adult = 20 >= 18
+      kind = type(is_adult)
+      as_int = int(True) + True
+      answers = [True, False, True, True]
+      n_yes = sum(answers)
+      share = n_yes / len(answers)
+      empty = bool("")
+      space = bool(" ")
+      zero = bool(0.0)
+      name = ""
+      shown = name or "anonymous"
+      print(is_adult, kind, as_int, n_yes, share, empty, space, zero, shown)
+    notes:
+      1:
+        what: 'المقارنة expression قيمته **منطقية**: `True`. عوامل المقارنة (`==`، `<`، `>=`…) تنتج دائمًا bool.'
+        theory: 'bool أبسط نوع: قيمتان فقط، `True` و`False` (بحرف أول كبير). وهو أساس كل قرار في البرنامج: `if` و`while` يسألان سؤالًا جوابه منطقي.'
+      2:
+        what: '`type(True)` هو `bool`.'
+      3:
+        what: '`bool` نوع فرعي (subclass) من `int`: `True` تساوي 1 و`False` تساوي 0، فيمكن الحساب بهما: 1 + 1 = 2.'
+        theory: لأسباب تاريخية وعملية، `isinstance(True, int)` تعطي `True`. هذا ما يجعل عدّ الشروط الصحيحة بـ`sum` ممكنًا، وهو أيضًا مصدر مفاجآت مثل `True + True == 2`.
+      5:
+        what: 'جمع قائمة منطقية = **عدد** القيم `True`: 3.'
+      6:
+        what: 'والقسمة على الطول = **النسبة**: 3 / 4 = 0.75. نمط شائع جدًا في تحليل الاستبيانات.'
+      7:
+        what: '**truthiness**: لكل object في Python قيمة منطقية. والنص الفارغ «خاطئ» (falsy).'
+        theory: 'القيم الـfalsy قليلة وتستحق الحفظ: `False`، `None`، `0`، `0.0`، `""`، والحاويات الفارغة `[]` و`{}` و`()` و`set()`. **وكل ما عداها truthy**. لذلك `if items:` تعني «إن كانت القائمة غير فارغة».'
+      8:
+        what: 'نص فيه مسافة واحدة **ليس فارغًا**، فهو truthy: `True`. خطأ شائع عند فحص مدخلات المستخدم؛ استعمل `s.strip()` أولًا.'
+      9:
+        what: الصفر بأي نوع رقمي falsy.
+      11:
+        what: '`or` تعيد **أول قيمة truthy**، وإلا الأخيرة. `name` فارغ فتعيد `"anonymous"`: قيمة افتراضية في سطر واحد.'
+        theory: '`and` و`or` لا تعيدان بالضرورة True/False بل **أحد المعاملين**، وتتوقفان مبكرًا (short-circuit): `a or b` لا تقيّم `b` إن كانت `a` truthy. انتبه: `0 or 10` تعطي 10 حتى لو كان الصفر قيمة مقصودة.'

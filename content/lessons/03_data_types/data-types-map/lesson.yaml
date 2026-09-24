@@ -87,3 +87,37 @@ exercises:
       - "`isinstance(x, (int, float))` تفحص عدة أنواع دفعة واحدة. و`None` تُفحص بـ`is None`."
       - "اكتب شرطين: واحد للأنواع الأساسية يُعيد `\"basic\"`، وآخر لبنى البيانات يُعيد `\"structure\"`."
       - "`if value is None or isinstance(value, (int, float, complex, bool, str)): return \"basic\"`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-types:
+    title: 'اسأل كل قيمة: ما نوعك؟'
+    code: |
+      values = [42, 3.14, 2 + 1j, True, None, "hi", [1, 2], {"a": 1}]
+      table = []
+      for v in values:
+          name = type(v).__name__
+          is_number = isinstance(v, (int, float, complex))
+          is_container = isinstance(v, (list, tuple, set, dict))
+          table.append((name, is_number, is_container))
+      bool_is_int = isinstance(True, int)
+      text_is_sequence = "hi"[0] == "h"
+      print(*table, sep="\n")
+    notes:
+      1:
+        what: قائمة تجمع قيمًا من أنواع مختلفة. القائمة نفسها **بنية بيانات**، وعناصرها قيم **أساسية** أو بنى أخرى.
+        theory: '**النوع (type)** يحدد ما هي القيمة وما العمليات المسموحة عليها. الأنواع الأساسية (int، float، complex، bool، None، str) قيم **مفردة**؛ أما بنى البيانات (list، tuple، set، dict) فـ**حاويات** تجمع قيمًا أخرى.'
+      3:
+        what: نمر على القيم واحدة واحدة ونسأل كل واحدة عن نوعها.
+      4:
+        what: '`type(v)` تعيد **class** القيمة، و`__name__` اسمه كنص: `''int''`، `''float''`…'
+        theory: 'كل قيمة في Python **object** يعرف نوعه. النوع مرتبط **بالقيمة** لا بالمتغير: الاسم `v` نفسه يشير إلى int ثم float ثم complex. هذا معنى أن Python لغة **dynamically typed**.'
+      5:
+        what: '`isinstance(v, (A, B, C))` تسأل: هل القيمة من أحد هذه الأنواع؟ لاحظ أن `True` ستُعدّ رقمًا!'
+        theory: '`isinstance` تحترم **الوراثة**: `bool` نوع فرعي من `int`، فـ`isinstance(True, int)` تعطي True، أما `type(True) == int` فتعطي False. لهذا تُفضَّل `isinstance` في الفحص.'
+      6:
+        what: وهل هي حاوية، أي بنية بيانات؟
+      8:
+        what: 'تأكيد: `bool` نوع فرعي من `int`.'
+      9:
+        what: '`str` قيمة **مفردة** في الاستعمال، لكنها **تسلسل (sequence)** من الحروف تقبل الفهرسة `s[0]` كالقوائم، ولهذا تقع بين العالمين.'

@@ -85,6 +85,8 @@ for s in structures:
 ولا نغيّر حروفه واحدًا واحدًا. لذلك يُصنَّف مع الأنواع الأساسية في هذه المنصة، كما في أغلب المراجع.
 :::
 
+:::animation id="anim-types":::
+
 ## بعدٌ ثانٍ: قابلية التعديل (mutability)
 
 :::theory title="كل نوع إما mutable أو immutable"

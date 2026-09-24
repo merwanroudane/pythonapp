@@ -120,3 +120,52 @@ exercises:
       - "اربط الجدولين: `FROM sales AS s JOIN products AS p ON p.id = s.product_id`."
       - "الإيراد: `SELECT p.category, SUM(s.qty * s.price) AS revenue ... GROUP BY p.category ORDER BY revenue DESC`."
       - "الشرط على المجموع مكانه `HAVING SUM(s.qty) > 5` بعد `GROUP BY p.name`."
+
+# --- step-by-step command animations ---
+animations:
+  anim-sql:
+    title: 'من الاتصال إلى النتيجة: رحلة استعلام SQL'
+    code: |
+      import sqlite3
+
+      con = sqlite3.connect(":memory:")
+      con.execute("CREATE TABLE cities (name TEXT, country TEXT, pop REAL)")
+      rows = [("Algiers", "DZ", 3.0), ("Oran", "DZ", 1.6), ("Tunis", "TN", 0.7)]
+      con.executemany("INSERT INTO cities VALUES (?, ?, ?)", rows)
+      con.commit()
+      cur = con.execute("SELECT name, pop FROM cities WHERE pop > ? ORDER BY pop DESC", (1,))
+      big = cur.fetchall()
+      totals = con.execute("SELECT country, SUM(pop) FROM cities GROUP BY country").fetchall()
+      print(big, totals)
+    notes:
+      3:
+        what: نفتح **اتصالًا** بقاعدة بيانات. `":memory:"` قاعدة مؤقتة في الذاكرة تختفي بانتهاء البرنامج؛ واسم ملف مثل `"data.db"` يحفظها على القرص.
+        theory: 'SQLite محرك قاعدة بيانات كامل **داخل مكتبة**، بلا خادم: القاعدة كلها ملف واحد. أما PostgreSQL وMySQL فخوادم تتصل بها عبر الشبكة، لكن واجهة Python متشابهة (معيار DB-API: `connect`، `execute`، `fetchall`، `commit`).'
+      4:
+        what: '`CREATE TABLE` يعرّف **مخطط (schema)** الجدول: اسمه وأعمدته ونوع كل عمود.'
+        parts:
+        - [CREATE TABLE cities, أنشئ جدولًا اسمه `cities`]
+        - [name TEXT, عمود نصي]
+        - [pop REAL, عمود عددي عشري]
+      5:
+        what: 'البيانات في Python: قائمة tuples، كل tuple صف واحد بترتيب الأعمدة.'
+      6:
+        what: '`executemany` تنفّذ الأمر نفسه لكل tuple. وعلامات `?` أماكن تملؤها المكتبة بالقيم بأمان.'
+        parts:
+        - [INSERT INTO cities VALUES, أدخل صفًا في الجدول]
+        - ['(?, ?, ?)', 'معاملات (placeholders): ثلاث قيم لكل صف']
+        theory: لا تبنِ SQL بدمج النصوص أبدًا. مع `?` تُرسل القيم **منفصلة** عن نص الأمر، فلا يمكن لقيمة خبيثة أن تغيّر معنى الاستعلام (**SQL injection**). وهي أسرع أيضًا لأن المحرك يحلّل الأمر مرة واحدة.
+      7:
+        what: '`commit` يثبّت التغييرات. قبله كانت داخل **معاملة (transaction)** مؤقتة يمكن التراجع عنها بـ`rollback()`.'
+      8:
+        what: 'استعلام: عمودان، للصفوف التي `pop > 1`، مرتبة تنازليًا. والقيمة 1 تُمرَّر معاملًا منفصلًا.'
+        parts:
+        - ['SELECT name, pop', ماذا نعيد]
+        - [FROM cities, من أي جدول]
+        - ['WHERE pop > ?', تصفية الصفوف]
+        - [ORDER BY pop DESC, الترتيب التنازلي]
+        theory: 'SQL لغة **تصريحية (declarative)**: تصف النتيجة المطلوبة ولا تكتب حلقة البحث؛ المحرك يختار طريقة التنفيذ (فهرس أم مسح كامل). والنتيجة **cursor**: مؤشر على صفوف لم تُقرأ بعد.'
+      9:
+        what: '`fetchall` تسحب كل صفوف النتيجة كقائمة tuples.'
+      10:
+        what: '`GROUP BY country` تقسم الصفوف حسب الدولة، و`SUM(pop)` تجمع السكان في كل مجموعة: الفكرة نفسها التي في `groupby` بـpandas.'

@@ -123,6 +123,8 @@ hash(t)                              # TypeError: unhashable type: 'list'
 ```
 :::
 
+:::animation id="anim-props":::
+
 ## العلاقة بين التعديل والـhash
 
 :::quiz id="q-mutable-hash":::

@@ -95,6 +95,8 @@ print(summary.sort_values("mean_income", ascending=False))
 المفقودة فقط.
 :::
 
+:::animation id="anim-pandas":::
+
 :::mistake
 - **`and` بدل `&`:** `df[df.age > 18 and df.city == "Oran"]` ترفع `ValueError`.
 - **نسيان الأقواس:** `df[df.age > 18 & df.city == "Oran"]` تُحسب بترتيب خاطئ لأن `&` أعلى أولوية من `>`.

@@ -117,6 +117,8 @@ word = "مرحبا"
 print(len(word), "characters,", len(word.encode("utf-8")), "bytes")
 :::
 
+:::animation id="anim-bits":::
+
 :::quiz id="q-bytes":::
 
 :::mistake

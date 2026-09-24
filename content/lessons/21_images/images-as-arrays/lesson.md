@@ -94,6 +94,8 @@ for axis, (title, img) in zip(ax, views.items()):
 fig.tight_layout()
 :::
 
+:::animation id="anim-image":::
+
 :::quiz id="q-overflow":::
 
 :::mistake

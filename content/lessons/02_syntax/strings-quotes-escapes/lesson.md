@@ -60,6 +60,8 @@ print(s)
 print("length:", len(s))
 :::
 
+:::animation id="anim-strings":::
+
 ## ما تراه مقابل ما هو موجود
 
 :::change id="ch-print-repr":::

@@ -89,3 +89,56 @@ exercises:
       - "`statistics.stdev` لانحراف العينة. وطرح تاريخين يعطي `timedelta` لها الخاصية `.days`."
       - "`datetime.strptime(text, \"%d/%m/%Y\")` ثم `.date()`. و`itertools.combinations(xs, 2)` ثم `list(...)`."
       - "`days_left = (date(2026, 12, 31) - date(2026, 9, 24)).days`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-stdlib:
+    title: 'ثلاث أدوات جاهزة: Counter وdate وstatistics'
+    code: |
+      from collections import Counter
+      from datetime import date, timedelta
+      import statistics
+
+      words = "the cat and the hat and the bat".split()
+      counts = Counter(words)
+      top = counts.most_common(2)
+      start = date(2024, 3, 1)
+      deadline = start + timedelta(days=30)
+      gap = (deadline - start).days
+      scores = [12, 15, 9, 14]
+      mean = statistics.mean(scores)
+      spread = round(statistics.stdev(scores), 2)
+      print(top, deadline.isoformat(), gap, mean, spread)
+    notes:
+      1:
+        what: 'نستورد من المكتبة القياسية: لا تثبيت، فهي تأتي مع Python نفسها.'
+        parts:
+        - [collections, 'بنى بيانات إضافية: `Counter`، `defaultdict`، `deque`، `namedtuple`']
+        - [datetime, التواريخ والأوقات والمدد]
+        - [statistics, إحصاءات وصفية بسيطة]
+      5:
+        what: '`split()` بلا معامل تقسم النص على المسافات، فنحصل على قائمة كلمات.'
+      6:
+        what: '`Counter` يعدّ تكرار كل عنصر في مرور واحد، ويعيد قاموسًا خاصًا: المفتاح هو العنصر والقيمة عدد مراته.'
+        parts:
+        - [Counter, subclass من `dict` متخصص في العدّ]
+        - [(words), 'أي iterable: قائمة، نص (فيعدّ الحروف)، generator']
+        theory: 'بدون `Counter` تكتب حلقة: `d[w] = d.get(w, 0) + 1`. المكتبة القياسية تجمع هذه الأنماط المتكررة في أدوات **مختبرة وسريعة** (بعضها مكتوب بلغة C). هذا معنى «batteries included»: قبل أن تكتب أداة، اسأل هل هي موجودة.'
+      7:
+        what: '`most_common(2)` أكثر عنصرين تكرارًا، كقائمة tuples `(العنصر، العدد)` مرتبة تنازليًا.'
+      8:
+        what: '`date(2024, 3, 1)` تاريخ بلا وقت. الترتيب دائمًا: سنة، شهر، يوم.'
+        parts:
+        - [date, تاريخ فقط]
+        - [datetime, تاريخ + وقت]
+        - [timedelta, 'مدة زمنية: الفرق بين لحظتين']
+      9:
+        what: تاريخ + مدة = تاريخ جديد. Python تتكفل بطول كل شهر وبالسنوات الكبيسة.
+        theory: 'الأنواع هنا تتبع «جبرًا» واضحًا: `date + timedelta → date`، و`date - date → timedelta`، أما `date + date` فخطأ `TypeError` لأنه بلا معنى. تصميم الأنواع الجيد **يمنع الأخطاء المنطقية** قبل وقوعها.'
+      10:
+        what: طرح تاريخين يعطي `timedelta`، والخاصية `.days` عدد الأيام فيه.
+      12:
+        what: '`statistics.mean` المتوسط الحسابي: (12 + 15 + 9 + 14) / 4 = 12.5.'
+      13:
+        what: '`stdev` الانحراف المعياري **للعينة** (يقسم على n − 1)، أما `pstdev` فللمجتمع (يقسم على n).'
+        theory: مجموع مربعات الانحرافات عن 12.5 هو 21، مقسومًا على 3 = 7، وجذره ≈ 2.65. القسمة على n − 1 (**تصحيح Bessel**) تجعل تقدير التباين غير متحيز عندما نقدّر تباين مجتمع من عينة.

@@ -49,6 +49,8 @@ ax.legend()
 fig.tight_layout()
 :::
 
+:::animation id="anim-plot":::
+
 ## أربعة أنواع أساسية في Figure واحدة
 
 :::code mode="script"

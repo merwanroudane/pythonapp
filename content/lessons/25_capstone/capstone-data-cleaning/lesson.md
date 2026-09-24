@@ -116,6 +116,8 @@ print(df)
 print(*log, sep="\n")
 :::
 
+:::animation id="anim-clean":::
+
 :::quiz id="q-missing":::
 
 ## 3. التحقق ثم التلخيص والرسم

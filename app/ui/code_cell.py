@@ -91,5 +91,6 @@ def render_code_cell(
             render_output(result, notebook_mode=mode == "notebook", key=f"out-{key}")
             traced_source = st.session_state.get(trace_key)
             if traced_source is not None and result.trace is not None:
-                render_stepper(traced_source, steps_from_run(result), key=f"stepper-{key}")
+                steps = steps_from_run(result, code=traced_source)
+                render_stepper(traced_source, steps, key=f"stepper-{key}")
     return result

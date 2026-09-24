@@ -94,6 +94,8 @@ print(statistics.mean([12, 15, 18]), statistics.stdev([12, 15, 18]))
 print(datetime.date(2026, 10, 1) - datetime.date(2026, 9, 24))
 :::
 
+:::animation id="anim-batteries":::
+
 :::quiz id="q-exit":::
 
 ## 4. أين تُستعمل Python؟

@@ -114,13 +114,21 @@ changes:
           print({w.lower(): len(w) for w in words})
         explain: "`مفتاح: قيمة` يصنع قاموسًا. المفتاح المكرر `oran` يُبقي آخر قيمة."
 
+# --- step-by-step command animations ---
 animations:
   anim-equivalent:
-    title: "الـcomprehension حلقة مختصرة"
+    title: الـcomprehension حلقة مختصرة
     code: |
       prices = [10, 25, 8]
       with_tax = [p * 1.2 for p in prices if p > 9]
       print(with_tax)
     notes:
-      2: "تمر الـcomprehension على كل p، تفحص الشرط، وتضيف `p * 1.2` للنتيجة. الحلقة تحدث داخل هذا السطر."
-      3: "النتيجة قائمة جديدة؛ القائمة الأصلية لم تتغير."
+      1: القائمة الأصلية التي سنمر عليها.
+      2:
+        what: تمر الـcomprehension على كل `p`، تفحص الشرط، وتضيف `p * 1.2` إلى النتيجة. الحلقة كلها تحدث داخل هذا السطر.
+        parts:
+        - [p * 1.2, '**ماذا** نضع في النتيجة (يُكتب أولًا)']
+        - [for p in prices, '**على ماذا** نمر']
+        - [if p > 9, '**أيّ** العناصر نُبقي (اختياري)']
+        theory: 'الـcomprehension ترجمة مباشرة لرمز المجموعات الرياضي { 1.2p : p ∈ prices، p > 9 }. وهي تكافئ حلقة `for` مع `append`، لكنها **expression** تعيد قائمة جديدة، فتُقرأ كجملة واحدة: «أعطني… لكل… إذا…».'
+      3: النتيجة قائمة جديدة، والقائمة الأصلية لم تتغير.

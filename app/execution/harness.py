@@ -26,6 +26,9 @@ MAX_STREAM_CHARS = 20_000
 MAX_TRACE_STEPS = 300
 MAX_VARIABLES = 40
 MAX_FRAMES = 12
+PREVIEW_LINES = 16
+PREVIEW_WIDTH = 110
+PREVIEW_MAX_ITEMS = 200
 
 MUTABLE_TYPES = (list, dict, set, bytearray)
 IMMUTABLE_TYPES = (int, float, complex, bool, str, bytes, tuple, frozenset, range, type(None))
@@ -111,6 +114,24 @@ def snapshot(namespace: dict) -> dict[str, str]:
     return {name: safe_repr(value) for name, value in user_names(namespace).items()}
 
 
+def preview_repr(obj: object, short: str) -> str | None:
+    """A bounded multi-line repr for values the one-line snapshot cuts off (DataFrames,
+    arrays, nested lists...). None when the short repr already says everything."""
+    if isinstance(obj, SIZED_BUILTINS) and len(obj) > PREVIEW_MAX_ITEMS:
+        return None  # keep tracing big containers cheap; the short repr summarises them
+    try:
+        text = repr(obj)
+    except Exception:
+        return None
+    if text == short:
+        return None
+    lines = text.splitlines() or [""]
+    if len(lines) > PREVIEW_LINES:
+        lines = [*lines[:PREVIEW_LINES], "…"]
+    lines = [ln if len(ln) <= PREVIEW_WIDTH else ln[: PREVIEW_WIDTH - 1] + "…" for ln in lines]
+    return "\n".join(lines)
+
+
 def format_exception(exc: BaseException) -> dict:
     tbe = traceback.TracebackException.from_exception(exc, capture_locals=False)
     frames = [
@@ -159,6 +180,7 @@ class Tracer:
         self.steps: list[dict] = []
         self.stack: list[str] = []
         self.truncated = False
+        self._last_previews: dict[str, str | None] = {}
 
     def _record(self, frame, event: str, extra: dict | None = None) -> None:
         if len(self.steps) >= MAX_TRACE_STEPS:
@@ -175,19 +197,37 @@ class Tracer:
                 frames.append({"name": walker.f_code.co_name, "locals": snapshot(walker.f_locals)})
             walker = walker.f_back
         frames = frames[:MAX_FRAMES][::-1]
+        global_vars = snapshot(self.module_ns)
         step = {
             "line": frame.f_lineno,
             "event": event,
             "frame": frame.f_code.co_name,
             "stack": list(self.stack),
-            "globals": snapshot(self.module_ns),
+            "globals": global_vars,
             "locals": local_vars,
             "frames": frames,
             "stdout": self.stdout.getvalue(),
+            "previews": self._changed_previews(frame, is_module, {**global_vars, **local_vars}),
         }
         if extra:
             step.update(extra)
         self.steps.append(step)
+
+    def _changed_previews(self, frame, is_module: bool, shorts: dict[str, str]) -> dict[str, str]:
+        """Full-looking reprs of the visible values that changed since the previous step.
+        Compared on the full text, so an in-place change hidden by the short repr (a new
+        DataFrame column) still shows up."""
+        visible = user_names(self.module_ns)
+        if not is_module:
+            visible.update(user_names(frame.f_locals))
+        current = {name: preview_repr(visible[name], short) for name, short in shorts.items()}
+        changed = {
+            name: text
+            for name, text in current.items()
+            if text is not None and self._last_previews.get(name) != text
+        }
+        self._last_previews = current
+        return changed
 
     def __call__(self, frame, event, arg):
         if frame.f_code.co_filename != FILENAME:

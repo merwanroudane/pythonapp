@@ -121,3 +121,49 @@ exercises:
       - "`config = tomllib.loads(PYPROJECT)` ثم `config[\"project\"][\"name\"]`."
       - "`parser.add_argument(\"path\")`، `parser.add_argument(\"--sep\", default=\",\")`، `parser.add_argument(\"--verbose\", action=\"store_true\")`."
       - "`args = build_parser().parse_args([\"data.csv\", \"--sep\", \";\"])`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-cli:
+    title: من pyproject.toml وسطر الأوامر إلى معاملات برنامجك
+    code: |
+      import argparse
+      import tomllib
+
+      config = tomllib.loads('[project]\nname = "survey-tools"\nversion = "0.3.1"\n')
+      version = config["project"]["version"]
+      parser = argparse.ArgumentParser(prog="survey")
+      parser.add_argument("path")
+      parser.add_argument("--sep", default=",")
+      parser.add_argument("--verbose", action="store_true")
+      args = parser.parse_args(["data.csv", "--sep", ";"])
+      major, minor, patch = map(int, version.split("."))
+      print(args.path, args.sep, args.verbose, (major, minor, patch))
+    notes:
+      4:
+        what: '`tomllib.loads` تحلّل نص **TOML**، وهي صيغة `pyproject.toml`، إلى قاموس Python متداخل.'
+        parts:
+        - ['[project]', جدول (table) ← مفتاح في القاموس]
+        - [name = "survey-tools", مفتاح = قيمة]
+        - [tomllib, في المكتبة القياسية منذ Python 3.11، للقراءة فقط]
+        theory: '`pyproject.toml` هو **العقد** بين مشروعك وأدوات Python: pip وuv وأدوات البناء تقرأ منه الاسم والإصدار والتبعيات. واختير TOML لأنه سهل القراءة للبشر وواضح الأنواع (نص، رقم، قائمة، جدول).'
+      5:
+        what: 'وصول متداخل: الجدول `project` ثم المفتاح `version`.'
+      6:
+        what: 'ننشئ **محلل سطر الأوامر**: object يعرف المعاملات التي يقبلها برنامجك، ويولّد رسالة `--help` تلقائيًا.'
+        theory: عندما تكتب `survey data.csv --sep ;` في الـterminal، يستقبل البرنامج قائمة نصوص `sys.argv[1:]` = `['data.csv', '--sep', ';']`. مهمة argparse تحويلها إلى معاملات مسماة بأنواع صحيحة، ورفض الخاطئ برسالة واضحة ورمز خروج 2.
+      7:
+        what: 'معامل **موضعي** إلزامي: أول نص لا يبدأ بـ`--` يصبح `args.path`.'
+      8:
+        what: '**خيار** يبدأ بـ`--`، اختياري، وقيمته الافتراضية `","` إن لم يُذكر.'
+      9:
+        what: '**علَم (flag)** بلا قيمة: وجوده يجعل `args.verbose` تساوي `True` بفضل `action="store_true"`.'
+      10:
+        what: نحلل قائمة معاملات، نمررها هنا يدويًا بدل `sys.argv`، فنحصل على **Namespace** فيه `path` و`sep` و`verbose`.
+        parts:
+        - ['["data.csv", "--sep", ";"]', ما كان المستخدم سيكتبه في الـterminal]
+        - [args.sep, '`'';''` لأنه ذُكر، أما `args.verbose` فبقي `False`']
+        theory: 'تمرير قائمة صريحة إلى `parse_args(argv)` يجعل الـCLI **قابلًا للاختبار**: تستدعي `main(["x.csv"])` في pytest بدل تشغيل عملية جديدة. لذلك نكتب `def main(argv=None)`.'
+      11:
+        what: 'نفكك الإصدار حسب **Semantic Versioning**: `MAJOR.MINOR.PATCH` ← `(0, 3, 1)`.'
+        theory: 'MAJOR لتغيير يكسر التوافق، وMINOR لميزة جديدة متوافقة، وPATCH لإصلاح خطأ. والإصدارات `0.x` تعني «قبل الاستقرار»: قد يتغير أي شيء.'

@@ -84,3 +84,43 @@ exercises:
       - "صفِّ القيم أولًا: احتفظ فقط بما ليس `None`. انتبه: لا تحذف الصفر!"
       - "`[v for v in values if v is not None]` ثم افحص إن كانت القائمة فارغة."
       - "`if not present: return None` ثم `return sum(present) / len(present)`"
+
+# --- step-by-step command animations ---
+animations:
+  anim-none:
+    title: من أين تأتي None؟
+    code: |
+      answer = None
+      missing = answer is None
+
+
+      def greet(name):
+          print("Hi", name)
+
+
+      result = greet("Sara")
+      nothing_returned = result is None
+      scores = {"Sara": 15}
+      omar = scores.get("Omar")
+      safe = scores.get("Omar", 0)
+      items = [3, 1, 2]
+      sorted_in_place = items.sort()
+      print(missing, nothing_returned, omar, safe, sorted_in_place, items)
+    notes:
+      1:
+        what: '`None` القيمة الوحيدة من النوع `NoneType`: تعني «لا قيمة» أو «غير معروف بعد».'
+        theory: '`None` ليست 0 ولا `""` ولا `False`: هي **غياب** القيمة. ولأنها **singleton** (نسخة واحدة في البرنامج كله)، نقارن بها بالهوية `is` لا بـ`==`.'
+      2:
+        what: '`is None` الطريقة الصحيحة للفحص: سريعة، ولا يمكن لأي class أن يغيّر معناها بتعريف `__eq__`.'
+      5:
+        what: دالة **بلا `return`**...
+      9:
+        what: '...فتعيد `None` ضمنيًا بعد أن تطبع. راقب الـcall stack: الـframe يُغلق ويعود بـ`None`.'
+        theory: 'كل دالة في Python تعيد شيئًا. إن انتهت بلا `return` (أو بـ`return` وحدها) فالقيمة `None`. وهذا مصدر خطأ شهير: `x = print(...)` أو `x = lst.sort()`.'
+      12:
+        what: '`get` لمفتاح غير موجود تعيد `None` بدل رفع `KeyError`.'
+      13:
+        what: ومع قيمة افتراضية تعيدها بدل `None`.
+      15:
+        what: '`sort()` ترتّب القائمة **في مكانها** وتعيد `None`؛ النتيجة المرتبة موجودة في `items` نفسها.'
+        theory: 'عُرف في Python: الـmethods التي **تعدّل الـobject** (`sort`، `append`، `reverse`، `update`) تعيد `None`، كي لا تظن أنها أنشأت نسخة جديدة. أما `sorted(items)` فتعيد قائمة جديدة ولا تلمس الأصل.'

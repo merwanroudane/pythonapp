@@ -79,4 +79,8 @@ def validate(curriculum: Curriculum) -> list[Issue]:
         for anim_id, anim in meta.animations.items():
             if not _compiles(anim.code):
                 add(f"animation '{anim_id}': code does not compile")
+            code_lines = anim.code.splitlines()
+            for line_no in anim.notes:
+                if not 1 <= line_no <= len(code_lines) or not code_lines[line_no - 1].strip():
+                    add(f"animation '{anim_id}': note on line {line_no} has no code line")
     return issues

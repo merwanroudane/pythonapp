@@ -126,6 +126,8 @@ else:
     print("mean =", mean)
 :::
 
+:::animation id="anim-algorithm":::
+
 :::try
 غيّر السطر الأول إلى `scores = []` وشغّل الكود. هل تعامل البرنامج مع الحالة الخاصة كما صممناها
 في الـpseudocode؟

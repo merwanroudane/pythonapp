@@ -79,6 +79,8 @@ for w in words:
 print(counts)
 :::
 
+:::animation id="anim-dict":::
+
 :::tip
 المكتبة القياسية فيها أداة جاهزة لهذا: `from collections import Counter` ثم
 `Counter(words).most_common(2)`. لكن افهم النمط اليدوي أولًا، فهو يتكرر في كل مكان.
