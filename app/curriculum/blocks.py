@@ -74,6 +74,7 @@ INTERACTIVE: dict[str, frozenset[str]] = {
     "change": frozenset({LEARN}),
     "diagram": frozenset({LEARN}),
     "compare": frozenset({LEARN, REVIEW, REFERENCE}),
+    "property_lab": frozenset({LEARN, REFERENCE}),
 }
 
 # Which lesson.yaml collection each id-referencing block points into.

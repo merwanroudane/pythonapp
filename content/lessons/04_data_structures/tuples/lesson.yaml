@@ -1,6 +1,6 @@
 id: tuples
 track: data_structures
-order: 3
+order: 4
 title_ar: "الـtuple: سجل ثابت لا يتغير"
 title_en: "Tuples: a fixed, immutable record"
 level: beginner

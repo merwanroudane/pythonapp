@@ -36,7 +36,15 @@ def build_navigation(render_lesson: Callable[[str], None]) -> dict[str, list[st.
         icon=":material/code:",
         url_path="playground",
     )
-    sections: dict[str, list[st.Page]] = {"": [pages_by_key["home"], pages_by_key["playground"]]}
+    pages_by_key["type_lab"] = st.Page(
+        ROOT / "app_pages" / "type_lab.py",
+        title="مختبر الأنواع",
+        icon=":material/biotech:",
+        url_path="type-lab",
+    )
+    sections: dict[str, list[st.Page]] = {
+        "": [pages_by_key["home"], pages_by_key["playground"], pages_by_key["type_lab"]]
+    }
     for track in curriculum.tracks:
         lessons = curriculum.lessons_in(track.id)
         if not lessons:

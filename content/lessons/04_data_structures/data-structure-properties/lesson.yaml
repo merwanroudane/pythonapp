@@ -1,0 +1,146 @@
+id: data-structure-properties
+track: data_structures
+order: 2
+title_ar: "خصائص الأنواع وبنى البيانات: التعديل، الترتيب، التكرار، الـhash وغيرها"
+title_en: "Properties of types and data structures: mutability, order, duplicates, hashability and more"
+level: beginner_to_intermediate
+estimated_minutes: 45
+prerequisites: [data-structures-overview]
+objectives:
+  - "تعريف إحدى عشرة خاصية: قابلية التعديل، الترتيب، التكرار، الوصول بـ[]، الـhashability، قابلية المرور، الطول، الكسل، قابلية المقارنة، القيمة المنطقية، وتجانس العناصر."
+  - "قراءة جدول الخصائص الكامل لكل الأنواع الأساسية وبنى البيانات المدمجة."
+  - "فحص كل خاصية برمجيًا بدل حفظها (hash، len، collections.abc)."
+  - "فهم العلاقة بين قابلية التعديل والـhashability."
+  - "توقّع ما يُحفظ وما يضيع عند التحويل بين البنى."
+docs_url: "https://docs.python.org/3/library/collections.abc.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [properties, mutable, immutable, ordered, duplicates, hashable, iterable, sized, lazy, orderable, truthiness, homogeneous, collections.abc, conversion]
+
+quizzes:
+  q-hash-tuple:
+    kind: predict
+    question: "أي سطر يرفع `TypeError`؟"
+    code: |
+      a = {(1, 2): "ok"}
+      b = {(1, [2]): "?"}
+    options: ["السطر الأول", "السطر الثاني", "لا أحد منهما"]
+    answer: 1
+    explanation: |
+      الـtuple تكون hashable فقط إذا كانت **كل** عناصرها hashable. `(1, [2])` تحوي list، فلا يمكن
+      حساب hash لها ولا استخدامها مفتاحًا.
+  q-convert:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      xs = [3, 1, 3, 2, 1]
+      print(len(set(xs)), sorted(set(xs)), list(dict.fromkeys(xs)))
+    options:
+      - "`5 [1, 1, 2, 3, 3] [3, 1, 3, 2, 1]`"
+      - "`3 [1, 2, 3] [3, 1, 2]`"
+      - "`3 [3, 1, 2] [1, 2, 3]`"
+    answer: 1
+    explanation: |
+      `set` يزيل التكرار (3 قيم فريدة) ويضيع الترتيب، و`sorted` يُعيد ترتيبًا تصاعديًا، أما
+      `dict.fromkeys` فتزيل التكرار **مع** الحفاظ على ترتيب أول ظهور.
+  q-mutable-hash:
+    kind: concept
+    question: "لماذا لا تكون `list` وset وdict قابلة للـhash؟"
+    options:
+      - "لأنها بطيئة"
+      - "لأن محتواها يمكن أن يتغير، فيتغير الـhash ويضيع مكانها داخل dict أو set"
+      - "لأنها لا تحتوي أرقامًا"
+    answer: 1
+    explanation: |
+      الـhash يجب أن يبقى ثابتًا طوال وجود المفتاح في الجدول. البنى القابلة للتعديل لا تضمن ذلك،
+      لذلك ترفض Python حساب hash لها.
+  q-exit:
+    kind: exit
+    question: "أي بنية مرتبة، ثابتة، تسمح بالتكرار، وقابلة للـhash (إن كانت عناصرها كذلك)؟"
+    options: ["`list`", "`tuple`", "`frozenset`", "`dict`"]
+    answer: 1
+    explanation: |
+      `frozenset` ثابتة وقابلة للـhash لكنها غير مرتبة ولا تسمح بالتكرار. `tuple` تجمع الخصائص الأربع.
+
+exercises:
+  ex-matrix:
+    title: "املأ جدول الخصائص… ودع Python يصحّحه"
+    prompt: |
+      لكل بنية في القاموس `answers`، ضع `True` أو `False` لأربع خصائص:
+      `mutable` و`ordered` و`duplicates` (تسمح بالتكرار) و`hashable`.
+
+      لن نقارن إجاباتك بقائمة محفوظة: الفحص يسأل Python نفسها، فيجرّب `hash()` ويحاول تعديل
+      البنية ويضيف عنصرًا مكررًا ويقارن الترتيب.
+    starter: |
+      answers = {
+          "list":      {"mutable": ..., "ordered": ..., "duplicates": ..., "hashable": ...},
+          "tuple":     {"mutable": ..., "ordered": ..., "duplicates": ..., "hashable": ...},
+          "set":       {"mutable": ..., "ordered": ..., "duplicates": ..., "hashable": ...},
+          "frozenset": {"mutable": ..., "ordered": ..., "duplicates": ..., "hashable": ...},
+          "str":       {"mutable": ..., "ordered": ..., "duplicates": ..., "hashable": ...},
+      }
+    solution: |
+      answers = {
+          "list":      {"mutable": True,  "ordered": True,  "duplicates": True,  "hashable": False},
+          "tuple":     {"mutable": False, "ordered": True,  "duplicates": True,  "hashable": True},
+          "set":       {"mutable": True,  "ordered": False, "duplicates": False, "hashable": False},
+          "frozenset": {"mutable": False, "ordered": False, "duplicates": False, "hashable": True},
+          "str":       {"mutable": False, "ordered": True,  "duplicates": True,  "hashable": True},
+      }
+    tests: |
+      import collections.abc as _abc
+
+      def _truth(name):
+          make = {"list": lambda xs: list(xs), "tuple": lambda xs: tuple(xs),
+                  "set": lambda xs: set(xs), "frozenset": lambda xs: frozenset(xs),
+                  "str": lambda xs: "".join(str(x) for x in xs)}[name]
+          sample = make([3, 1, 3])
+          try:
+              hash(sample)
+              hashable = True
+          except TypeError:
+              hashable = False
+          mutable = isinstance(sample, (_abc.MutableSequence, _abc.MutableSet))
+          return {"mutable": mutable, "ordered": isinstance(sample, _abc.Sequence),
+                  "duplicates": len(sample) == 3, "hashable": hashable}
+
+      for _name, _given in answers.items():
+          _real = _truth(_name)
+          for _prop, _value in _real.items():
+              assert _given.get(_prop) is _value, (
+                  f"{_name}.{_prop}: كتبت {_given.get(_prop)!r} لكن Python تقول {_value!r}"
+              )
+    hints:
+      - "استعن بجدول الخصائص في هذه المحاضرة، أو جرّب كل بنية في مختبر الأنواع أعلاه."
+      - "المجموعات (set وfrozenset) غير مرتبة ولا تسمح بالتكرار. والـstr وtuple ثابتان وقابلان للـhash."
+      - "الفرق الوحيد بين set وfrozenset: الثانية ثابتة وقابلة للـhash."
+
+changes:
+  ch-convert:
+    title: "ماذا تحفظ كل عملية تحويل وماذا تضيّع؟"
+    base: |
+      xs = ["b", "a", "b", "c", "a"]
+      print(list(xs))
+    base_label: "قبل · list كما هي"
+    variants:
+      - label: "set(xs)"
+        code: |
+          xs = ["b", "a", "b", "c", "a"]
+          print(set(xs), len(set(xs)))
+        explain: "يضيّع **التكرار والترتيب**. العناصر الفريدة فقط، بلا ترتيب مضمون."
+      - label: "sorted(set(xs))"
+        code: |
+          xs = ["b", "a", "b", "c", "a"]
+          print(sorted(set(xs)))
+        explain: "فريدة ومرتبة **أبجديًا**: ترتيب جديد، لا ترتيب الظهور الأصلي."
+      - label: "dict.fromkeys(xs)"
+        code: |
+          xs = ["b", "a", "b", "c", "a"]
+          print(list(dict.fromkeys(xs)))
+        explain: "فريدة **مع** ترتيب أول ظهور، لأن مفاتيح dict فريدة وتحفظ ترتيب الإدخال."
+      - label: "tuple(xs)"
+        code: |
+          xs = ["b", "a", "b", "c", "a"]
+          t = tuple(xs)
+          print(t, hash(t) is not None)
+        explain: "يحفظ الترتيب والتكرار، ويكسب **الثبات والـhashability**: يصلح الآن مفتاحًا في dict."

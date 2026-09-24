@@ -21,6 +21,7 @@ from app.ui.change import render_change
 from app.ui.code_cell import render_code_cell
 from app.ui.exercise import render_exercise
 from app.ui.navigation import page_for
+from app.ui.property_lab import render_property_lab
 from app.ui.quiz import render_quiz
 from app.ui.stepper import render_stepper, steps_for_animation
 from app.ui.theme import page_background, track_blobs
@@ -138,6 +139,9 @@ def _render_block(lesson: Lesson, block: Block, index: int) -> None:
         render_stepper(anim.code, steps, key=f"anim-{key}", title=anim.title)
     elif kind == "change":
         render_change(meta.changes[attrs["id"]], key=key)
+    elif kind == "property_lab":
+        start = block.body.strip() or "[3, 1, 3]"
+        render_property_lab(key=f"lab-{key}", lesson_id=meta.id, initial=start)
 
 
 def _footer(lesson: Lesson) -> None:

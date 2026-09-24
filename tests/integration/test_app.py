@@ -74,3 +74,13 @@ def test_view_modes_filter_blocks():
     at.segmented_control(key="view-for-loop-mode").set_value("review").run()
     assert not at.exception
     assert len(at.code) < learn_count
+
+
+def test_type_lab_block_probes_a_value_in_the_lesson():
+    at = _lesson_app("data-structure-properties")
+    button = next(b for b in at.button if b.key and b.key.startswith("probe-"))
+    at.button(key=button.key).click().run()
+    assert not at.exception
+    tables = [m.value for m in at.markdown if m.value.startswith("| الخاصية | النتيجة |")]
+    assert tables, "the property table was not rendered"
+    assert "مختلطة" in tables[0]  # the default value is the mixed list

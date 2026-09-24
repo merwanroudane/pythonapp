@@ -3,7 +3,7 @@
 An Arabic-first, interactive Streamlit platform for learning Python, built from the
 author's platform blueprint (the § numbers in the code refer to it). Roadmap status (§130):
 **Phase A — Foundation** done; **Phase B — Core Python MVP** done (isolated execution,
-code editor, loop/function animations). 33 lectures across tracks 00–10, with basic data types
+code editor, loop/function animations). 35 lectures across tracks 00–10, with basic data types
 (`int`, `float`, `complex`, `bool`, `None`, `str`) and data structures (`list`, `tuple`, `set`,
 `dict`, `range`, `deque`, `Counter`, …) taught as two separate tracks.
 
@@ -35,6 +35,7 @@ streamlit run streamlit_app.py
 | Predict-first quizzes, exercises with hidden checks and graded hints (§76) | `app/ui/quiz.py`, `app/ui/exercise.py` |
 | Change & Observe before/after (§2.10) | `app/ui/change.py` |
 | Dashboard: progress, continue, search, 25-track roadmap, errors faced (§4) | `app_pages/home.py` |
+| Type Lab: every property of any value, probed inside the runner (§117) | `app/ui/property_lab.py`, `app/execution/probe.py` |
 | Content validation + example verification (§101) | `scripts/` |
 
 ## Execution backends
@@ -103,6 +104,10 @@ right
 :::
 
 :::quiz id="q1":::    :::exercise id="ex1":::    :::animation id="a1":::    :::change id="c1":::
+
+:::property_lab                       Type Lab block; the body is the starting value
+[1, "2", None]
+:::
 ```
 
 Then check it:

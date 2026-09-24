@@ -1,6 +1,6 @@
 id: other-structures
 track: data_structures
-order: 6
+order: 7
 title_ar: "بنى أخرى: range وbytes وdeque وCounter وdefaultdict وnamedtuple"
 title_en: "Other structures: range, bytes, deque, Counter, defaultdict, namedtuple"
 level: beginner_to_intermediate

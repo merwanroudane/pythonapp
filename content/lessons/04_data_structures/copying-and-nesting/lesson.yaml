@@ -1,0 +1,144 @@
+id: copying-and-nesting
+track: data_structures
+order: 8
+title_ar: "البنى المتداخلة والنسخ: alias وshallow copy وdeep copy"
+title_en: "Nested structures and copying: alias, shallow copy, deep copy"
+level: intermediate
+estimated_minutes: 35
+prerequisites: [other-structures]
+objectives:
+  - "بناء بنى متداخلة (قائمة قوائم، قائمة قواميس، قاموس قوائم) والوصول إلى عناصرها العميقة."
+  - "التمييز بين alias وshallow copy وdeep copy."
+  - "توقّع أثر تعديل عنصر داخلي بعد كل نوع من النسخ."
+  - "اختيار copy() أو copy.deepcopy() حسب عمق البنية."
+docs_url: "https://docs.python.org/3/library/copy.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [nested, copy, shallow copy, deep copy, alias, deepcopy, mutable]
+
+quizzes:
+  q-shallow:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      a = [[1, 2], [3, 4]]
+      b = a.copy()
+      b[0].append(99)
+      b.append([5])
+      print(a)
+    options:
+      - "`[[1, 2], [3, 4]]`"
+      - "`[[1, 2, 99], [3, 4]]`"
+      - "`[[1, 2, 99], [3, 4], [5]]`"
+    answer: 1
+    explanation: |
+      `copy()` **سطحية**: القائمة الخارجية جديدة (فإضافة `[5]` لا تظهر في a)، لكن القوائم الداخلية
+      **مشتركة** (فـ`99` تظهر في a أيضًا).
+  q-deep:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      import copy
+      a = {"scores": [12, 15]}
+      b = copy.deepcopy(a)
+      b["scores"].append(20)
+      print(a["scores"], b["scores"])
+    options:
+      - "`[12, 15, 20] [12, 15, 20]`"
+      - "`[12, 15] [12, 15, 20]`"
+      - "`[12, 15] [12, 15]`"
+    answer: 1
+    explanation: "`deepcopy` تنسخ كل المستويات، فلا شيء مشترك بين a وb."
+  q-exit:
+    kind: exit
+    question: "متى تكفي `xs.copy()`؟"
+    options:
+      - "دائمًا"
+      - "عندما تكون العناصر immutable (أرقام، نصوص، tuples من قيم ثابتة)"
+      - "عندما تحتوي القائمة قوائم أخرى"
+    answer: 1
+    explanation: |
+      إذا كانت العناصر لا تتغير فمشاركتها لا تضر، والنسخة السطحية كافية وأسرع. أما البنى المتداخلة
+      القابلة للتعديل فتحتاج `deepcopy`.
+
+exercises:
+  ex-safe-update:
+    title: "دالة لا تفسد بيانات المستدعي"
+    prompt: |
+      الدالة `with_bonus(record, bonus)` يجب أن تُعيد **نسخة** من السجل أُضيف فيها `bonus` إلى كل
+      درجة في القائمة `record["scores"]`، **دون** أن يتغير السجل الأصلي. النسخة الحالية تفسد الأصل.
+      أصلحها.
+    starter: |
+      def with_bonus(record, bonus):
+          new = record.copy()
+          for i in range(len(new["scores"])):
+              new["scores"][i] += bonus
+          return new
+
+      original = {"name": "Sara", "scores": [12, 15]}
+      updated = with_bonus(original, 2)
+      print(original, updated)
+    solution: |
+      import copy
+
+      def with_bonus(record, bonus):
+          new = copy.deepcopy(record)
+          for i in range(len(new["scores"])):
+              new["scores"][i] += bonus
+          return new
+
+      original = {"name": "Sara", "scores": [12, 15]}
+      updated = with_bonus(original, 2)
+      print(original, updated)
+    tests: |
+      _orig = {"name": "Sara", "scores": [12, 15]}
+      _new = with_bonus(_orig, 2)
+      assert _new["scores"] == [14, 17], f"النسخة يجب أن تحوي [14, 17] وليس {_new['scores']}"
+      assert _orig["scores"] == [12, 15], f"الأصل تغيّر إلى {_orig['scores']}: النسخ سطحي"
+      assert _new["scores"] is not _orig["scores"], "القائمة الداخلية ما زالت مشتركة"
+    hints:
+      - "`record.copy()` نسخة سطحية: القاموس جديد لكن القائمة `scores` داخله هي نفسها."
+      - "تحتاج نسخًا لكل المستويات: الوحدة `copy` فيها دالة لذلك."
+      - "`import copy` ثم `new = copy.deepcopy(record)`"
+
+changes:
+  ch-copies:
+    title: "ثلاث طرق لـ«النسخ»"
+    base: |
+      a = [[1, 2], [3, 4]]
+      b = a
+      b[0].append(99)
+      print("a =", a, "| a is b:", a is b)
+    base_label: "قبل · b = a (alias)"
+    variants:
+      - label: "a.copy()"
+        code: |
+          a = [[1, 2], [3, 4]]
+          b = a.copy()
+          b[0].append(99)
+          print("a =", a, "| a is b:", a is b, "| a[0] is b[0]:", a[0] is b[0])
+        explain: "نسخة **سطحية**: القائمة الخارجية جديدة (`a is b` خطأ)، لكن الداخلية مشتركة (`a[0] is b[0]` صحيح)، فيظهر 99 في a."
+      - label: "copy.deepcopy(a)"
+        code: |
+          import copy
+          a = [[1, 2], [3, 4]]
+          b = copy.deepcopy(a)
+          b[0].append(99)
+          print("a =", a, "| a is b:", a is b, "| a[0] is b[0]:", a[0] is b[0])
+        explain: "نسخة **عميقة**: كل المستويات جديدة، فلا يظهر أي تعديل على b في a."
+
+animations:
+  anim-shallow:
+    title: "النسخة السطحية تتشارك الداخل"
+    code: |
+      a = [[1, 2], [3]]
+      b = a.copy()
+      b.append([4])
+      b[0].append(99)
+      print(a)
+      print(b)
+    notes:
+      2: "`copy()` تنشئ قائمة خارجية **جديدة** تحوي **المراجع نفسها** إلى القوائم الداخلية."
+      3: "الإضافة إلى القائمة الخارجية لـb لا تمس a: القائمتان الخارجيتان مختلفتان."
+      4: "`b[0]` هي نفسها `a[0]`: تعديلها يظهر في الاثنين."
+      5: "a تحوي 99 لكنها لا تحوي [4]. هذا هو معنى «سطحية»."
