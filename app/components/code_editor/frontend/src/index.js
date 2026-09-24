@@ -24,7 +24,7 @@ import { tags as t } from "@lezer/highlight"
 
 // Syntax colours = the palette's text-safe inks (all >= 4.5:1 on white).
 const pllHighlight = HighlightStyle.define([
-  { tag: t.keyword, color: "#7352DA", fontWeight: "600" },
+  { tag: t.keyword, color: "#2469CE", fontWeight: "600" },
   { tag: [t.string, t.special(t.string)], color: "#2D7B4B" },
   { tag: [t.number, t.integer, t.float], color: "#A7580A" },
   { tag: [t.bool, t.null, t.atom], color: "#177874", fontWeight: "600" },
@@ -32,8 +32,8 @@ const pllHighlight = HighlightStyle.define([
   { tag: [t.function(t.variableName), t.function(t.propertyName)], color: "#1B72A9" },
   { tag: t.definition(t.variableName), color: "#2B2A27", fontWeight: "600" },
   { tag: [t.className, t.definition(t.className)], color: "#8B6700", fontWeight: "600" },
-  { tag: t.operator, color: "#CA2C23" },
-  { tag: t.self, color: "#7352DA", fontStyle: "italic" },
+  { tag: t.operator, color: "#A7580A" },
+  { tag: t.self, color: "#2469CE", fontStyle: "italic" },
 ])
 
 const pllTheme = EditorView.theme({

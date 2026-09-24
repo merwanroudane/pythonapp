@@ -210,7 +210,7 @@ def render_property_lab(*, key: str, lesson_id: str | None = None, initial: str 
 
         p = outcome.properties
         with st.container(horizontal=True, gap="small"):
-            st.badge(ltr(p["type"]), icon=":material/category:", color="violet")
+            st.badge(ltr(p["type"]), icon=":material/category:", color="green")
             st.badge(
                 KIND_LABELS[p["kind"]],
                 icon=":material/label:",

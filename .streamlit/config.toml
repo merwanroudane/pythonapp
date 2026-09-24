@@ -1,4 +1,4 @@
-# Bright multicolour light system — blueprint §3.2 / §123 (no pink, no dark UI).
+# Bright multicolour light system — blueprint §3.2 / §123 (no pink / violet, no dark UI).
 # Neutral cream surfaces; each knowledge type gets its own distinct hue.
 # primaryColor / linkColor are one shade deeper so they stay >= 4.5:1 on the
 # multicolour background blobs too (app/ui/theme.py BLOB_STRENGTH).
@@ -30,27 +30,28 @@ codeFontSize = "0.9rem"
 headingFontWeights = [700, 700, 600, 600, 600, 600]
 
 redColor = "#E0524A"
-redBackgroundColor = "#FCEBE4"
-redTextColor = "#CA2C23"
+redBackgroundColor = "#F7F6F2"
+redTextColor = "#D12D24"
 orangeColor = "#F28C28"
-orangeBackgroundColor = "#FEF1E0"
+orangeBackgroundColor = "#FEF4EA"
 orangeTextColor = "#A7580A"
 yellowColor = "#F4B400"
-yellowBackgroundColor = "#FEF5DC"
+yellowBackgroundColor = "#FEF8E6"
 yellowTextColor = "#8B6700"
 greenColor = "#3FAE6A"
-greenBackgroundColor = "#ECF4E7"
+greenBackgroundColor = "#ECF7F0"
 greenTextColor = "#2D7B4B"
 blueColor = "#3AA0E0"
-blueBackgroundColor = "#EBF3F3"
-blueTextColor = "#1B72A9"
-violetColor = "#8B6FE0"
-violetBackgroundColor = "#F3EEF3"
-violetTextColor = "#7352DA"
+blueBackgroundColor = "#EBF6FC"
+blueTextColor = "#1B73AB"
+# Streamlit's "violet" slot is re-coloured lime so nothing purple can appear.
+violetColor = "#7CB518"
+violetBackgroundColor = "#F2F8E8"
+violetTextColor = "#527810"
 grayColor = "#6B665C"
 grayTextColor = "#6B665C"
 
-chartCategoricalColors = ["#F28C28", "#3AA0E0", "#3FAE6A", "#8B6FE0", "#F4B400", "#1FA5A0", "#E0524A"]
+chartCategoricalColors = ["#F28C28", "#3AA0E0", "#3FAE6A", "#7CB518", "#F4B400", "#1FA5A0", "#3B7DDD", "#E0524A"]
 
 [theme.sidebar]
 backgroundColor = "#F6F3EA"

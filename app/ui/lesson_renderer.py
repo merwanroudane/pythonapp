@@ -57,7 +57,7 @@ def _header(lesson: Lesson) -> str:
     with st.container(horizontal=True, gap="small", vertical_alignment="center"):
         if meta.kind == "theory":
             st.badge("محاضرة نظرية · Theory", icon=":material/school:", color="blue")
-        st.badge(LEVEL_LABELS[meta.level], icon=":material/signal_cellular_alt:", color="violet")
+        st.badge(LEVEL_LABELS[meta.level], icon=":material/signal_cellular_alt:", color="green")
         st.badge(f"{meta.estimated_minutes} دقيقة", icon=":material/schedule:", color="blue")
         st.badge(ltr(f"Python ≥ {meta.python_min}"), icon=":material/code:", color="orange")
         st.badge(progress.STATUS_LABELS[state], icon=progress.STATUS_ICONS[state], color="green")

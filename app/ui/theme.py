@@ -37,22 +37,25 @@ class Tone:
 
 
 TONES: dict[str, Tone] = {
-    "concept": Tone("#F4B400", "#FEF5DC", "#8B6700"),  # amber
-    "example": Tone("#F28C28", "#FEF1E0", "#A7580A"),  # orange
-    "practice": Tone("#3FAE6A", "#ECF4E7", "#2D7B4B"),  # green
-    "insight": Tone("#1FA5A0", "#E9F3EC", "#177874"),  # teal
-    "deepdive": Tone("#8B6FE0", "#F3EEF3", "#7352DA"),  # violet
-    "data": Tone("#3AA0E0", "#EBF3F3", "#1B72A9"),  # sky
-    "theory": Tone("#5B7FE0", "#EFF0F3", "#3763D9"),  # indigo
-    "highlight": Tone("#F5D547", "#FEF8E4", "#826C07"),  # yellow
-    "warning": Tone("#E0A526", "#FCF3E0", "#8C6614"),  # gold
-    "error": Tone("#E0524A", "#FCEBE4", "#CA2C23"),  # red
+    # Tints are 10% of the base mixed into WHITE (not cream), so cool hues stay clean
+    # blue/green instead of turning mauve. No violet, magenta or pink anywhere (user
+    # requirement); light red reads as pink, so the error tone uses a neutral tint.
+    "concept": Tone("#F4B400", "#FEF8E6", "#8B6700"),  # amber
+    "example": Tone("#F28C28", "#FEF4EA", "#A7580A"),  # orange
+    "practice": Tone("#3FAE6A", "#ECF7F0", "#2D7B4B"),  # green
+    "insight": Tone("#1FA5A0", "#E9F6F6", "#177A76"),  # teal
+    "deepdive": Tone("#7CB518", "#F2F8E8", "#527810"),  # lime
+    "data": Tone("#3AA0E0", "#EBF6FC", "#1B73AB"),  # sky
+    "theory": Tone("#3B7DDD", "#EBF2FC", "#246AD0"),  # blue
+    "highlight": Tone("#F5D547", "#FEFBED", "#826C07"),  # yellow
+    "warning": Tone("#E0A526", "#FCF6E9", "#8C6614"),  # gold
+    "error": Tone("#E0524A", "#F7F6F2", "#D12D24"),  # red stripe, neutral tint
     "neutral": Tone("#B5AC9C", SOFT, MUTED),
 }
 
 # One hue per track, in track order; used by the roadmap cards and the lesson pages.
 TRACK_TONES = ["concept", "example", "practice", "insight", "deepdive", "data", "theory"]
-HOME_BLOBS = ["concept", "data", "practice", "deepdive", "example", "insight"]
+HOME_BLOBS = ["concept", "data", "practice", "theory", "example", "deepdive"]
 
 
 def mix(a: str, b: str, t: float) -> str:
@@ -63,7 +66,7 @@ def mix(a: str, b: str, t: float) -> str:
 
 
 def blob(tone: str) -> str:
-    return mix(CANVAS, TONES[tone].base, BLOB_STRENGTH)
+    return mix(RAISED, TONES[tone].base, BLOB_STRENGTH)
 
 
 def track_tone(track_order: int) -> str:
@@ -154,7 +157,7 @@ pre, textarea, [data-testid="stCode"], [data-testid="stDataFrame"], [data-testid
 {_tone_rules()}
 [class*="st-key-card-"] {{
   background: var(--tone-tint);
-  border: 1px solid color-mix(in srgb, var(--tone) 35%, transparent) !important;
+  border: 1px solid var(--border-soft) !important;  /* neutral: a tinted red edge reads pink */
   border-right: 6px solid var(--tone) !important;
 }}
 [class*="st-key-cardtitle-"] p, [class*="st-key-cardtitle-"] span {{
