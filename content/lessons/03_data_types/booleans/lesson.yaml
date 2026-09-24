@@ -1,0 +1,83 @@
+id: booleans
+track: data_types
+order: 5
+title_ar: "القيم المنطقية bool: True وFalse"
+title_en: "Booleans: True and False"
+level: beginner
+estimated_minutes: 30
+prerequisites: [complex-numbers]
+objectives:
+  - "فهم النوع bool وقيمتيه الوحيدتين True وFalse."
+  - "معرفة أن المقارنات تُنتج bool، وأن bool نوع فرعي من int."
+  - "تطبيق قواعد truthiness عبر bool() وتجنّب فخ bool(\"False\")."
+  - "العدّ وحساب النسب بجمع قيم منطقية."
+docs_url: "https://docs.python.org/3/library/stdtypes.html#boolean-type-bool"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [bool, "True", "False", comparison, truthiness, int, counting]
+
+quizzes:
+  q-sum:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      passed = [True, False, True, True]
+      print(sum(passed), sum(passed) / len(passed))
+    options: ["`TypeError`", "`3 0.75`", "`True 0.75`"]
+    answer: 1
+    explanation: |
+      `True` تساوي 1 و`False` تساوي 0، فمجموع القائمة هو **عدد** القيم الصحيحة، ومتوسطها هو
+      **النسبة**. نمط شائع جدًا في تحليل البيانات.
+  q-false-string:
+    kind: predict
+    question: "ما قيمة `bool(\"False\")`؟"
+    options: ["`False`", "`True`", "`ValueError`"]
+    answer: 1
+    explanation: |
+      `bool()` على نص لا تقرأ معناه؛ تسأل فقط: هل النص **فارغ**؟ `"False"` نص من خمسة حروف
+      فهو truthy. لتحويل نص مثل `"yes"`/`"no"` إلى bool قارنه صراحة.
+  q-exit:
+    kind: exit
+    question: "أي أسلوب هو المعتاد في Python؟"
+    options: ["`if is_valid == True:`", "`if is_valid:`", "`if is_valid is True == True:`"]
+    answer: 1
+    explanation: |
+      المتغير نفسه bool، فلا حاجة لمقارنته بـ`True` (PEP 8 ينصح بذلك). ومقارنة `== True` قد
+      تخطئ مع القيم truthy غير المنطقية مثل `2`.
+
+exercises:
+  ex-yesno:
+    title: "من إجابات نصية إلى قيم منطقية"
+    prompt: |
+      إجابات استبيان جاءت كنصوص. أنشئ:
+
+      - `consent`: قائمة bool بنفس الطول، تكون `True` إذا كانت الإجابة (بعد إزالة المسافات
+        وتحويلها لأحرف صغيرة) إحدى: `"yes"`، `"y"`، `"1"`، `"true"`.
+      - `n_consent`: عدد الموافقين (اجمع القائمة).
+      - `share`: نسبة الموافقين من الكل.
+    starter: |
+      answers = ["Yes", " no", "y", "False", "1", "NO", "true "]
+
+      consent = [bool(a) for a in answers]
+      n_consent = ...
+      share = ...
+
+      print(consent, n_consent, share)
+    solution: |
+      answers = ["Yes", " no", "y", "False", "1", "NO", "true "]
+
+      consent = [a.strip().lower() in {"yes", "y", "1", "true"} for a in answers]
+      n_consent = sum(consent)
+      share = n_consent / len(answers)
+
+      print(consent, n_consent, share)
+    tests: |
+      import math as _m
+      assert consent == [True, False, True, False, True, False, True], f"consent غير صحيح: {consent}"
+      assert all(type(c) is bool for c in consent), "كل عناصر consent يجب أن تكون bool"
+      assert n_consent == 4, f"n_consent يجب أن يكون 4 وليس {n_consent}"
+      assert _m.isclose(share, 4 / 7)
+    hints:
+      - "`bool(\"False\")` تعطي True! لا تستعمل `bool()` على النص؛ قارن النص المنظّف بمجموعة القيم المقبولة."
+      - "`a.strip().lower() in {\"yes\", \"y\", \"1\", \"true\"}` تعطي bool مباشرة. ثم `sum(consent)`."
+      - "`consent = [a.strip().lower() in {\"yes\", \"y\", \"1\", \"true\"} for a in answers]`"

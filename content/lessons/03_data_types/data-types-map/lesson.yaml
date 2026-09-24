@@ -1,0 +1,89 @@
+id: data-types-map
+track: data_types
+order: 2
+title_ar: "خريطة الأنواع: الأنواع الأساسية مقابل بنى البيانات"
+title_en: "The type map: basic data types vs data structures"
+level: beginner
+estimated_minutes: 30
+prerequisites: [variables-assignment]
+objectives:
+  - "التمييز بين نوع بيانات أساسي (قيمة مفردة) وبنية بيانات (حاوية لقيم كثيرة)."
+  - "معرفة الأنواع الأساسية: int وfloat وcomplex وbool وNoneType وstr."
+  - "معرفة بنى البيانات المدمجة: list وtuple وrange وset وfrozenset وdict، وبنى أخرى."
+  - "فحص النوع بـtype() وisinstance()، وتصنيف أي قيمة حسب قابلية التعديل."
+docs_url: "https://docs.python.org/3/library/stdtypes.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [type, data type, data structure, scalar, collection, mutable, isinstance, int, float, complex, bool, None, str]
+
+quizzes:
+  q-which:
+    kind: concept
+    question: "أي من هذه **بنية بيانات** وليس نوعًا أساسيًا؟"
+    options: ["`3.14`", "`True`", "`(3, 14)`", "`None`"]
+    answer: 2
+    explanation: |
+      `(3, 14)` **tuple**: حاوية تجمع قيمتين. أما `3.14` (float) و`True` (bool) و`None`
+      (NoneType) فكل منها **قيمة مفردة** لا تحتوي عناصر.
+  q-bool-int:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      print(isinstance(True, int), True + True)
+    options: ["`False TypeError`", "`True 2`", "`True True`"]
+    answer: 1
+    explanation: |
+      في Python، `bool` **نوع فرعي (subclass)** من `int`: `True` تساوي 1 و`False` تساوي 0.
+      لهذا `True + True` تساوي 2. سنرى فائدة ذلك في محاضرة bool.
+  q-exit:
+    kind: exit
+    question: "لماذا نعامل `str` كنوع أساسي رغم أنه يحتوي حروفًا؟"
+    options:
+      - "لأنه لا يمكن المرور على حروفه"
+      - "لأنه يمثل قيمة نصية واحدة ويُستعمل ككتلة واحدة، مع أنه تقنيًا sequence غير قابلة للتعديل"
+      - "لأنه نوع رقمي"
+    answer: 1
+    explanation: |
+      `str` يقع على الحدود: هو **sequence** (له indexing وslicing)، لكن الاسم أو الجملة قيمة
+      واحدة في معظم الاستعمالات. لذلك تضعه معظم المراجع مع الأنواع الأساسية، ونفعل ذلك هنا.
+
+exercises:
+  ex-classify:
+    title: "صنّف أي قيمة"
+    prompt: |
+      أكمل الدالة `kind(value)` لتُعيد:
+
+      - `"basic"` إذا كانت القيمة من الأنواع الأساسية: `int` أو `float` أو `complex` أو `bool`
+        أو `str` أو `None`.
+      - `"structure"` إذا كانت من بنى البيانات: `list` أو `tuple` أو `range` أو `set` أو
+        `frozenset` أو `dict`.
+
+      استخدم `isinstance(value, (…))` مع tuple من الأنواع، و`value is None` لـNone.
+      (لا تقلق من `def` و`return`؛ ركّز على الشرط.)
+    starter: |
+      def kind(value):
+          return "?"
+
+      print(kind(3), kind([1, 2]), kind(None), kind({"a": 1}))
+    solution: |
+      def kind(value):
+          if value is None or isinstance(value, (int, float, complex, bool, str)):
+              return "basic"
+          if isinstance(value, (list, tuple, range, set, frozenset, dict)):
+              return "structure"
+          return "other"
+
+      print(kind(3), kind([1, 2]), kind(None), kind({"a": 1}))
+    tests: |
+      _cases = {
+          3: "basic", 2.5: "basic", 3 + 4j: "basic", True: "basic", "abc": "basic",
+      }
+      for _v, _want in _cases.items():
+          assert kind(_v) == _want, f"kind({_v!r}) أعادت {kind(_v)!r} والمتوقع {_want!r}"
+      assert kind(None) == "basic", "None نوع أساسي (NoneType)"
+      for _v in ([1], (1, 2), range(3), {1, 2}, frozenset({1}), {"a": 1}):
+          assert kind(_v) == "structure", f"kind({_v!r}) يجب أن تكون 'structure'"
+    hints:
+      - "`isinstance(x, (int, float))` تفحص عدة أنواع دفعة واحدة. و`None` تُفحص بـ`is None`."
+      - "اكتب شرطين: واحد للأنواع الأساسية يُعيد `\"basic\"`، وآخر لبنى البيانات يُعيد `\"structure\"`."
+      - "`if value is None or isinstance(value, (int, float, complex, bool, str)): return \"basic\"`"

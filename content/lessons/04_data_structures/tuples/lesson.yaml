@@ -1,0 +1,130 @@
+id: tuples
+track: data_structures
+order: 3
+title_ar: "الـtuple: سجل ثابت لا يتغير"
+title_en: "Tuples: a fixed, immutable record"
+level: beginner
+estimated_minutes: 30
+prerequisites: [lists]
+objectives:
+  - "إنشاء tuple وفهم أن الفاصلة هي التي تصنعه، لا الأقواس."
+  - "استخدام packing وunpacking، بما في ذلك تبديل قيمتين والـstarred unpacking."
+  - "فهم عدم قابلية التعديل وحدودها: tuple تحوي list."
+  - "استخدام tuple كمفتاح مركّب في dict وكقيمة مُعادة متعددة."
+docs_url: "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [tuple, immutable, packing, unpacking, swap, record, hashable, namedtuple]
+
+quizzes:
+  q-comma:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      a = (5)
+      b = (5,)
+      c = 5,
+      print(type(a).__name__, type(b).__name__, type(c).__name__)
+    options: ["`tuple tuple int`", "`int tuple tuple`", "`int int tuple`"]
+    answer: 1
+    explanation: |
+      الأقواس وحدها مجرد تجميع رياضي: `(5)` هي `5`. **الفاصلة** هي التي تصنع الـtuple، لذلك
+      `(5,)` و`5,` كلاهما tuple من عنصر واحد.
+  q-inner:
+    kind: predict
+    question: "ماذا يحدث؟"
+    code: |
+      t = ([1, 2], "x")
+      t[0].append(3)
+      print(t)
+    options: ["`TypeError`", "`([1, 2, 3], 'x')`", "`([1, 2], 'x')`"]
+    answer: 1
+    explanation: |
+      الـtuple لم يتغير: ما زال يحوي **المرجعين نفسيهما**. لكن القائمة التي يشير إليها المرجع الأول
+      mutable فتغيرت. «tuple immutable» تعني أن مواضعه لا تُستبدل، لا أن كل ما بداخله مجمّد.
+  q-exit:
+    kind: exit
+    question: "متى تختار tuple بدل list؟"
+    options:
+      - "عندما أريد إضافة عناصر كثيرًا"
+      - "عندما تمثل القيم سجلًا ثابتًا بحقول معروفة، أو أحتاج مفتاحًا في dict"
+      - "عندما أحتاج ترتيب العناصر"
+    answer: 1
+    explanation: |
+      القاعدة الشائعة: **list لمجموعة عناصر من النوع نفسه تكبر وتصغر**، و**tuple لسجل ثابت** كل
+      موضع فيه له معنى (اسم، عمر، مدينة).
+
+exercises:
+  ex-minmax:
+    title: "دالة تُعيد قيمتين"
+    prompt: |
+      1. أكمل `min_max(values)` لتُعيد **tuple** من قيمتين: `(أصغر قيمة، أكبر قيمة)`.
+      2. استدعها على `scores` وفكّ النتيجة مباشرة في متغيرين `low` و`high`.
+      3. بدّل قيمتي `a` و`b` في سطر واحد بلا متغير مؤقت.
+    starter: |
+      def min_max(values):
+          return [min(values)]
+
+      scores = [12, 7, 18, 10]
+      result = min_max(scores)
+
+      a, b = "first", "second"
+      # swap a and b here
+
+      print(result, a, b)
+    solution: |
+      def min_max(values):
+          return min(values), max(values)
+
+      scores = [12, 7, 18, 10]
+      low, high = min_max(scores)
+
+      a, b = "first", "second"
+      a, b = b, a
+
+      print(low, high, a, b)
+    tests: |
+      assert min_max([12, 7, 18, 10]) == (7, 18), "min_max يجب أن تُعيد (7, 18)"
+      assert isinstance(min_max([3]), tuple), "يجب أن تُعيد tuple"
+      assert (low, high) == (7, 18), "فكّ النتيجة في low وhigh"
+      assert (a, b) == ("second", "first"), "لم يتم تبديل a وb"
+    hints:
+      - "`return x, y` تُعيد tuple تلقائيًا (الفاصلة تصنعه). وللفكّ: `low, high = min_max(scores)`."
+      - "التبديل: الطرف الأيمن يُبنى tuple أولًا، ثم يُفكّ في الأسماء على اليسار."
+      - "`a, b = b, a`"
+
+changes:
+  ch-comma:
+    title: "الفاصلة هي التي تصنع الـtuple"
+    base: |
+      x = (5)
+      print(type(x).__name__, x)
+    base_label: "قبل · (5)"
+    variants:
+      - label: "(5,)"
+        code: |
+          x = (5,)
+          print(type(x).__name__, x, len(x))
+        explain: "فاصلة واحدة تكفي لإنشاء tuple من عنصر واحد."
+      - label: "5, 6"
+        code: |
+          x = 5, 6
+          print(type(x).__name__, x)
+        explain: "حتى بلا أقواس: القيم المفصولة بفواصل تُجمع في tuple (packing)."
+      - label: "tuple()"
+        code: |
+          x = tuple("abc")
+          print(type(x).__name__, x)
+        explain: "`tuple(iterable)` تبني tuple من أي iterable، هنا من حروف نص."
+
+animations:
+  anim-swap:
+    title: "a, b = b, a"
+    code: |
+      a = 1
+      b = 2
+      a, b = b, a
+      print(a, b)
+    notes:
+      3: "يُحسب الطرف الأيمن أولًا فيُنشأ tuple مؤقت `(2, 1)`، ثم يُفكّ: `a` ← 2 و`b` ← 1."
+      4: "تم التبديل دون متغير مؤقت، لأن القيم الأصلية حُفظت في الـtuple قبل إعادة الربط."

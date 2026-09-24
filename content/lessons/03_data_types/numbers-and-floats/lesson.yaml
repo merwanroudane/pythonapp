@@ -1,11 +1,11 @@
 id: numbers-and-floats
 track: data_types
-order: 2
+order: 3
 title_ar: "الأرقام: int وfloat ولماذا 0.1 + 0.2 ≠ 0.3"
 title_en: "Numbers: int, float, and why 0.1 + 0.2 != 0.3"
 level: beginner
 estimated_minutes: 30
-prerequisites: [variables-assignment]
+prerequisites: [data-types-map]
 objectives:
   - "التمييز بين int وfloat ومتى ينتج كل منهما."
   - "فهم الفرق بين / و// و%."

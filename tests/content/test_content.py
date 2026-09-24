@@ -10,9 +10,11 @@ def test_curriculum_has_no_validation_issues():
     assert not issues, "\n".join(map(str, issues))
 
 
-def test_all_25_tracks_are_declared_in_order():
+def test_tracks_are_numbered_consecutively():
     tracks = load_curriculum().tracks
-    assert [t.code for t in tracks] == [f"{i:02d}" for i in range(25)]
+    assert [t.code for t in tracks] == [f"{i:02d}" for i in range(len(tracks))]
+    ids = [t.id for t in tracks]
+    assert ids.index("data_types") + 1 == ids.index("data_structures")
 
 
 def test_every_lesson_meets_the_minimum_lecture_standard():

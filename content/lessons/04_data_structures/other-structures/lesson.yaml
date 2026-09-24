@@ -1,0 +1,98 @@
+id: other-structures
+track: data_structures
+order: 6
+title_ar: "بنى أخرى: range وbytes وdeque وCounter وdefaultdict وnamedtuple"
+title_en: "Other structures: range, bytes, deque, Counter, defaultdict, namedtuple"
+level: beginner_to_intermediate
+estimated_minutes: 35
+prerequisites: [dicts]
+objectives:
+  - "فهم range كتسلسل كسول لا يخزّن عناصره."
+  - "التمييز بين str وbytes وbytearray."
+  - "استخدام بنى الوحدة collections: deque وCounter وdefaultdict وnamedtuple."
+  - "اختيار البنية المتخصصة بدل كتابة كود يدوي معقد."
+docs_url: "https://docs.python.org/3/library/collections.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [range, bytes, bytearray, deque, Counter, defaultdict, namedtuple, collections]
+
+quizzes:
+  q-range:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      r = range(0, 1_000_000_000, 2)
+      print(len(r), r[3], 10 in r)
+    options:
+      - "`MemoryError`"
+      - "`500000000 6 True`"
+      - "`1000000000 3 False`"
+    answer: 1
+    explanation: |
+      `range` لا يخزّن مليار عنصر؛ يخزّن فقط start وstop وstep ويحسب أي عنصر عند الطلب. لذلك
+      `len` والـindexing و`in` فورية.
+  q-counter:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      from collections import Counter
+      print(Counter("banana").most_common(2))
+    options:
+      - "`[('b', 1), ('a', 3)]`"
+      - "`[('a', 3), ('n', 2)]`"
+      - "`{'a': 3, 'n': 2}`"
+    answer: 1
+    explanation: "`Counter` يعدّ كل عنصر، و`most_common(k)` يُعيد أكثر k عناصر تكرارًا كقائمة من tuples."
+  q-exit:
+    kind: exit
+    question: "تحتاج طابورًا تضيف إليه من نهاية وتسحب من البداية آلاف المرات. أي بنية؟"
+    options: ["`list` مع `pop(0)`", "`collections.deque` مع `popleft()`", "`set`"]
+    answer: 1
+    explanation: |
+      `list.pop(0)` تزيح كل العناصر (O(n))، بينما `deque.popleft()` O(1). الـdeque مصممة للإضافة
+      والحذف السريعين من الطرفين.
+
+exercises:
+  ex-group:
+    title: "تجميع وعدّ بأدوات collections"
+    prompt: |
+      لديك قائمة (اسم، مدينة). أنشئ:
+
+      - `by_city`: `defaultdict(list)` تجمع الأسماء حسب المدينة، مثل `{"Oran": ["Sara", "Adam"], ...}`.
+      - `city_counts`: `Counter` لعدد الأشخاص في كل مدينة.
+      - `top_city`: اسم المدينة الأكثر تكرارًا (نص).
+    starter: |
+      from collections import Counter, defaultdict
+
+      people = [("Sara", "Oran"), ("Omar", "Algiers"), ("Adam", "Oran"),
+                ("Lina", "Setif"), ("Yasmine", "Oran")]
+
+      by_city = {}
+      city_counts = {}
+      top_city = ...
+
+      print(dict(by_city), city_counts, top_city)
+    solution: |
+      from collections import Counter, defaultdict
+
+      people = [("Sara", "Oran"), ("Omar", "Algiers"), ("Adam", "Oran"),
+                ("Lina", "Setif"), ("Yasmine", "Oran")]
+
+      by_city = defaultdict(list)
+      for name, city in people:
+          by_city[city].append(name)
+
+      city_counts = Counter(city for _, city in people)
+      top_city = city_counts.most_common(1)[0][0]
+
+      print(dict(by_city), city_counts, top_city)
+    tests: |
+      from collections import Counter as _C, defaultdict as _D
+      assert isinstance(by_city, _D), "by_city يجب أن تكون defaultdict(list)"
+      assert by_city["Oran"] == ["Sara", "Adam", "Yasmine"], f"مجموعة Oran غير صحيحة: {by_city['Oran']}"
+      assert isinstance(city_counts, _C) and city_counts["Oran"] == 3 and city_counts["Setif"] == 1
+      assert top_city == "Oran", f"top_city يجب أن يكون 'Oran' وليس {top_city!r}"
+    hints:
+      - "`defaultdict(list)` تنشئ قائمة فارغة تلقائيًا لأي مفتاح جديد، فتكفي `by_city[city].append(name)`."
+      - "`Counter(...)` يقبل أي iterable من القيم. و`most_common(1)` تُعيد `[('Oran', 3)]`."
+      - "`top_city = city_counts.most_common(1)[0][0]`"

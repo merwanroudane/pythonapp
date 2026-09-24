@@ -1,11 +1,11 @@
 id: lists
-track: data_types
-order: 4
+track: data_structures
+order: 2
 title_ar: "القوائم list: تسلسل قابل للتعديل"
 title_en: "Lists: a mutable sequence"
 level: beginner
 estimated_minutes: 40
-prerequisites: [variables-assignment, strings-methods-fstrings]
+prerequisites: [data-structures-overview]
 objectives:
   - "إنشاء list والوصول إلى عناصرها بالـindex والـslicing."
   - "تعديل القائمة في مكانها: append وextend وinsert وremove وpop."

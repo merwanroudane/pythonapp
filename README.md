@@ -3,7 +3,9 @@
 An Arabic-first, interactive Streamlit platform for learning Python, built from the
 author's platform blueprint (the § numbers in the code refer to it). Roadmap status (§130):
 **Phase A — Foundation** done; **Phase B — Core Python MVP** done (isolated execution,
-code editor, loop/function animations, 20 lectures across tracks 00–09).
+code editor, loop/function animations). 33 lectures across tracks 00–10, with basic data types
+(`int`, `float`, `complex`, `bool`, `None`, `str`) and data structures (`list`, `tuple`, `set`,
+`dict`, `range`, `deque`, `Counter`, …) taught as two separate tracks.
 
 Author: **Dr Merwan Roudane** — <https://github.com/merwanroudane>
 

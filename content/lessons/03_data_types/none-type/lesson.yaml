@@ -1,0 +1,86 @@
+id: none-type
+track: data_types
+order: 6
+title_ar: "None: قيمة «لا شيء»"
+title_en: "None: the value of nothing"
+level: beginner
+estimated_minutes: 25
+prerequisites: [booleans]
+objectives:
+  - "فهم None كالقيمة الوحيدة للنوع NoneType، ومعنى أنها singleton."
+  - "التمييز بين None و0 و\"\" وFalse و[] وNaN."
+  - "فحص None بـis None، ومعرفة أين تظهر None ضمنيًا."
+  - "قراءة أخطاء NoneType الشائعة وإصلاح مصدرها."
+docs_url: "https://docs.python.org/3/library/constants.html#None"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [None, NoneType, singleton, is None, missing, sentinel, AttributeError]
+
+quizzes:
+  q-equal:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      print(None == 0, None == False, None == "", bool(None))
+    options:
+      - "`True True True False`"
+      - "`False False False False`"
+      - "`False False False True`"
+    answer: 1
+    explanation: |
+      `None` لا تساوي أي قيمة أخرى، حتى لو كانت كلها falsy. هي **غياب** قيمة، أما `0` و`False` و`""`
+      فقيم حقيقية.
+  q-sort:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      scores = [14, 9, 17].sort()
+      print(scores)
+    options: ["`[9, 14, 17]`", "`None`", "`[14, 9, 17]`"]
+    answer: 1
+    explanation: |
+      `sort()` ترتب القائمة في مكانها وتُعيد `None`. خزّنّا القيمة المُعادة لا القائمة. أي
+      `scores.append(...)` بعدها سيرفع `AttributeError: 'NoneType' object has no attribute`.
+  q-exit:
+    kind: exit
+    question: "لماذا نكتب `x is None` لا `x == None`؟"
+    options:
+      - "لأن `is` أسرع فقط"
+      - "لأن None singleton (object واحد فقط)، و`is` يسأل مباشرة «هل هو هذا الـobject؟»، ولا يمكن لأي class أن يغيّر معناه"
+      - "لأن `==` خطأ syntax"
+    answer: 1
+    explanation: "يمكن لأي class أن يعيد تعريف `==`، أما `is` فمقارنة هوية لا تُخدع. وPEP 8 ينص على `is None`."
+
+exercises:
+  ex-safe-mean:
+    title: "متوسط يعرف متى لا توجد بيانات"
+    prompt: |
+      اكتب `safe_mean(values)`:
+
+      - تتجاهل القيم التي هي `None` (مفقودة).
+      - تُعيد المتوسط لبقية القيم.
+      - إن لم تبقَ أي قيمة، تُعيد `None` (وليس 0، لأن 0 قيمة حقيقية مضللة).
+    starter: |
+      def safe_mean(values):
+          return sum(values) / len(values)
+
+      print(safe_mean([12, None, 18]))
+      print(safe_mean([None, None]))
+    solution: |
+      def safe_mean(values):
+          present = [v for v in values if v is not None]
+          if not present:
+              return None
+          return sum(present) / len(present)
+
+      print(safe_mean([12, None, 18]))
+      print(safe_mean([None, None]))
+    tests: |
+      assert safe_mean([12, None, 18]) == 15, "المتوسط يجب أن يتجاهل None"
+      assert safe_mean([None, None]) is None, "بلا قيم يجب أن تُعيد None"
+      assert safe_mean([]) is None
+      assert safe_mean([0, None]) == 0, "الصفر قيمة حقيقية ولا يُحذف"
+    hints:
+      - "صفِّ القيم أولًا: احتفظ فقط بما ليس `None`. انتبه: لا تحذف الصفر!"
+      - "`[v for v in values if v is not None]` ثم افحص إن كانت القائمة فارغة."
+      - "`if not present: return None` ثم `return sum(present) / len(present)`"

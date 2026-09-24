@@ -1,0 +1,74 @@
+id: data-structures-overview
+track: data_structures
+order: 1
+title_ar: "ما بنية البيانات؟ ومتى تختار list أو tuple أو set أو dict"
+title_en: "What is a data structure? Choosing list, tuple, set or dict"
+level: beginner
+estimated_minutes: 30
+prerequisites: [strings-methods-fstrings]
+objectives:
+  - "تعريف بنية البيانات وسبب وجود أكثر من بنية واحدة."
+  - "مقارنة البنى الأربع المدمجة: الترتيب، قابلية التعديل، التكرار، طريقة الوصول، سرعة البحث."
+  - "اختيار البنية المناسبة لمشكلة معطاة باستخدام أسئلة قرار بسيطة."
+  - "بناء بنى متداخلة مثل قائمة من القواميس (صفوف جدول)."
+docs_url: "https://docs.python.org/3/tutorial/datastructures.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [data structure, list, tuple, set, dict, collection, choice, nested, Big-O]
+
+quizzes:
+  q-choose-set:
+    kind: concept
+    question: "تريد أن تعرف بسرعة إن كان رقم هوية طالب ما موجودًا ضمن 100,000 رقم، ولا يهمك الترتيب. أي بنية؟"
+    options: ["`list`", "`tuple`", "`set`"]
+    answer: 2
+    explanation: |
+      `x in some_set` سريع جدًا (O(1) في المتوسط) لأنه يعتمد على hashing، بينما `x in some_list`
+      يمر على العناصر واحدًا واحدًا (O(n)).
+  q-empty:
+    kind: predict
+    question: "ما نوع `{}`؟"
+    code: |
+      print(type({}).__name__, type(set()).__name__)
+    options: ["`set set`", "`dict set`", "`dict dict`"]
+    answer: 1
+    explanation: |
+      `{}` قاموس فارغ (تاريخيًا جاء dict قبل set). المجموعة الفارغة تُكتب `set()`.
+  q-exit:
+    kind: exit
+    question: "إحداثيات مدينة (خط العرض، خط الطول) لا تتغير. أي بنية أنسب؟"
+    options: ["`list`", "`tuple`", "`dict`"]
+    answer: 1
+    explanation: |
+      قيمتان ثابتتان لهما معنى حسب موضعهما: هذا **سجل (record)**، والـtuple هو البنية المصممة لذلك،
+      ويمكن استخدامه مفتاحًا في dict.
+
+exercises:
+  ex-pick:
+    title: "اختر البنية الصحيحة لكل بيان"
+    prompt: |
+      أنشئ أربعة متغيرات، **كل واحد بالبنية الأنسب**:
+
+      - `capital_coords`: إحداثيات ثابتة للجزائر العاصمة `36.75` و`3.06`.
+      - `visited_countries`: الدول التي زرتها: `"DZ"`، `"FR"`، `"TN"`، `"DZ"` (لا تكرار، ولا يهم الترتيب).
+      - `population_millions`: عدد السكان بالملايين لكل دولة: DZ → 45.6، TN → 12.3.
+      - `daily_log`: قراءات يومية بالترتيب ستُضاف إليها قيم لاحقًا: 21، 23، 19.
+    starter: |
+      capital_coords = [36.75, 3.06]
+      visited_countries = ["DZ", "FR", "TN", "DZ"]
+      population_millions = [["DZ", 45.6], ["TN", 12.3]]
+      daily_log = (21, 23, 19)
+    solution: |
+      capital_coords = (36.75, 3.06)
+      visited_countries = {"DZ", "FR", "TN", "DZ"}
+      population_millions = {"DZ": 45.6, "TN": 12.3}
+      daily_log = [21, 23, 19]
+    tests: |
+      assert isinstance(capital_coords, tuple) and capital_coords == (36.75, 3.06), "الإحداثيات الثابتة: tuple"
+      assert isinstance(visited_countries, set) and visited_countries == {"DZ", "FR", "TN"}, "بلا تكرار: set"
+      assert isinstance(population_millions, dict) and population_millions["TN"] == 12.3, "من دولة إلى قيمة: dict"
+      assert isinstance(daily_log, list) and daily_log == [21, 23, 19], "مرتّب وسيُضاف إليه: list"
+    hints:
+      - "اسأل لكل بيان: هل سيتغير؟ هل الترتيب مهم؟ هل التكرار مسموح؟ هل أبحث بمفتاح؟"
+      - "ثابت ومرتّب ← `( )`. بلا تكرار ← `{ }` بلا أزواج. مفتاح ← قيمة ← `{k: v}`. مرتّب ويكبر ← `[ ]`."
+      - "`capital_coords = (36.75, 3.06)` و`population_millions = {\"DZ\": 45.6, \"TN\": 12.3}`"

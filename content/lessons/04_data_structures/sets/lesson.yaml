@@ -1,0 +1,121 @@
+id: sets
+track: data_structures
+order: 4
+title_ar: "المجموعات set: عناصر فريدة وعمليات المجموعات"
+title_en: "Sets: unique items and set operations"
+level: beginner
+estimated_minutes: 35
+prerequisites: [tuples]
+objectives:
+  - "فهم set كمجموعة غير مرتبة من عناصر فريدة hashable."
+  - "الإضافة والحذف وفحص العضوية السريع."
+  - "تطبيق عمليات المجموعات: الاتحاد والتقاطع والفرق والفرق التماثلي والاحتواء."
+  - "إزالة التكرار، ومعرفة frozenset وفخ {} الفارغة."
+docs_url: "https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [set, frozenset, union, intersection, difference, membership, unique, dedupe, hash]
+
+quizzes:
+  q-ops:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      a = {1, 2, 3, 4}
+      b = {3, 4, 5}
+      print(a & b, a - b, a ^ b)
+    options:
+      - "`{3, 4} {1, 2} {1, 2, 5}`"
+      - "`{1, 2, 3, 4, 5} {5} {3, 4}`"
+      - "`{3, 4} {5} {1, 2}`"
+    answer: 0
+    explanation: |
+      `&` التقاطع (في الاثنين)، `-` الفرق (في a فقط)، `^` الفرق التماثلي (في أحدهما لا كليهما).
+  q-order:
+    kind: concept
+    question: "هل يمكن الاعتماد على ترتيب العناصر عند طباعة set؟"
+    options:
+      - "نعم، تُطبع دائمًا بترتيب الإدخال"
+      - "لا، الـset غير مرتبة؛ الترتيب الظاهر تفصيل داخلي قد يختلف"
+      - "نعم، تُطبع مرتبة تصاعديًا دائمًا"
+    answer: 1
+    explanation: |
+      الـset تخزّن عناصرها حسب الـhash لا حسب الموضع، ولا يمكن `s[0]`. إن احتجت ترتيبًا، حوّل إلى
+      قائمة مرتبة: `sorted(s)`.
+  q-exit:
+    kind: exit
+    question: "كيف تزيل التكرار من قائمة **مع الحفاظ على ترتيب أول ظهور**؟"
+    options: ["`list(set(xs))`", "`list(dict.fromkeys(xs))`", "`sorted(xs)`"]
+    answer: 1
+    explanation: |
+      `set` يزيل التكرار لكنه يضيع الترتيب. مفاتيح الـdict فريدة **وتحافظ على ترتيب الإدخال**، لذلك
+      `dict.fromkeys(xs)` هي الحيلة المعتادة.
+
+exercises:
+  ex-waves:
+    title: "المشاركون بين موجتين من الاستبيان"
+    prompt: |
+      لديك أرقام المشاركين في موجتين من استبيان panel. أنشئ:
+
+      - `both`: من شارك في الموجتين (set).
+      - `dropped`: من شارك في الأولى فقط وغاب عن الثانية (set).
+      - `new`: من ظهر في الثانية فقط (set).
+      - `attrition`: نسبة المنسحبين من مشاركي الموجة الأولى (`len(dropped) / len(wave1)`).
+    starter: |
+      wave1 = [101, 102, 103, 104, 105, 102]
+      wave2 = [102, 104, 106, 107]
+
+      both = ...
+      dropped = ...
+      new = ...
+      attrition = ...
+
+      print(both, dropped, new, attrition)
+    solution: |
+      wave1 = set([101, 102, 103, 104, 105, 102])
+      wave2 = set([102, 104, 106, 107])
+
+      both = wave1 & wave2
+      dropped = wave1 - wave2
+      new = wave2 - wave1
+      attrition = len(dropped) / len(wave1)
+
+      print(both, dropped, new, attrition)
+    tests: |
+      import math as _m
+      assert both == {102, 104}, f"both غير صحيح: {both}"
+      assert dropped == {101, 103, 105}, f"dropped غير صحيح: {dropped}"
+      assert new == {106, 107}, f"new غير صحيح: {new}"
+      assert _m.isclose(attrition, 3 / 5), f"attrition = 3 منسحبين من 5 مشاركين فريدين، وليس {attrition}"
+    hints:
+      - "حوّل القائمتين إلى set أولًا؛ لاحظ أن 102 مكرر في الموجة الأولى."
+      - "التقاطع `&`، والفرق `-`. والمقام هو عدد المشاركين **الفريدين** في الموجة الأولى."
+      - "`wave1 = set(wave1)` ثم `dropped = wave1 - wave2` و`attrition = len(dropped) / len(wave1)`"
+
+changes:
+  ch-ops:
+    title: "أربع عمليات على مجموعتين"
+    base: |
+      math_club = {"Sara", "Omar", "Lina"}
+      chess_club = {"Omar", "Adam"}
+      print(math_club | chess_club)
+    base_label: "قبل · الاتحاد |"
+    variants:
+      - label: "التقاطع &"
+        code: |
+          math_club = {"Sara", "Omar", "Lina"}
+          chess_club = {"Omar", "Adam"}
+          print(math_club & chess_club)
+        explain: "`&` (أو `.intersection`) العناصر الموجودة في المجموعتين معًا."
+      - label: "الفرق -"
+        code: |
+          math_club = {"Sara", "Omar", "Lina"}
+          chess_club = {"Omar", "Adam"}
+          print(math_club - chess_club)
+        explain: "`-` (أو `.difference`) ما في الأولى وليس في الثانية. الترتيب مهم: `b - a` نتيجة أخرى."
+      - label: "الفرق التماثلي ^"
+        code: |
+          math_club = {"Sara", "Omar", "Lina"}
+          chess_club = {"Omar", "Adam"}
+          print(math_club ^ chess_club)
+        explain: "`^` ما في إحداهما فقط، لا في كلتيهما."

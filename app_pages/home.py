@@ -68,7 +68,10 @@ if query:
         st.caption("لا نتائج في المحاضرات المتاحة حاليًا.")
 
 st.subheader("خريطة المسار · Roadmap")
-st.caption("25 مسارًا من «ما قبل Python» حتى المشاريع الختامية. المسارات الرمادية قيد الإنشاء.")
+st.caption(
+    f"{len(curriculum.tracks)} مسارًا من «ما قبل Python» حتى المشاريع الختامية. "
+    "المسارات الرمادية قيد الإنشاء."
+)
 cols = st.columns(3)
 for i, track in enumerate(curriculum.tracks):
     track_lessons = curriculum.lessons_in(track.id)

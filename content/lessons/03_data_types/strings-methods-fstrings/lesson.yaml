@@ -1,11 +1,11 @@
 id: strings-methods-fstrings
 track: data_types
-order: 3
+order: 7
 title_ar: "النصوص في العمل: indexing وslicing والـmethods وf-strings"
 title_en: "Working with strings: indexing, slicing, methods & f-strings"
 level: beginner
 estimated_minutes: 40
-prerequisites: [numbers-and-floats]
+prerequisites: [none-type]
 objectives:
   - "الوصول إلى الحروف بالـindex الموجب والسالب، واقتطاع أجزاء بالـslicing."
   - "فهم أن str immutable: كل method تُعيد نصًا جديدًا."

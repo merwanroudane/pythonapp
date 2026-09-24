@@ -1,11 +1,11 @@
 id: dicts
-track: data_types
+track: data_structures
 order: 5
 title_ar: "القواميس dict: من المفتاح إلى القيمة"
 title_en: "Dictionaries: from key to value"
 level: beginner
 estimated_minutes: 40
-prerequisites: [lists]
+prerequisites: [sets]
 objectives:
   - "فهم الـdict كـmapping من مفاتيح فريدة إلى قيم."
   - "القراءة بـ[] وبـget() ومعرفة متى نريد KeyError فعلًا."

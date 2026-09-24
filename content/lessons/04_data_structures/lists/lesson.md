@@ -88,7 +88,7 @@ print(sorted(names, key=len, reverse=True))
 :::note
 السطر `[[0] * 3 for _ in range(3)]` هو **list comprehension**: طريقة مختصرة لبناء قائمة
 بحلقة. يكفي الآن أن تعرف أنه ينشئ قائمة جديدة في كل دورة؛ ستتعلم `for` والـcomprehensions
-بالتفصيل في مسار **06 · الحلقات**.
+بالتفصيل في مسار **07 · الحلقات**.
 :::
 
 :::mistake

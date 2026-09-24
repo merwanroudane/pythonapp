@@ -1,0 +1,125 @@
+id: complex-numbers
+track: data_types
+order: 4
+title_ar: "الأعداد المركّبة complex"
+title_en: "Complex numbers"
+level: beginner_to_intermediate
+estimated_minutes: 30
+prerequisites: [numbers-and-floats]
+objectives:
+  - "إنشاء عدد مركّب بالصيغة a + bj أو complex(a, b)."
+  - "استخراج الجزء الحقيقي والتخيلي، والـmodulus بـabs، والـconjugate."
+  - "استخدام cmath للجذور والصيغة القطبية (polar form)."
+  - "معرفة أن الأعداد المركّبة لا تُرتَّب بـ< و>."
+  - "تطبيق بحثي: فحص استقرارية نموذج AR(2) من جذوره المركّبة."
+docs_url: "https://docs.python.org/3/library/cmath.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [complex, j, real, imag, conjugate, abs, cmath, polar, AR, stationarity]
+
+quizzes:
+  q-abs:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      z = 3 + 4j
+      print(z.real, z.imag, abs(z))
+    options: ["`3 4 7`", "`3.0 4.0 5.0`", "`3.0 4.0 7.0`"]
+    answer: 1
+    explanation: |
+      الجزءان مخزّنان كـfloat، و`abs(z)` هو **الـmodulus**: المسافة عن الصفر،
+      `√(3² + 4²) = 5`.
+  q-sqrt:
+    kind: predict
+    question: "ماذا يحدث؟"
+    code: |
+      import math, cmath
+      print(cmath.sqrt(-4))
+      print(math.sqrt(-4))
+    options:
+      - "`2j` ثم `2j`"
+      - "`2j` ثم `ValueError`"
+      - "`ValueError` مرتين"
+    answer: 1
+    explanation: |
+      `math` تعمل على الأعداد الحقيقية فقط وترفض جذر عدد سالب. أما `cmath` فتعمل في عالم
+      الأعداد المركّبة فتعطي `2j`.
+  q-exit:
+    kind: exit
+    question: "لماذا `(1 + 2j) < (2 + 1j)` يرفع `TypeError`؟"
+    options:
+      - "لأن Python لا تدعم complex"
+      - "لأن الأعداد المركّبة لا يوجد لها ترتيب طبيعي متوافق مع الحساب"
+      - "لأن الأقواس خاطئة"
+    answer: 1
+    explanation: |
+      يمكن مقارنة الـmodulus: `abs(z1) < abs(z2)`، أو مقارنة المساواة `==`، لكن لا يوجد «أكبر»
+      و«أصغر» بين أعداد مركّبة.
+
+exercises:
+  ex-ar2:
+    title: "هل نموذج AR(2) مستقر؟"
+    prompt: |
+      للنموذج `y_t = φ1·y_{t-1} + φ2·y_{t-2} + ε_t` جذور المعادلة المميزة `λ² − φ1·λ − φ2 = 0` هي:
+
+      `λ = (φ1 ± √(φ1² + 4·φ2)) / 2`
+
+      النموذج **مستقر (stationary)** إذا كان **modulus كل جذر أقل من 1**.
+
+      مع `phi1 = 0.5` و`phi2 = -0.7`: احسب `roots` (tuple من جذرين بـ`cmath.sqrt`)، و`moduli`
+      (tuple من قيم `abs` لهما)، و`stationary` (True إن كان كلاهما أقل من 1).
+    starter: |
+      import cmath
+
+      phi1, phi2 = 0.5, -0.7
+
+      roots = ...
+      moduli = ...
+      stationary = ...
+
+      print(roots, moduli, stationary)
+    solution: |
+      import cmath
+
+      phi1, phi2 = 0.5, -0.7
+
+      disc = cmath.sqrt(phi1 ** 2 + 4 * phi2)
+      roots = ((phi1 + disc) / 2, (phi1 - disc) / 2)
+      moduli = (abs(roots[0]), abs(roots[1]))
+      stationary = moduli[0] < 1 and moduli[1] < 1
+
+      print(roots, moduli, stationary)
+    tests: |
+      import math as _m
+      assert isinstance(roots, tuple) and len(roots) == 2, "roots يجب أن يكون tuple من جذرين"
+      assert all(isinstance(r, complex) for r in roots), "استخدم cmath.sqrt لتحصل على جذور مركّبة"
+      for _r in roots:
+          assert _m.isclose(abs(_r * _r - phi1 * _r - phi2), 0, abs_tol=1e-9), "هذا ليس جذرًا للمعادلة"
+      assert all(_m.isclose(m, _m.sqrt(0.7)) for m in moduli), f"moduli غير صحيح: {moduli}"
+      assert stationary is True, "كلا الجذرين داخل دائرة الوحدة، فالنموذج مستقر"
+    hints:
+      - "المميّز `φ1² + 4·φ2` سالب هنا، لذلك تحتاج `cmath.sqrt` لا `math.sqrt`."
+      - "الجذران: `(phi1 + d) / 2` و`(phi1 - d) / 2`. والـmodulus هو `abs(root)`."
+      - "`stationary = moduli[0] < 1 and moduli[1] < 1`"
+
+changes:
+  ch-polar:
+    title: "شكلان لكتابة العدد نفسه"
+    base: |
+      z = 1 + 1j
+      print(z.real, z.imag)
+    base_label: "قبل · الصيغة الديكارتية"
+    variants:
+      - label: "الصيغة القطبية"
+        code: |
+          import cmath
+          z = 1 + 1j
+          r, theta = cmath.polar(z)
+          print(round(r, 4), round(theta, 4))
+        explain: "`polar` تعطي **البعد** `r = |z|` و**الزاوية** θ بالراديان. هنا `r = √2` و`θ = π/4`."
+      - label: "العودة من القطبية"
+        code: |
+          import cmath, math
+          z = cmath.rect(math.sqrt(2), math.pi / 4)
+          print(z, round(z.real, 10), round(z.imag, 10))
+        explain: "`rect` تبني العدد من (r, θ). الفروق الصغيرة جدًا سببها تقريب float الذي درسناه."
