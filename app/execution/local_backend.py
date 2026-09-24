@@ -29,10 +29,14 @@ from app.execution.models import RunResult
 
 HARNESS = Path(__file__).with_name("harness.py")
 BACKEND = "local"
+# Matplotlib builds a font cache on first import; keep it outside the per-run sandbox so
+# it is built once per machine instead of on every run (which would hit the timeout).
+MPL_CACHE = Path(tempfile.gettempdir()) / "pll-mplconfig"
 _ENV_ALLOWLIST = ("SYSTEMROOT", "WINDIR", "PATH", "LANG", "LC_ALL")
 
 
 def _child_env(workdir: str) -> dict[str, str]:
+    MPL_CACHE.mkdir(exist_ok=True)
     env = {k: os.environ[k] for k in _ENV_ALLOWLIST if k in os.environ}
     env.update(
         {
@@ -40,6 +44,7 @@ def _child_env(workdir: str) -> dict[str, str]:
             "PYTHONUTF8": "1",
             "PYTHONDONTWRITEBYTECODE": "1",
             "MPLBACKEND": "Agg",
+            "MPLCONFIGDIR": str(MPL_CACHE),
             # One thread for BLAS/OpenMP: predictable memory under the address-space cap.
             "OPENBLAS_NUM_THREADS": "1",
             "OMP_NUM_THREADS": "1",

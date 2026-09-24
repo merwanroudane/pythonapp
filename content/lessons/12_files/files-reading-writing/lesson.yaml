@@ -1,0 +1,106 @@
+id: files-reading-writing
+track: files
+order: 1
+title_ar: "الملفات: القراءة والكتابة وCSV وJSON"
+title_en: "Files: reading, writing, CSV and JSON"
+level: beginner_to_intermediate
+estimated_minutes: 45
+prerequisites: [modules-imports]
+objectives:
+  - "فتح ملف بـopen داخل with وفهم أوضاع r وw وa وx."
+  - "تحديد الترميز encoding=\"utf-8\" دائمًا، والتمييز بين الملفات النصية والثنائية."
+  - "قراءة الملف كاملًا أو سطرًا سطرًا، واستخدام pathlib للملفات الصغيرة."
+  - "قراءة وكتابة CSV بالوحدة csv، وJSON بالوحدة json."
+docs_url: "https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [file, open, with, encoding, utf-8, csv, json, pathlib, context manager]
+
+quizzes:
+  q-mode:
+    kind: predict
+    question: "ماذا يحتوي `log.txt` بعد تنفيذ الكود؟"
+    code: |
+      with open("log.txt", "w", encoding="utf-8") as f:
+          f.write("first\n")
+      with open("log.txt", "w", encoding="utf-8") as f:
+          f.write("second\n")
+    options: ["`first` و`second`", "`second` فقط", "ملف فارغ"]
+    answer: 1
+    explanation: |
+      الوضع `"w"` **يمسح** الملف ثم يكتب. للإضافة إلى النهاية استخدم `"a"` (append).
+  q-json:
+    kind: concept
+    question: "ما الفرق بين `json.dump` و`json.dumps`؟"
+    options:
+      - "لا فرق"
+      - "`dump` تكتب في ملف مفتوح، و`dumps` تُعيد نصًا (s = string)"
+      - "`dumps` أسرع فقط"
+    answer: 1
+    explanation: "القاعدة نفسها للقراءة: `json.load(f)` من ملف، و`json.loads(text)` من نص."
+  q-exit:
+    kind: exit
+    question: "لماذا نفتح الملفات داخل `with`؟"
+    options:
+      - "لأنها أسرع"
+      - "لأن الملف يُغلق تلقائيًا عند الخروج من الـblock، حتى لو حدث خطأ"
+      - "لأن open لا تعمل بدونها"
+    answer: 1
+    explanation: |
+      `with` تضمن استدعاء `close()` في كل الحالات، فلا تبقى ملفات مفتوحة ولا بيانات غير مكتوبة على القرص.
+
+exercises:
+  ex-csv:
+    title: "من CSV إلى JSON"
+    prompt: |
+      الملف `grades.csv` يُنشأ لك في بداية الكود. اقرأه بـ`csv.DictReader`، واحسب لكل طالب متوسط
+      درجاته الثلاث، ثم اكتب النتيجة في `summary.json` بالشكل:
+      `{"Sara": 15.0, "Omar": 9.0, ...}` (أرقام float مقرّبة لمنزلة واحدة).
+      ضع القاموس نفسه في المتغير `summary`.
+    starter: |
+      import csv
+      import json
+      from pathlib import Path
+
+      Path("grades.csv").write_text(
+          "name,math,physics,stats\n"
+          "Sara,14,16,15\n"
+          "Omar,8,10,9\n"
+          "Lina,17,15,19\n",
+          encoding="utf-8",
+      )
+
+      summary = {}
+      # read grades.csv, fill summary, write summary.json
+    solution: |
+      import csv
+      import json
+      from pathlib import Path
+
+      Path("grades.csv").write_text(
+          "name,math,physics,stats\n"
+          "Sara,14,16,15\n"
+          "Omar,8,10,9\n"
+          "Lina,17,15,19\n",
+          encoding="utf-8",
+      )
+
+      summary = {}
+      with open("grades.csv", newline="", encoding="utf-8") as f:
+          for row in csv.DictReader(f):
+              marks = [float(row["math"]), float(row["physics"]), float(row["stats"])]
+              summary[row["name"]] = round(sum(marks) / len(marks), 1)
+
+      with open("summary.json", "w", encoding="utf-8") as f:
+          json.dump(summary, f, ensure_ascii=False, indent=2)
+      print(summary)
+    tests: |
+      import json as _j
+      from pathlib import Path as _P
+      assert summary == {"Sara": 15.0, "Omar": 9.0, "Lina": 17.0}, f"summary غير صحيح: {summary}"
+      assert _P("summary.json").exists(), "لم يُكتب summary.json"
+      assert _j.loads(_P("summary.json").read_text(encoding="utf-8")) == summary, "محتوى الملف لا يطابق summary"
+    hints:
+      - "`csv.DictReader(f)` تُعيد كل صف كقاموس مفاتيحه أسماء الأعمدة. القيم **نصوص**: حوّلها بـ`float`."
+      - "افتح الملف بـ`with open(\"grades.csv\", newline=\"\", encoding=\"utf-8\") as f:` ثم مرّ على الصفوف."
+      - "للكتابة: `with open(\"summary.json\", \"w\", encoding=\"utf-8\") as f: json.dump(summary, f)`"

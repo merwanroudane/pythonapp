@@ -8,6 +8,16 @@ from app.storage import progress
 from app.ui.navigation import page_for
 from app.ui.theme import track_tone
 
+
+def _lectures(n: int) -> str:
+    """Arabic count agreement: 1 محاضرة، 2 محاضرتان، 3-10 محاضرات، 11+ محاضرة."""
+    if n == 1:
+        return "محاضرة واحدة"
+    if n == 2:
+        return "محاضرتان"
+    return f"{n} محاضرات" if n <= 10 else f"{n} محاضرة"
+
+
 curriculum = get_curriculum()
 lessons = curriculum.ordered_lessons()
 statuses = {les.meta.id: progress.status(les) for les in lessons}
@@ -68,9 +78,10 @@ if query:
         st.caption("لا نتائج في المحاضرات المتاحة حاليًا.")
 
 st.subheader("خريطة المسار · Roadmap")
+pending = sum(not curriculum.lessons_in(track.id) for track in curriculum.tracks)
 st.caption(
-    f"{len(curriculum.tracks)} مسارًا من «ما قبل Python» حتى المشاريع الختامية. "
-    "المسارات الرمادية قيد الإنشاء."
+    f"{len(curriculum.tracks)} مسارًا من «ما قبل Python» حتى المشاريع الختامية."
+    + (" المسارات الرمادية قيد الإنشاء." if pending else "")
 )
 cols = st.columns(3)
 for i, track in enumerate(curriculum.tracks):
@@ -84,7 +95,7 @@ for i, track in enumerate(curriculum.tracks):
             mastered = sum(statuses[les.meta.id] == "demonstrated" for les in track_lessons)
             st.progress(
                 mastered / len(track_lessons),
-                text=f"{len(track_lessons)} محاضرات · أتقنت {mastered}",
+                text=f"{_lectures(len(track_lessons))} · أتقنت {mastered}",
             )
             if page := page_for(track_lessons[0].meta.id):
                 st.page_link(page, label="ابدأ المسار", icon=":material/arrow_back:")

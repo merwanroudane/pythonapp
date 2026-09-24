@@ -1,0 +1,153 @@
+id: decorators-closures
+track: advanced
+order: 1
+title_ar: "Closures وDecorators: دوال تصنع دوالًا"
+title_en: "Closures and decorators: functions that build functions"
+level: advanced
+estimated_minutes: 50
+prerequisites: [scope-legb, iterators-generators]
+objectives:
+  - "فهم أن الدوال objects: تُمرَّر وتُعاد وتُخزَّن."
+  - "فهم الـclosure: دالة داخلية تتذكر متغيرات الدالة التي أنشأتها، ودور nonlocal."
+  - "كتابة decorator يلف دالة ويضيف سلوكًا (توقيت، تسجيل، تحقق)."
+  - "فهم أن @deco مجرد اختصار لـf = deco(f)، واستخدام functools.wraps."
+  - "كتابة decorator يأخذ معاملات، ومعرفة الجاهز منها: lru_cache وproperty وdataclass."
+docs_url: "https://docs.python.org/3/glossary.html#term-decorator"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [closure, decorator, nonlocal, functools, wraps, lru_cache, higher-order function, "@"]
+
+quizzes:
+  q-closure:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      def make_multiplier(k):
+          def multiply(x):
+              return x * k
+          return multiply
+
+      double = make_multiplier(2)
+      triple = make_multiplier(3)
+      print(double(5), triple(5))
+    options: ["`10 15`", "`15 15`", "`NameError: k`"]
+    answer: 0
+    explanation: |
+      كل استدعاء لـ`make_multiplier` ينشئ دالة `multiply` جديدة **تتذكر** قيمة `k` الخاصة بها، حتى بعد
+      انتهاء `make_multiplier`. هذا هو الـclosure.
+  q-sugar:
+    kind: concept
+    question: "ما الذي يكافئ هذا الكود تمامًا؟\n```python\n@timer\ndef load(): ...\n```"
+    options:
+      - "`timer(load())`"
+      - "`load = timer(load)`"
+      - "`def load(): timer()`"
+    answer: 1
+    explanation: |
+      الـ`@` **سكّر نحوي (syntactic sugar)**: بعد تعريف الدالة، يُستدعى الـdecorator عليها، ويُربط الاسم
+      `load` بما أعاده، وهو عادة دالة غلاف (wrapper).
+  q-exit:
+    kind: exit
+    question: "لماذا نضع `@functools.wraps(func)` على الدالة الداخلية؟"
+    options:
+      - "لتسريع التنفيذ"
+      - "لتحتفظ الدالة المغلَّفة باسمها و docstring الأصليين بدل أن تصبح `wrapper`"
+      - "لأنها إجبارية وإلا يرفع خطأ"
+    answer: 1
+    explanation: "بدون `wraps` يصبح `load.__name__ == 'wrapper'` ويضيع التوثيق، فتتشوش رسائل الأخطاء وأدوات التوثيق والاختبار."
+
+exercises:
+  ex-retry:
+    title: "decorator للمحاولة من جديد"
+    prompt: |
+      اكتب decorator بمعامل: `retry(times)`. عند تغليف دالة:
+
+      - يستدعيها، وإن رفعت `ValueError` يعيد المحاولة، حتى `times` محاولات إجمالًا.
+      - إن نجحت يُعيد نتيجتها فورًا.
+      - إن فشلت كل المحاولات يعيد رفع **آخر** `ValueError`.
+      - يحافظ على اسم الدالة الأصلي (`functools.wraps`).
+
+      الدالة `flaky` تفشل مرتين ثم تنجح، فيجب أن تنجح مع `@retry(3)`.
+    starter: |
+      import functools
+
+
+      def retry(times):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  return func(*args, **kwargs)
+              return wrapper
+          return decorator
+
+
+      calls = {"n": 0}
+
+
+      @retry(3)
+      def flaky():
+          """Fails twice, then works."""
+          calls["n"] += 1
+          if calls["n"] < 3:
+              raise ValueError(f"attempt {calls['n']} failed")
+          return "ok"
+
+
+      print(flaky(), calls["n"], flaky.__name__)
+    solution: |
+      import functools
+
+
+      def retry(times):
+          def decorator(func):
+              @functools.wraps(func)
+              def wrapper(*args, **kwargs):
+                  last_error = None
+                  for _ in range(times):
+                      try:
+                          return func(*args, **kwargs)
+                      except ValueError as exc:
+                          last_error = exc
+                  raise last_error
+              return wrapper
+          return decorator
+
+
+      calls = {"n": 0}
+
+
+      @retry(3)
+      def flaky():
+          """Fails twice, then works."""
+          calls["n"] += 1
+          if calls["n"] < 3:
+              raise ValueError(f"attempt {calls['n']} failed")
+          return "ok"
+
+
+      print(flaky(), calls["n"], flaky.__name__)
+    tests: |
+      assert flaky.__name__ == "flaky", f"استخدم functools.wraps: الاسم الآن {flaky.__name__}"
+      _count = {"n": 0}
+
+      @retry(2)
+      def _always_fails():
+          _count["n"] += 1
+          raise ValueError(f"boom {_count['n']}")
+
+      try:
+          _always_fails()
+      except ValueError as _e:
+          assert str(_e) == "boom 2", f"يجب إعادة رفع آخر خطأ، وجدت: {_e}"
+      else:
+          raise AssertionError("كان يجب أن يُرفع ValueError بعد نفاد المحاولات")
+      assert _count["n"] == 2, f"يجب أن تكون المحاولات 2 بالضبط، وجدت {_count['n']}"
+
+      @retry(5)
+      def _add(a, b=0):
+          return a + b
+
+      assert _add(2, b=3) == 5, "مرّر *args و**kwargs إلى الدالة الأصلية"
+    hints:
+      - "ثلاث طبقات: `retry(times)` تعيد `decorator(func)` التي تعيد `wrapper(*args, **kwargs)`."
+      - "داخل `wrapper`: حلقة `for _ in range(times)` فيها `try: return func(...)` و`except ValueError as exc: last_error = exc`."
+      - "بعد الحلقة: `raise last_error`. وضع `@functools.wraps(func)` فوق `def wrapper`."

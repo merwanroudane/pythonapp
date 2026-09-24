@@ -3,9 +3,11 @@
 An Arabic-first, interactive Streamlit platform for learning Python, built from the
 author's platform blueprint (the § numbers in the code refer to it). Roadmap status (§130):
 **Phase A — Foundation** done; **Phase B — Core Python MVP** done (isolated execution,
-code editor, loop/function animations). 35 lectures across tracks 00–10, with basic data types
-(`int`, `float`, `complex`, `bool`, `None`, `str`) and data structures (`list`, `tuple`, `set`,
-`dict`, `range`, `deque`, `Counter`, …) taught as two separate tracks.
+code editor, loop/function animations). 51 lectures covering all 26 tracks (00–25), from
+"Before Python" through NumPy, pandas, visualization, SQL, images, web data, decorators and
+packaging to a capstone data-cleaning project. Basic data types (`int`, `float`, `complex`,
+`bool`, `None`, `str`) and data structures (`list`, `tuple`, `set`, `dict`, `range`, `deque`,
+`Counter`, …) are taught as two separate tracks.
 
 Author: **Dr Merwan Roudane** — <https://github.com/merwanroudane>
 

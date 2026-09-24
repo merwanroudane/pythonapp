@@ -40,6 +40,17 @@ def test_warnings_are_captured():
     assert [(w.category, w.message) for w in r.warnings] == [("UserWarning", "careful")]
 
 
+def test_library_deprecations_are_hidden_but_user_ones_kept():
+    code = (
+        "import warnings\n"
+        "warnings.warn_explicit('old api', DeprecationWarning, 'somelib.py', 3)\n"
+        "warnings.warn('mine is old', DeprecationWarning)\n"
+        "warnings.warn_explicit('lib runtime', RuntimeWarning, 'somelib.py', 4)\n"
+    )
+    r = run_code(code)
+    assert [w.message for w in r.warnings] == ["mine is old", "lib runtime"]
+
+
 def test_aliases_are_detected():
     r = run_code("a = [1]\nb = a\nc = [1]")
     assert sorted(next(iter(r.alias_groups().values()))) == ["a", "b"]

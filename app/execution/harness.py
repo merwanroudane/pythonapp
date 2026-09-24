@@ -277,13 +277,21 @@ def run(job: dict) -> dict:
             result["exception"] = format_exception(exc)
     result["timing_ms"] = round((time.perf_counter() - start) * 1000, 2)
 
+    # Like Python's default filters: deprecations raised inside libraries (e.g. matplotlib
+    # calling old pyparsing names) are noise for the learner; keep them only for user code.
+    shown = [
+        w
+        for w in caught
+        if w.filename == FILENAME
+        or not issubclass(w.category, (DeprecationWarning, PendingDeprecationWarning))
+    ]
     result["warnings"] = [
         {
             "category": w.category.__name__,
             "message": str(w.message),
             "lineno": w.lineno if w.filename == FILENAME else None,
         }
-        for w in caught[:20]
+        for w in shown[:20]
     ]
     result["stdout"] = stdout.getvalue()
     result["stderr"] = stderr.getvalue()

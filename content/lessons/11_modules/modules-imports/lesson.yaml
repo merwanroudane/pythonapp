@@ -1,0 +1,99 @@
+id: modules-imports
+track: modules
+order: 1
+title_ar: "الـmodules والـimport: تقسيم الكود إلى ملفات"
+title_en: "Modules and import: splitting code into files"
+level: beginner_to_intermediate
+estimated_minutes: 40
+prerequisites: [try-except]
+objectives:
+  - "فهم الـmodule كملف .py له namespace خاص."
+  - "استخدام أشكال import المختلفة: import m، from m import x، import m as alias."
+  - "فهم كيف يبحث Python عن الـmodules عبر sys.path، ولماذا يُنفَّذ الـmodule مرة واحدة."
+  - "استخدام if __name__ == \"__main__\" لفصل كود التشغيل عن كود المكتبة."
+  - "تشخيص ModuleNotFoundError وفخ تسمية ملفك باسم مكتبة موجودة."
+docs_url: "https://docs.python.org/3/tutorial/modules.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [module, import, namespace, sys.path, __name__, __main__, package, ModuleNotFoundError]
+
+quizzes:
+  q-once:
+    kind: predict
+    question: "الملف `helpers.py` يحتوي `print(\"loading helpers\")`. كم مرة تُطبع الرسالة؟"
+    code: |
+      import helpers
+      import helpers
+      from helpers import greet
+    options: ["3 مرات", "مرة واحدة", "لا تُطبع أبدًا"]
+    answer: 1
+    explanation: |
+      أول `import` ينفّذ الملف ويخزّن الـmodule في `sys.modules`. أي import لاحق يعيد الـobject
+      المخزّن دون تنفيذ الملف من جديد.
+  q-name:
+    kind: concept
+    question: "ما قيمة `__name__` داخل ملف `tools.py` عندما يُستورد بـ`import tools`؟"
+    options: ["`\"__main__\"`", "`\"tools\"`", "`None`"]
+    answer: 1
+    explanation: |
+      عند الاستيراد يكون `__name__` اسم الـmodule. ولا يساوي `"__main__"` إلا إذا شُغّل الملف مباشرة
+      (`python tools.py`). هذا ما يستعمله الشرط `if __name__ == "__main__":`.
+  q-exit:
+    kind: exit
+    question: "سمّيت ملفك `random.py` ثم كتبت داخله `import random; random.randint(1, 6)` فظهر AttributeError. لماذا؟"
+    options:
+      - "لأن random مكتبة خارجية غير مثبتة"
+      - "لأن Python وجد ملفك أولًا في sys.path فاستورده بدل مكتبة random القياسية"
+      - "لأن randint حُذفت"
+    answer: 1
+    explanation: |
+      المجلد الحالي يأتي قبل المكتبة القياسية في البحث، فيُظلّل ملفك الـmodule الحقيقي. لا تسمِّ ملفاتك
+      `random.py` أو `math.py` أو `pandas.py`.
+
+exercises:
+  ex-module:
+    title: "أنشئ module واستورده"
+    prompt: |
+      1. اكتب في الملف `stats_tools.py` (عبر `Path.write_text`) دالتين: `mean(xs)` و`spread(xs)` التي
+         تُعيد `max(xs) - min(xs)`.
+      2. أضف المجلد الحالي إلى `sys.path`، ثم استورد الـmodule باسم مختصر `st`.
+      3. احسب `m = st.mean([2, 4, 9])` و`r = st.spread([2, 4, 9])`.
+    starter: |
+      import sys
+      from pathlib import Path
+
+      Path("stats_tools.py").write_text(
+          "def mean(xs):\n"
+          "    return sum(xs) / len(xs)\n",
+          encoding="utf-8",
+      )
+
+      # add the current folder to sys.path, import as st, then compute m and r
+    solution: |
+      import sys
+      from pathlib import Path
+
+      Path("stats_tools.py").write_text(
+          "def mean(xs):\n"
+          "    return sum(xs) / len(xs)\n"
+          "\n"
+          "def spread(xs):\n"
+          "    return max(xs) - min(xs)\n",
+          encoding="utf-8",
+      )
+
+      sys.path.insert(0, ".")
+      import stats_tools as st
+
+      m = st.mean([2, 4, 9])
+      r = st.spread([2, 4, 9])
+      print(m, r)
+    tests: |
+      assert "stats_tools" in sys.modules, "لم يُستورد stats_tools"
+      assert st.__name__ == "stats_tools", "استورد الـmodule باسم st"
+      assert m == 5 and r == 7, f"m يجب أن يكون 5 وr يجب أن يكون 7، وليس {m}, {r}"
+      assert st.spread([1, 10]) == 9, "spread يجب أن تُعيد الفرق بين الأكبر والأصغر"
+    hints:
+      - "أضف دالة `spread` إلى النص المكتوب في الملف، مع الإزاحة الصحيحة `\\n    `."
+      - "`sys.path.insert(0, \".\")` تجعل Python يبحث في المجلد الحالي أولًا، ثم `import stats_tools as st`."
+      - "`m = st.mean([2, 4, 9])` و`r = st.spread([2, 4, 9])`"

@@ -1,0 +1,126 @@
+id: comprehensions
+track: loops
+order: 3
+title_ar: "الـcomprehensions: بناء قائمة أو قاموس أو مجموعة في سطر واحد"
+title_en: "Comprehensions: build a list, dict or set in one line"
+level: beginner_to_intermediate
+estimated_minutes: 35
+prerequisites: [while-loop]
+objectives:
+  - "تحويل حلقة for تبني قائمة إلى list comprehension والعكس."
+  - "إضافة شرط تصفية if، واستخدام conditional expression داخل الـcomprehension."
+  - "كتابة dict وset comprehensions وgenerator expressions."
+  - "معرفة متى تصبح الـcomprehension أقل وضوحًا من حلقة عادية."
+docs_url: "https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [comprehension, list comprehension, dict comprehension, set comprehension, generator expression, filter, map]
+
+quizzes:
+  q-read:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      nums = [1, 2, 3, 4, 5, 6]
+      print([n * n for n in nums if n % 2 == 0])
+    options: ["`[1, 9, 25]`", "`[4, 16, 36]`", "`[2, 4, 6]`"]
+    answer: 1
+    explanation: |
+      اقرأها: «لكل n في nums **إذا** كان زوجيًا، احسب `n * n`». الزوجية 2 و4 و6 ومربعاتها 4 و16 و36.
+  q-where-if:
+    kind: predict
+    question: "ما الفرق بين السطرين؟"
+    code: |
+      xs = [3, -1, 5]
+      a = [x for x in xs if x > 0]
+      b = [x if x > 0 else 0 for x in xs]
+      print(a, b)
+    options: ["`[3, 5] [3, 0, 5]`", "`[3, 0, 5] [3, 5]`", "`[3, 5] [3, 5]`"]
+    answer: 0
+    explanation: |
+      `if` **بعد** الـfor **تصفية**: تحذف العناصر. أما `a if cond else b` **قبل** الـfor فهو
+      **تحويل**: يُبقي كل العناصر ويختار قيمة لكل واحد.
+  q-exit:
+    kind: exit
+    question: "أي أقواس تُنتج generator (قيم عند الطلب) لا قائمة؟"
+    options: ["`[x for x in xs]`", "`(x for x in xs)`", "`{x for x in xs}`"]
+    answer: 1
+    explanation: "`[ ]` قائمة، `{ }` مجموعة (أو قاموس مع `k: v`)، و`( )` generator expression كسولة."
+
+exercises:
+  ex-clean:
+    title: "نظّف وحوّل بالـcomprehensions"
+    prompt: |
+      من `raw` أنشئ:
+
+      - `scores`: قائمة الأعداد الصحيحة للقيم التي هي أرقام فقط (`s.strip().isdigit()`).
+      - `passed`: قاموس `{اسم: درجة}` للطلاب الذين درجتهم 10 أو أكثر، من القائمة `students`.
+      - `initials`: مجموعة الحرف الأول (كبيرًا) من كل اسم في `students`.
+    starter: |
+      raw = [" 12", "abc", "7", "", "15 ", "x9"]
+      students = [("sara", 14), ("omar", 8), ("lina", 17), ("adam", 10)]
+
+      scores = []
+      for s in raw:
+          if s.strip().isdigit():
+              scores.append(int(s))
+
+      passed = ...
+      initials = ...
+
+      print(scores, passed, initials)
+    solution: |
+      raw = [" 12", "abc", "7", "", "15 ", "x9"]
+      students = [("sara", 14), ("omar", 8), ("lina", 17), ("adam", 10)]
+
+      scores = [int(s) for s in raw if s.strip().isdigit()]
+      passed = {name: grade for name, grade in students if grade >= 10}
+      initials = {name[0].upper() for name, _ in students}
+
+      print(scores, passed, initials)
+    tests: |
+      assert scores == [12, 7, 15], f"scores غير صحيح: {scores}"
+      assert passed == {"sara": 14, "lina": 17, "adam": 10}, f"passed غير صحيح: {passed}"
+      assert initials == {"S", "O", "L", "A"}, f"initials غير صحيح: {initials}"
+    hints:
+      - "الشكل العام: `[تعبير for عنصر in مجموعة if شرط]`. وللقاموس `{مفتاح: قيمة for …}`."
+      - "فكّ الـtuple مباشرة في الـfor: `for name, grade in students`."
+      - "`passed = {name: grade for name, grade in students if grade >= 10}`"
+
+changes:
+  ch-forms:
+    title: "الحلقة نفسها بأربعة أشكال"
+    base: |
+      words = ["Oran", "algiers", "ORAN", "Setif"]
+      result = []
+      for w in words:
+          result.append(w.lower())
+      print(result)
+    base_label: "قبل · حلقة for"
+    variants:
+      - label: "list comprehension"
+        code: |
+          words = ["Oran", "algiers", "ORAN", "Setif"]
+          print([w.lower() for w in words])
+        explain: "النتيجة نفسها في سطر: التعبير أولًا، ثم `for`. قائمة بالترتيب مع التكرار."
+      - label: "set comprehension"
+        code: |
+          words = ["Oran", "algiers", "ORAN", "Setif"]
+          print({w.lower() for w in words})
+        explain: "بالأقواس `{}` تصبح مجموعة: تكرار `oran` اختفى، والترتيب غير مضمون."
+      - label: "dict comprehension"
+        code: |
+          words = ["Oran", "algiers", "ORAN", "Setif"]
+          print({w.lower(): len(w) for w in words})
+        explain: "`مفتاح: قيمة` يصنع قاموسًا. المفتاح المكرر `oran` يُبقي آخر قيمة."
+
+animations:
+  anim-equivalent:
+    title: "الـcomprehension حلقة مختصرة"
+    code: |
+      prices = [10, 25, 8]
+      with_tax = [p * 1.2 for p in prices if p > 9]
+      print(with_tax)
+    notes:
+      2: "تمر الـcomprehension على كل p، تفحص الشرط، وتضيف `p * 1.2` للنتيجة. الحلقة تحدث داخل هذا السطر."
+      3: "النتيجة قائمة جديدة؛ القائمة الأصلية لم تتغير."

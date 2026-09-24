@@ -1,0 +1,123 @@
+id: project-structure-packaging
+track: packaging
+order: 1
+title_ar: "بنية المشروع والحزم: من سكربت إلى مشروع قابل للتثبيت"
+title_en: "Project structure and packaging: from a script to an installable project"
+level: advanced
+estimated_minutes: 50
+prerequisites: [modules-imports, testing-and-style]
+objectives:
+  - "تنظيم مشروع بـsrc layout: كود، اختبارات، بيانات، ومخرجات منفصلة."
+  - "فهم pyproject.toml: الاسم، الإصدار، التبعيات، وإعدادات الأدوات."
+  - "فهم البيئات الافتراضية وتثبيت المشروع بـpip install -e أو uv."
+  - "كتابة واجهة سطر أوامر (CLI) بـargparse وحارس __main__."
+  - "معرفة Semantic Versioning ودور Git وملف .gitignore وLICENSE."
+docs_url: "https://packaging.python.org/en/latest/tutorials/packaging-projects/"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [pyproject.toml, src layout, package, venv, pip, uv, argparse, CLI, semver, git, tomllib]
+
+quizzes:
+  q-src:
+    kind: concept
+    question: "ما الفائدة الأساسية من وضع الحزمة داخل `src/`؟"
+    options:
+      - "شكل أجمل فقط"
+      - "تجبرك على تثبيت الحزمة لتستوردها، فتختبر النسخة المثبتة فعلًا لا الملفات المجاورة بالصدفة"
+      - "تجعل الكود أسرع"
+    answer: 1
+    explanation: |
+      بدون `src/` قد تنجح `import mypkg` في الاختبارات لأن المجلد الحالي على `sys.path`، ثم تفشل عند
+      المستخدم لأن ملفًا نُسي في الحزمة. الـsrc layout يكشف ذلك مبكرًا.
+  q-semver:
+    kind: concept
+    question: "حزمتك في الإصدار `1.4.2`. أزلت دالة عامة يستخدمها الناس. ما الإصدار التالي حسب SemVer؟"
+    options: ["`1.4.3`", "`1.5.0`", "`2.0.0`"]
+    answer: 2
+    explanation: |
+      **MAJOR.MINOR.PATCH**: PATCH لإصلاح أخطاء، MINOR لميزات جديدة متوافقة، MAJOR لتغيير **يكسر**
+      التوافق، مثل إزالة دالة أو تغيير معاملاتها.
+  q-exit:
+    kind: exit
+    question: "أي ملف يجب ألا يُرفع إلى Git أبدًا؟"
+    options: ["`pyproject.toml`", "`.env` فيه مفاتيح API وكلمات سر", "`README.md`"]
+    answer: 1
+    explanation: "الأسرار تبقى خارج المستودع: ضع `.env` في `.gitignore`، وقدّم `.env.example` بقيم وهمية بدلًا منه."
+
+exercises:
+  ex-cli:
+    title: "CLI صغير يقرأ إعداداته من pyproject"
+    prompt: |
+      1. حلّل النص `PYPROJECT` بـ`tomllib.loads` في `config`، ثم استخرج `name` و`version` من جدول `[project]`.
+      2. اكتب `build_parser()` تُعيد `argparse.ArgumentParser` له:
+         - معامل موضعي `path`.
+         - خيار `--sep` قيمته الافتراضية `","`.
+         - علَم `--verbose` (`action="store_true"`).
+      3. `args = build_parser().parse_args(["data.csv", "--sep", ";"])`.
+    starter: |
+      import argparse
+      import tomllib
+
+      PYPROJECT = """
+      [project]
+      name = "survey-tools"
+      version = "0.3.1"
+      requires-python = ">=3.11"
+      dependencies = ["pandas>=2.2"]
+
+      [project.scripts]
+      survey = "survey_tools.cli:main"
+      """
+
+      config = {}
+      name = ""
+      version = ""
+
+
+      def build_parser():
+          parser = argparse.ArgumentParser(prog="survey")
+          return parser
+
+
+      args = None
+      print(name, version, args)
+    solution: |
+      import argparse
+      import tomllib
+
+      PYPROJECT = """
+      [project]
+      name = "survey-tools"
+      version = "0.3.1"
+      requires-python = ">=3.11"
+      dependencies = ["pandas>=2.2"]
+
+      [project.scripts]
+      survey = "survey_tools.cli:main"
+      """
+
+      config = tomllib.loads(PYPROJECT)
+      name = config["project"]["name"]
+      version = config["project"]["version"]
+
+
+      def build_parser():
+          parser = argparse.ArgumentParser(prog="survey")
+          parser.add_argument("path", help="CSV file to summarise")
+          parser.add_argument("--sep", default=",", help="field separator")
+          parser.add_argument("--verbose", action="store_true")
+          return parser
+
+
+      args = build_parser().parse_args(["data.csv", "--sep", ";"])
+      print(name, version, args)
+    tests: |
+      assert config["project"]["scripts"]["survey"] == "survey_tools.cli:main", "حلّل PYPROJECT بـtomllib.loads"
+      assert (name, version) == ("survey-tools", "0.3.1"), f"name/version غير صحيحين: {name} {version}"
+      assert args is not None and args.path == "data.csv" and args.sep == ";" and args.verbose is False, f"args غير صحيح: {args}"
+      _d = build_parser().parse_args(["x.csv", "--verbose"])
+      assert _d.sep == "," and _d.verbose is True, "القيمة الافتراضية لـ--sep يجب أن تكون ',' و--verbose علَم store_true"
+    hints:
+      - "`config = tomllib.loads(PYPROJECT)` ثم `config[\"project\"][\"name\"]`."
+      - "`parser.add_argument(\"path\")`، `parser.add_argument(\"--sep\", default=\",\")`، `parser.add_argument(\"--verbose\", action=\"store_true\")`."
+      - "`args = build_parser().parse_args([\"data.csv\", \"--sep\", \";\"])`"

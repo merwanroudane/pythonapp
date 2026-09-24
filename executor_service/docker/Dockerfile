@@ -14,6 +14,6 @@ WORKDIR /work
 
 FROM core-python AS scientific
 USER root
-RUN pip install --no-cache-dir "numpy>=2" "pandas>=2.2" "matplotlib>=3.9" \
+RUN pip install --no-cache-dir "numpy>=2" "pandas>=2.2" "matplotlib>=3.9" "pillow>=10" \
     && rm -rf /root/.cache
 USER 65534:65534

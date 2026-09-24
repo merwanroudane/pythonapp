@@ -1,0 +1,100 @@
+id: testing-and-style
+track: quality
+order: 1
+title_ar: "جودة الكود: الأسلوب والاختبارات والـlogging"
+title_en: "Code quality: style, tests and logging"
+level: intermediate
+estimated_minutes: 45
+prerequisites: [try-except]
+objectives:
+  - "تطبيق أساسيات PEP 8: التسمية والإزاحة والمسافات وطول السطر."
+  - "كتابة docstrings وtype hints لتوضيح الواجهة."
+  - "كتابة اختبارات بـassert على شكل دوال test_، وفهم أسلوب pytest."
+  - "استخدام doctest لاختبار الأمثلة داخل الـdocstring."
+  - "استخدام logging بدل print لتتبع برنامج حقيقي."
+docs_url: "https://peps.python.org/pep-0008/"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [PEP 8, style, docstring, type hints, testing, assert, pytest, doctest, logging, ruff]
+
+quizzes:
+  q-naming:
+    kind: concept
+    question: "أي تسمية تتبع PEP 8؟"
+    options:
+      - "`def CleanData(RawTable):` و`class data_set:`"
+      - "`def clean_data(raw_table):` و`class DataSet:` و`MAX_ROWS = 100`"
+      - "`def cleandata(x):` و`class dataset:`"
+    answer: 1
+    explanation: |
+      الدوال والمتغيرات `snake_case`، والـclasses `CapWords`، والثوابت `UPPER_CASE`. التسمية الواضحة أهم
+      قاعدة جودة على الإطلاق.
+  q-test:
+    kind: concept
+    question: "ما الذي يجعل اختبارًا جيدًا؟"
+    options:
+      - "أن يطبع النتيجة لتنظر إليها"
+      - "أن يتحقق آليًا من نتيجة متوقعة محددة، بما في ذلك الحالات الحدّية"
+      - "أن يكون طويلًا"
+    answer: 1
+    explanation: |
+      الاختبار الآلي يفشل من تلقاء نفسه عندما يتغير السلوك، دون أن تحتاج قراءة المخرجات. غطِّ الحالة
+      العادية والحالات الحدّية (قائمة فارغة، صفر، قيمة مفقودة).
+  q-exit:
+    kind: exit
+    question: "لماذا logging أفضل من print في برنامج حقيقي؟"
+    options:
+      - "لأنه أسرع فقط"
+      - "لأن له مستويات (DEBUG/INFO/WARNING/ERROR) ووقتًا ومصدرًا، ويمكن توجيهه لملف أو إيقافه دون حذف الأسطر"
+      - "لأن print لا تعمل في الـscripts"
+    answer: 1
+    explanation: "تضبط مستوى التفاصيل من مكان واحد، وتحتفظ بسجل يمكن مراجعته بعد التشغيل."
+
+exercises:
+  ex-tests:
+    title: "اكتب اختبارات لدالة"
+    prompt: |
+      الدالة `normalize(values)` تحوّل القيم إلى المجال [0, 1] بالصيغة `(x - min) / (max - min)`.
+      اكتب **ثلاث دوال اختبار** تبدأ أسماؤها بـ`test_`:
+
+      - `test_basic`: `normalize([0, 5, 10])` تساوي `[0.0, 0.5, 1.0]`.
+      - `test_negative`: تعمل مع القيم السالبة، مثل `[-2, 0, 2]`.
+      - `test_constant`: عندما تتساوى كل القيم تُعيد أصفارًا، مثل `[3, 3]` ← `[0.0, 0.0]`.
+
+      ثم أصلح الدالة حتى تنجح الاختبارات الثلاثة (الحالة الأخيرة تقسم على صفر حاليًا).
+    starter: |
+      def normalize(values):
+          lo, hi = min(values), max(values)
+          return [(x - lo) / (hi - lo) for x in values]
+
+      # write test_basic, test_negative, test_constant here
+    solution: |
+      def normalize(values):
+          lo, hi = min(values), max(values)
+          if hi == lo:
+              return [0.0 for _ in values]
+          return [(x - lo) / (hi - lo) for x in values]
+
+      def test_basic():
+          assert normalize([0, 5, 10]) == [0.0, 0.5, 1.0]
+
+      def test_negative():
+          assert normalize([-2, 0, 2]) == [0.0, 0.5, 1.0]
+
+      def test_constant():
+          assert normalize([3, 3]) == [0.0, 0.0]
+
+      for test in (test_basic, test_negative, test_constant):
+          test()
+      print("all tests passed")
+    tests: |
+      _tests = [v for k, v in dict(globals()).items() if k.startswith("test_") and callable(v)]
+      assert len(_tests) >= 3, f"اكتب ثلاث دوال test_ على الأقل (وجدت {len(_tests)})"
+      for _t in _tests:
+          _t()
+      assert normalize([3, 3, 3]) == [0.0, 0.0, 0.0], "حالة القيم المتساوية ما زالت تفشل"
+      assert normalize([1, 3]) == [0.0, 1.0]
+    hints:
+      - "كل اختبار دالة بلا parameters تحتوي `assert normalize(...) == [...]`."
+      - "الحالة `[3, 3]` تجعل `hi - lo` صفرًا. افحصها قبل القسمة وأعِد قائمة أصفار."
+      - "`if hi == lo: return [0.0 for _ in values]`"

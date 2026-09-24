@@ -1,0 +1,134 @@
+id: classes-objects
+track: oop
+order: 1
+title_ar: "الـclasses والـobjects: بيانات وسلوك في وحدة واحدة"
+title_en: "Classes and objects: data and behaviour in one unit"
+level: intermediate
+estimated_minutes: 50
+prerequisites: [function-parameters]
+objectives:
+  - "فهم الـclass كقالب والـobject (instance) كنسخة ملموسة منه."
+  - "كتابة __init__ واستخدام self لتخزين حالة كل instance."
+  - "كتابة methods، والتمييز بين instance attributes وclass attributes."
+  - "تعريف __repr__ لعرض واضح، واستخدام @dataclass لتقليل الكود المتكرر."
+  - "التعرف على inheritance كفكرة: class جديد يبني على class موجود."
+docs_url: "https://docs.python.org/3/tutorial/classes.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [class, object, instance, __init__, self, method, attribute, __repr__, dataclass, inheritance, OOP]
+
+quizzes:
+  q-self:
+    kind: concept
+    question: "في `acc.deposit(100)`، ما الذي يصل إلى الـparameter `self`؟"
+    options: ["الرقم 100", "الـobject `acc` نفسه", "الـclass `Account`"]
+    answer: 1
+    explanation: |
+      `acc.deposit(100)` تعادل `Account.deposit(acc, 100)`: Python يمرّر الـinstance تلقائيًا كأول
+      argument، وهو ما نسميه `self`.
+  q-class-attr:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      class Counter:
+          total = 0
+          def __init__(self):
+              Counter.total += 1
+
+      a, b = Counter(), Counter()
+      print(Counter.total, a.total)
+    options: ["`1 1`", "`2 2`", "`0 0`"]
+    answer: 1
+    explanation: |
+      `total` **class attribute** مشترك بين كل الـinstances. كل إنشاء زاده بواحد، و`a.total` يقرأ
+      القيمة المشتركة نفسها.
+  q-exit:
+    kind: exit
+    question: "ما فائدة `@dataclass`؟"
+    options:
+      - "تجعل الـclass أسرع"
+      - "تولّد تلقائيًا __init__ و__repr__ و__eq__ من الحقول المعلنة"
+      - "تمنع إنشاء instances"
+    answer: 1
+    explanation: "للـclasses التي هي أساسًا «حاويات بيانات» توفر dataclass عشرات الأسطر المتكررة."
+
+exercises:
+  ex-account:
+    title: "حساب بنكي بقواعد"
+    prompt: |
+      أكمل الـclass `Account`:
+
+      - `__init__(self, owner, balance=0)` يخزّن المالك والرصيد.
+      - `deposit(amount)` يضيف المبلغ، ويرفع `ValueError` إن كان المبلغ ≤ 0.
+      - `withdraw(amount)` يطرح المبلغ، ويرفع `ValueError` إن تجاوز الرصيد.
+      - `__repr__` يُعيد مثل `Account('Sara', 150)`.
+    starter: |
+      class Account:
+          def __init__(self, owner, balance=0):
+              pass
+
+      acc = Account("Sara", 100)
+      acc.deposit(50)
+      print(acc)
+    solution: |
+      class Account:
+          def __init__(self, owner, balance=0):
+              self.owner = owner
+              self.balance = balance
+
+          def deposit(self, amount):
+              if amount <= 0:
+                  raise ValueError("amount must be positive")
+              self.balance += amount
+
+          def withdraw(self, amount):
+              if amount > self.balance:
+                  raise ValueError("insufficient funds")
+              self.balance -= amount
+
+          def __repr__(self):
+              return f"Account({self.owner!r}, {self.balance})"
+
+      acc = Account("Sara", 100)
+      acc.deposit(50)
+      print(acc)
+    tests: |
+      _a = Account("Sara", 100)
+      _a.deposit(50)
+      assert _a.balance == 150, f"الرصيد بعد الإيداع يجب أن يكون 150 وليس {_a.balance}"
+      _a.withdraw(30)
+      assert _a.balance == 120
+      assert repr(_a) == "Account('Sara', 120)", f"__repr__ غير صحيح: {_a!r}"
+      for _bad in (lambda: _a.deposit(0), lambda: _a.withdraw(1000)):
+          try:
+              _bad()
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("يجب رفع ValueError للمبلغ غير الصالح")
+      assert Account("Omar").balance == 0, "الرصيد الافتراضي 0"
+    hints:
+      - "خزّن القيم على الـinstance: `self.owner = owner`. كل method تستقبل `self` أولًا."
+      - "في `deposit`: `if amount <= 0: raise ValueError(...)` ثم `self.balance += amount`."
+      - "`def __repr__(self): return f\"Account({self.owner!r}, {self.balance})\"`"
+
+animations:
+  anim-instance:
+    title: "إنشاء instance واستدعاء method"
+    code: |
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def shifted(self, dx):
+              return Point(self.x + dx, self.y)
+
+      p = Point(1, 2)
+      q = p.shifted(10)
+      print(p.x, q.x)
+    notes:
+      1: "تنفيذ `class` يُنشئ الـclass object ويعرّف methods فيه؛ لا instance بعد."
+      9: "`Point(1, 2)` تُنشئ object فارغًا ثم تستدعي `__init__` لتملأه: `self` هو الـobject الجديد."
+      10: "`p.shifted(10)`: الـinstance `p` يصل كـ`self`، وتُنشأ نقطة جديدة؛ `p` لم يتغير."
+      11: "لكل instance حالته الخاصة: `p.x` و`q.x` مختلفان."

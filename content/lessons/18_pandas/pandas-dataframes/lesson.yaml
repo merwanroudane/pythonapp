@@ -1,0 +1,104 @@
+id: pandas-dataframes
+track: pandas
+order: 1
+title_ar: "pandas: الجداول DataFrame من القراءة إلى التلخيص"
+title_en: "pandas: DataFrames from loading to summarising"
+level: intermediate
+estimated_minutes: 55
+prerequisites: [numpy-arrays]
+objectives:
+  - "فهم Series (عمود له index) وDataFrame (جدول أعمدة له index مشترك)."
+  - "إنشاء جدول من قاموس أو من CSV، وفحصه بـhead وshape وdtypes وdescribe."
+  - "الاختيار بـ[] و.loc (بالتسمية) و.iloc (بالموضع)، والتصفية بشروط."
+  - "إضافة أعمدة محسوبة، ومعالجة القيم المفقودة."
+  - "التجميع بـgroupby و.agg، والترتيب."
+docs_url: "https://pandas.pydata.org/docs/user_guide/10min.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [pandas, DataFrame, Series, index, loc, iloc, filter, groupby, agg, missing values, read_csv]
+
+quizzes:
+  q-loc-iloc:
+    kind: predict
+    question: "الـindex هنا أسماء المدن. ماذا يطبع؟"
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"pop": [3.0, 1.6, 0.7]}, index=["Algiers", "Oran", "Setif"])
+      print(df.loc["Oran", "pop"], df.iloc[0, 0])
+    options: ["`1.6 3.0`", "`3.0 1.6`", "`KeyError`"]
+    answer: 0
+    explanation: |
+      `.loc` يختار **بالتسمية** (label): الصف "Oran". و`.iloc` **بالموضع**: الصف الأول (رقم 0) وهو Algiers.
+  q-filter:
+    kind: concept
+    question: "كيف تختار الصفوف التي عمرها 18 أو أكثر **و** مدينتها Oran؟"
+    options:
+      - "`df[df.age >= 18 and df.city == \"Oran\"]`"
+      - "`df[(df[\"age\"] >= 18) & (df[\"city\"] == \"Oran\")]`"
+      - "`df.loc[age >= 18, city == \"Oran\"]`"
+    answer: 1
+    explanation: |
+      كل شرط يُنتج **Series منطقية**، وتجمعها بـ`&` (و) أو `|` (أو)، مع **أقواس** حول كل شرط. `and`
+      لا تعمل مع الأعمدة.
+  q-exit:
+    kind: exit
+    question: "ماذا يفعل `df.groupby(\"city\")[\"income\"].mean()`؟"
+    options:
+      - "يرتب الجدول حسب المدينة"
+      - "يقسم الصفوف حسب المدينة، يحسب متوسط الدخل لكل مجموعة، ويجمع النتائج في Series"
+      - "يحذف المدن المكررة"
+    answer: 1
+    explanation: "هذا نمط **split → apply → combine**، قلب تحليل البيانات الجدولية."
+
+exercises:
+  ex-survey:
+    title: "حلّل استبيانًا صغيرًا"
+    prompt: |
+      من الجدول `df` أنشئ:
+
+      - `adults`: الصفوف التي `age >= 18` فقط.
+      - `mean_income`: Series بمتوسط `income` لكل `city` من `adults`، **مرتبة تنازليًا**.
+      - `n_missing`: عدد القيم المفقودة في العمود `income` في الجدول الأصلي.
+      - `df["income_k"]`: عمود جديد في `df` = income / 1000.
+    starter: |
+      import pandas as pd
+
+      df = pd.DataFrame({
+          "name": ["Sara", "Omar", "Lina", "Adam", "Yasmine", "Rami"],
+          "age": [30, 17, 45, 22, 38, 51],
+          "city": ["Oran", "Algiers", "Oran", "Setif", "Algiers", "Oran"],
+          "income": [42000, None, 58000, 31000, 47000, 61000],
+      })
+
+      adults = ...
+      mean_income = ...
+      n_missing = ...
+
+      print(adults, mean_income, n_missing, sep="\n\n")
+    solution: |
+      import pandas as pd
+
+      df = pd.DataFrame({
+          "name": ["Sara", "Omar", "Lina", "Adam", "Yasmine", "Rami"],
+          "age": [30, 17, 45, 22, 38, 51],
+          "city": ["Oran", "Algiers", "Oran", "Setif", "Algiers", "Oran"],
+          "income": [42000, None, 58000, 31000, 47000, 61000],
+      })
+
+      adults = df[df["age"] >= 18]
+      mean_income = adults.groupby("city")["income"].mean().sort_values(ascending=False)
+      n_missing = int(df["income"].isna().sum())
+      df["income_k"] = df["income"] / 1000
+
+      print(adults, mean_income, n_missing, sep="\n\n")
+    tests: |
+      import math as _m
+      assert list(adults["name"]) == ["Sara", "Lina", "Adam", "Yasmine", "Rami"], "adults غير صحيح"
+      assert list(mean_income.index) == ["Oran", "Algiers", "Setif"], f"الترتيب غير صحيح: {list(mean_income.index)}"
+      assert _m.isclose(mean_income["Oran"], (42000 + 58000 + 61000) / 3)
+      assert n_missing == 1, f"n_missing يجب أن يكون 1 وليس {n_missing}"
+      assert "income_k" in df.columns and _m.isclose(df.loc[0, "income_k"], 42.0), "أضف العمود income_k إلى df"
+    hints:
+      - "التصفية: `df[df[\"age\"] >= 18]`. والقيم المفقودة: `df[\"income\"].isna().sum()`."
+      - "`adults.groupby(\"city\")[\"income\"].mean()` ثم `.sort_values(ascending=False)`."
+      - "عمود جديد: `df[\"income_k\"] = df[\"income\"] / 1000`"

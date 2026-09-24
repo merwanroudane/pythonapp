@@ -16,6 +16,7 @@ scientific = [
   "numpy",
   "pandas",
   "matplotlib",
+  "pillow",
 ]
 dev = [
   "pytest",

@@ -1,0 +1,114 @@
+id: numpy-arrays
+track: numpy
+order: 1
+title_ar: "NumPy: المصفوفات والحساب المتجه (vectorization)"
+title_en: "NumPy: arrays and vectorized computation"
+level: intermediate
+estimated_minutes: 50
+prerequisites: [comprehensions]
+objectives:
+  - "فهم ndarray: بنية متجانسة لها shape وdtype، والفرق بينها وبين list."
+  - "إنشاء arrays بـnp.array وarange وlinspace وzeros، وتغيير الشكل بـreshape."
+  - "تطبيق العمليات elementwise دون حلقات (vectorization)."
+  - "فهم الـbroadcasting بين أشكال مختلفة."
+  - "التصفية بالأقنعة المنطقية، والتجميع على محور axis."
+docs_url: "https://numpy.org/doc/stable/user/absolute_beginners.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [numpy, ndarray, shape, dtype, vectorization, broadcasting, mask, axis, reshape]
+
+quizzes:
+  q-list-vs-array:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      import numpy as np
+      print([1, 2, 3] * 2)
+      print(np.array([1, 2, 3]) * 2)
+    options:
+      - "`[2, 4, 6]` ثم `[2 4 6]`"
+      - "`[1, 2, 3, 1, 2, 3]` ثم `[2 4 6]`"
+      - "`[1, 2, 3, 1, 2, 3]` مرتين"
+    answer: 1
+    explanation: |
+      `*` على list **تكرار** للقائمة. أما على ndarray فهي عملية **رياضية على كل عنصر**. هذا جوهر NumPy.
+  q-axis:
+    kind: predict
+    question: "ما قيمة `m.sum(axis=0)`؟"
+    code: |
+      import numpy as np
+      m = np.array([[1, 2, 3],
+                    [4, 5, 6]])
+      print(m.sum(axis=0), m.sum(axis=1))
+    options: ["`[6 15] [5 7 9]`", "`[5 7 9] [6 15]`", "`21 21`"]
+    answer: 1
+    explanation: |
+      `axis=0` يجمع **على طول الصفوف** (نزولًا) فيعطي مجموع كل **عمود**. `axis=1` يجمع على طول الأعمدة
+      فيعطي مجموع كل **صف**. قاعدة: المحور المذكور هو الذي «يختفي» من الشكل.
+  q-exit:
+    kind: exit
+    question: 'لماذا `np.array([1, "2", 3.0])` ليست فكرة جيدة؟'
+    options:
+      - "لأنها ترفع خطأ"
+      - "لأن الـarray متجانسة، فتُحوَّل كل العناصر إلى نوع واحد (هنا نصوص) وتضيع الأرقام"
+      - "لأن NumPy لا تقبل float"
+    answer: 1
+    explanation: |
+      على عكس list، لكل ndarray **dtype واحد**. عند الخلط يختار NumPy نوعًا يسع الجميع، وهنا يصبح كل شيء
+      نصًا فلا يمكن الحساب.
+
+exercises:
+  ex-standardize:
+    title: "توحيد القياس (z-scores) بلا حلقات"
+    prompt: |
+      لديك درجات 5 طلاب في 3 مواد (مصفوفة 5 × 3). دون أي حلقة `for`:
+
+      - `col_means`: متوسط كل **مادة** (عمود) ← shape `(3,)`.
+      - `z`: الـz-score لكل خلية: `(x - متوسط العمود) / انحراف العمود المعياري` (استخدم `std(axis=0)`).
+      - `top_mask`: قناع منطقي للخلايا التي `z > 1`.
+      - `n_top`: عدد هذه الخلايا.
+    starter: |
+      import numpy as np
+
+      scores = np.array([
+          [12, 15, 9],
+          [14, 11, 16],
+          [18, 13, 12],
+          [10, 17, 14],
+          [16, 14, 19],
+      ], dtype=float)
+
+      col_means = ...
+      z = ...
+      top_mask = ...
+      n_top = ...
+
+      print(col_means, n_top)
+    solution: |
+      import numpy as np
+
+      scores = np.array([
+          [12, 15, 9],
+          [14, 11, 16],
+          [18, 13, 12],
+          [10, 17, 14],
+          [16, 14, 19],
+      ], dtype=float)
+
+      col_means = scores.mean(axis=0)
+      z = (scores - col_means) / scores.std(axis=0)
+      top_mask = z > 1
+      n_top = int(top_mask.sum())
+
+      print(col_means, n_top)
+    tests: |
+      import numpy as _np
+      assert col_means.shape == (3,), f"col_means يجب أن يكون shape (3,) وليس {getattr(col_means, 'shape', None)}"
+      assert _np.allclose(col_means, [14.0, 14.0, 14.0])
+      assert z.shape == (5, 3), "z يجب أن يكون بنفس شكل scores"
+      assert _np.allclose(z.mean(axis=0), 0) and _np.allclose(z.std(axis=0), 1), "أعمدة z يجب أن يكون متوسطها 0 وانحرافها 1"
+      assert top_mask.dtype == bool and n_top == 3, f"n_top يجب أن يكون 3 وليس {n_top}"
+    hints:
+      - "`scores.mean(axis=0)` متوسط كل عمود. والطرح `scores - col_means` يعمل بالـbroadcasting."
+      - "`z = (scores - col_means) / scores.std(axis=0)`، ثم المقارنة `z > 1` تُعيد مصفوفة bool."
+      - "`n_top = int(top_mask.sum())` لأن True تُحسب 1."

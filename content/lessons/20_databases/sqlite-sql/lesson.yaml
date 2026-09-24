@@ -1,0 +1,122 @@
+id: sqlite-sql
+track: databases
+order: 1
+title_ar: "قواعد البيانات وSQL مع sqlite3"
+title_en: "Databases and SQL with sqlite3"
+level: intermediate
+estimated_minutes: 50
+prerequisites: [pandas-dataframes]
+objectives:
+  - "فهم قاعدة البيانات العلائقية: جداول، صفوف، أعمدة، مفتاح أساسي، ومفتاح أجنبي."
+  - "كتابة CREATE وINSERT وSELECT مع WHERE وORDER BY وGROUP BY وJOIN."
+  - "استخدام sqlite3 من Python: connect وexecute وfetchall وcommit."
+  - "استعمال الاستعلامات ذات المعاملات (?) لتجنب SQL injection."
+  - "نقل النتائج إلى pandas بـread_sql_query."
+docs_url: "https://docs.python.org/3/library/sqlite3.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [SQL, sqlite3, database, SELECT, JOIN, GROUP BY, primary key, SQL injection, parameters]
+
+quizzes:
+  q-where-having:
+    kind: concept
+    question: "تريد المدن التي **متوسط** دخلها فوق 50,000. أين يوضع هذا الشرط؟"
+    options: ["`WHERE AVG(income) > 50000`", "`HAVING AVG(income) > 50000` بعد `GROUP BY city`", "`ORDER BY AVG(income) > 50000`"]
+    answer: 1
+    explanation: |
+      `WHERE` يصفّي **الصفوف** قبل التجميع، و`HAVING` يصفّي **المجموعات** بعد `GROUP BY`. الشرط على
+      دالة تجميع (`AVG`، `COUNT`…) مكانه `HAVING`.
+  q-injection:
+    kind: concept
+    question: "أي سطر آمن مع اسم يُدخله المستخدم `name`؟"
+    options:
+      - "`cur.execute(f\"SELECT * FROM users WHERE name = '{name}'\")`"
+      - "`cur.execute(\"SELECT * FROM users WHERE name = ?\", (name,))`"
+      - "`cur.execute(\"SELECT * FROM users WHERE name = \" + name)`"
+    answer: 1
+    explanation: |
+      مع `?` يُمرَّر الاسم **كقيمة** منفصلة عن نص الاستعلام، فلا يمكن أن يُفسَّر كجزء من SQL. أما
+      تركيب النص بـf-string أو `+` فيسمح لمدخل مثل `x' OR '1'='1` بتغيير معنى الاستعلام.
+  q-exit:
+    kind: exit
+    question: "ما وظيفة المفتاح الأجنبي `country_id` في جدول `cities`؟"
+    options:
+      - "يجعل البحث أسرع فقط"
+      - "يربط كل مدينة بصف في جدول `countries`، فتُخزَّن معلومات الدولة مرة واحدة ويُربط بها بـJOIN"
+      - "يمنع تكرار أسماء المدن"
+    answer: 1
+    explanation: "هذا جوهر التصميم العلائقي: لا تكرر البيانات، بل اربط الجداول بالمفاتيح واجمعها عند الحاجة بـJOIN."
+
+exercises:
+  ex-sales:
+    title: "استعلامات على قاعدة مبيعات"
+    prompt: |
+      القاعدة `con` فيها جدولان: `products(id, name, category)` و`sales(product_id, qty, price)`.
+      اكتب نص استعلامَين SQL ثم نفّذهما:
+
+      - `q_total`: لكل `category`: مجموع الإيراد `SUM(qty * price)` باسم `revenue`، **مرتب تنازليًا**.
+        خزّن النتيجة (قائمة tuples) في `totals`.
+      - `q_big`: أسماء المنتجات التي بيع منها **أكثر من 5 وحدات** إجمالًا، مرتبة أبجديًا. خزّن النتيجة في
+        `big` كقائمة أسماء (نصوص).
+    starter: |
+      import sqlite3
+
+      con = sqlite3.connect(":memory:")
+      con.executescript("""
+      CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, category TEXT);
+      CREATE TABLE sales (product_id INTEGER REFERENCES products(id), qty INTEGER, price REAL);
+      INSERT INTO products VALUES (1, 'pen', 'office'), (2, 'paper', 'office'),
+                                  (3, 'tea', 'food'), (4, 'dates', 'food');
+      INSERT INTO sales VALUES (1, 4, 50), (1, 3, 50), (2, 2, 400),
+                               (3, 6, 120), (4, 1, 900), (4, 2, 900);
+      """)
+
+      q_total = """
+      SELECT ...
+      """
+      totals = con.execute(q_total).fetchall()
+
+      q_big = """
+      SELECT ...
+      """
+      big = [row[0] for row in con.execute(q_big)]
+      print(totals, big)
+    solution: |
+      import sqlite3
+
+      con = sqlite3.connect(":memory:")
+      con.executescript("""
+      CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, category TEXT);
+      CREATE TABLE sales (product_id INTEGER REFERENCES products(id), qty INTEGER, price REAL);
+      INSERT INTO products VALUES (1, 'pen', 'office'), (2, 'paper', 'office'),
+                                  (3, 'tea', 'food'), (4, 'dates', 'food');
+      INSERT INTO sales VALUES (1, 4, 50), (1, 3, 50), (2, 2, 400),
+                               (3, 6, 120), (4, 1, 900), (4, 2, 900);
+      """)
+
+      q_total = """
+      SELECT p.category, SUM(s.qty * s.price) AS revenue
+      FROM sales AS s
+      JOIN products AS p ON p.id = s.product_id
+      GROUP BY p.category
+      ORDER BY revenue DESC
+      """
+      totals = con.execute(q_total).fetchall()
+
+      q_big = """
+      SELECT p.name
+      FROM sales AS s
+      JOIN products AS p ON p.id = s.product_id
+      GROUP BY p.name
+      HAVING SUM(s.qty) > 5
+      ORDER BY p.name
+      """
+      big = [row[0] for row in con.execute(q_big)]
+      print(totals, big)
+    tests: |
+      assert totals == [("food", 3420.0), ("office", 1150.0)], f"totals غير صحيح: {totals}"
+      assert big == ["pen", "tea"], f"big غير صحيح: {big}"
+    hints:
+      - "اربط الجدولين: `FROM sales AS s JOIN products AS p ON p.id = s.product_id`."
+      - "الإيراد: `SELECT p.category, SUM(s.qty * s.price) AS revenue ... GROUP BY p.category ORDER BY revenue DESC`."
+      - "الشرط على المجموع مكانه `HAVING SUM(s.qty) > 5` بعد `GROUP BY p.name`."

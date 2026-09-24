@@ -1,0 +1,96 @@
+id: matplotlib-basics
+track: visualization
+order: 1
+title_ar: "الرسوم البيانية بـMatplotlib: من السؤال إلى الرسم"
+title_en: "Charts with Matplotlib: from the question to the figure"
+level: intermediate
+estimated_minutes: 45
+prerequisites: [pandas-dataframes]
+objectives:
+  - "اختيار نوع الرسم حسب السؤال: توزيع، علاقة، مقارنة، اتجاه زمني."
+  - "فهم بنية Figure وAxes واستخدام الواجهة الكائنية fig, ax = plt.subplots()."
+  - "رسم line وscatter وbar وhist، وإضافة العناوين والتسميات والوحدات."
+  - "رسم عدة Axes في Figure واحدة، وحفظ الرسم بـsavefig."
+  - "تجنّب الرسوم المضللة (محاور مقطوعة، ألوان بلا معنى)."
+docs_url: "https://matplotlib.org/stable/users/explain/quick_start.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [matplotlib, figure, axes, subplots, line, scatter, bar, hist, savefig, visualization]
+
+quizzes:
+  q-choose:
+    kind: concept
+    question: "تريد أن ترى كيف تتوزع أعمار 5,000 مشارك. أي رسم؟"
+    options: ["مخطط خطي (line)", "مدرّج تكراري (histogram)", "مخطط دائري (pie)"]
+    answer: 1
+    explanation: |
+      الـhistogram يقسم القيم إلى فئات ويعرض تكرار كل فئة: الأداة الطبيعية لرؤية **التوزيع** (الشكل،
+      المركز، الانتشار، القيم الشاذة).
+  q-fig-ax:
+    kind: concept
+    question: "في `fig, ax = plt.subplots(1, 2)`، ما `ax`؟"
+    options:
+      - "رسم واحد"
+      - "مصفوفة من Axes اثنين، لكل واحد رسمه ومحاوره"
+      - "الـFigure نفسها"
+    answer: 1
+    explanation: "`fig` هي الصفحة كلها، و`ax[0]` و`ax[1]` منطقتا الرسم داخلها، لكل منهما محاوره وعنوانه."
+  q-exit:
+    kind: exit
+    question: "لماذا قد يكون مخطط أعمدة يبدأ محوره الرأسي من 95 بدل 0 مضللًا؟"
+    options:
+      - "لأنه أبطأ في الرسم"
+      - "لأن أطوال الأعمدة لم تعد تتناسب مع القيم، فيبدو فرق صغير (96 مقابل 98) هائلًا"
+      - "لأن Matplotlib لا تسمح بذلك"
+    answer: 1
+    explanation: "في مخطط الأعمدة يُقرأ **الطول**، فيجب أن يبدأ المحور من الصفر. أما المخطط الخطي فيمكنه التكبير."
+
+exercises:
+  ex-figure:
+    title: "لوحة من رسمين"
+    prompt: |
+      أنشئ Figure فيها **رسمان جنبًا إلى جنب** (`plt.subplots(1, 2)`):
+
+      1. على اليسار (`ax[0]`): مخطط خطي لـ`gdp_growth` عبر `years`، بعنوان `"GDP growth"` وتسمية
+         المحور الرأسي `"%"`.
+      2. على اليمين (`ax[1]`): مخطط أعمدة لـ`population` حسب `countries`، بعنوان `"Population"`.
+
+      خزّن الـFigure في `fig` والمحاور في `ax`.
+    starter: |
+      import matplotlib.pyplot as plt
+
+      years = [2020, 2021, 2022, 2023, 2024]
+      gdp_growth = [-5.1, 3.4, 3.6, 4.1, 3.8]
+      countries = ["DZ", "MA", "TN"]
+      population = [45.6, 37.8, 12.3]
+
+      fig, ax = plt.subplots()
+      ax.plot(years, gdp_growth)
+    solution: |
+      import matplotlib.pyplot as plt
+
+      years = [2020, 2021, 2022, 2023, 2024]
+      gdp_growth = [-5.1, 3.4, 3.6, 4.1, 3.8]
+      countries = ["DZ", "MA", "TN"]
+      population = [45.6, 37.8, 12.3]
+
+      fig, ax = plt.subplots(1, 2, figsize=(9, 3.5))
+      ax[0].plot(years, gdp_growth, marker="o")
+      ax[0].set_title("GDP growth")
+      ax[0].set_ylabel("%")
+      ax[0].axhline(0, linewidth=0.8)
+      ax[1].bar(countries, population)
+      ax[1].set_title("Population")
+      ax[1].set_ylabel("millions")
+      fig.tight_layout()
+    tests: |
+      assert len(fig.axes) == 2, f"الـFigure يجب أن تحتوي رسمين، وجدت {len(fig.axes)}"
+      _left, _right = fig.axes
+      assert _left.get_title() == "GDP growth" and _left.get_ylabel() == "%", "راجع عنوان وتسمية الرسم الأيسر"
+      assert len(_left.get_lines()) >= 1, "الرسم الأيسر يحتاج مخططًا خطيًا"
+      assert list(_left.get_lines()[0].get_ydata()) == gdp_growth
+      assert _right.get_title() == "Population" and len(_right.patches) == 3, "الرسم الأيمن: ثلاثة أعمدة بعنوان Population"
+    hints:
+      - "`fig, ax = plt.subplots(1, 2)` تعطي Axes اثنين: `ax[0]` و`ax[1]`."
+      - "`ax[0].plot(years, gdp_growth)` ثم `ax[0].set_title(...)` و`ax[0].set_ylabel(\"%\")`."
+      - "`ax[1].bar(countries, population)` ثم `ax[1].set_title(\"Population\")`"

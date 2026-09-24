@@ -1,0 +1,98 @@
+id: regex-basics
+track: regex
+order: 1
+title_ar: "التعابير النمطية Regex: البحث عن أنماط في النصوص"
+title_en: "Regular expressions: finding patterns in text"
+level: intermediate
+estimated_minutes: 45
+prerequisites: [strings-methods-fstrings]
+objectives:
+  - "فهم الـregex كلغة صغيرة لوصف أنماط النصوص."
+  - "استخدام فئات الحروف \\d و\\w و\\s والـquantifiers * و+ و? و{m,n}."
+  - "استخدام re.search وre.findall وre.sub وre.split."
+  - "استخراج أجزاء بالمجموعات (groups) والمجموعات المسماة."
+  - "كتابة الأنماط بـraw strings وفهم greedy مقابل lazy."
+docs_url: "https://docs.python.org/3/howto/regex.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [regex, re, pattern, search, findall, sub, groups, raw string, greedy]
+
+quizzes:
+  q-findall:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      import re
+      print(re.findall(r"\d+", "wave 2 of 2024, n=350"))
+    options: ["`['2', '2', '0', '2', '4', '3', '5', '0']`", "`['2', '2024', '350']`", "`[2, 2024, 350]`"]
+    answer: 1
+    explanation: |
+      `\d+` تعني «رقم واحد أو أكثر متتالية»، فتلتقط كل عدد كاملًا. والنتائج **نصوص** دائمًا.
+  q-greedy:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      import re
+      html = "<b>bold</b> and <i>italic</i>"
+      print(re.findall(r"<.+>", html), re.findall(r"<.+?>", html))
+    options:
+      - "`['<b>bold</b> and <i>italic</i>'] ['<b>', '</b>', '<i>', '</i>']`"
+      - "`['<b>', '</b>', '<i>', '</i>'] ['<b>bold</b> and <i>italic</i>']`"
+      - "`[] []`"
+    answer: 0
+    explanation: |
+      `+` **جشع (greedy)**: يأخذ أطول تطابق ممكن. `+?` **كسول (lazy)**: يأخذ أقصره. لذلك الأول يبتلع
+      السطر كله بين أول `<` وآخر `>`.
+  q-exit:
+    kind: exit
+    question: "لماذا نكتب الأنماط بـ`r\"...\"`؟"
+    options:
+      - "لأنها أسرع"
+      - "حتى لا يفسّر Python الشرطة العكسية قبل وصولها إلى الـregex (مثل `\\b` التي تصبح backspace)"
+      - "لأن re لا تقبل نصوصًا عادية"
+    answer: 1
+    explanation: |
+      الـregex يستخدم `\` كثيرًا (`\d` و`\b` و`\s`). الـraw string تمرّرها كما هي إلى محرك الـregex.
+
+exercises:
+  ex-parse:
+    title: "استخرج بيانات من سطور سجل"
+    prompt: |
+      كل سطر في `log` بالشكل `2024-03-15 ID=A17 score=14.5`. أنشئ:
+
+      - `records`: قائمة tuples `(date, id, score)` حيث score من نوع float، باستخدام `re.findall` ونمط
+        بثلاث مجموعات.
+      - `clean`: النص نفسه بعد استبدال كل رقم تعريف `ID=...` بـ`ID=***` بـ`re.sub`.
+    starter: |
+      import re
+
+      log = """2024-03-15 ID=A17 score=14.5
+      2024-03-16 ID=B02 score=9
+      2024-03-18 ID=A33 score=17.25"""
+
+      records = ...
+      clean = ...
+
+      print(records)
+      print(clean)
+    solution: |
+      import re
+
+      log = """2024-03-15 ID=A17 score=14.5
+      2024-03-16 ID=B02 score=9
+      2024-03-18 ID=A33 score=17.25"""
+
+      pattern = r"(\d{4}-\d{2}-\d{2}) ID=(\w+) score=([\d.]+)"
+      records = [(d, i, float(s)) for d, i, s in re.findall(pattern, log)]
+      clean = re.sub(r"ID=\w+", "ID=***", log)
+
+      print(records)
+      print(clean)
+    tests: |
+      assert records == [("2024-03-15", "A17", 14.5), ("2024-03-16", "B02", 9.0), ("2024-03-18", "A33", 17.25)], f"records غير صحيح: {records}"
+      assert "A17" not in clean and clean.count("ID=***") == 3, "استبدل كل ID=... بـID=***"
+      assert "score=14.5" in clean, "لا تغيّر بقية السطر"
+    hints:
+      - "المجموعات `( )` تحدد ما يُستخرج. التاريخ `\\d{4}-\\d{2}-\\d{2}`، والمعرّف `\\w+`، والدرجة `[\\d.]+`."
+      - "`re.findall` مع نمط فيه ثلاث مجموعات تُعيد قائمة tuples من ثلاثة نصوص؛ حوّل الثالث بـ`float`."
+      - "`clean = re.sub(r\"ID=\\w+\", \"ID=***\", log)`"

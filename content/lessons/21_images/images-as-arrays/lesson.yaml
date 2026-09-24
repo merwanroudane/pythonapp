@@ -1,0 +1,103 @@
+id: images-as-arrays
+track: images
+order: 1
+title_ar: "الصور كمصفوفات: pixels وchannels مع Pillow وNumPy"
+title_en: "Images as arrays: pixels and channels with Pillow and NumPy"
+level: intermediate
+estimated_minutes: 45
+prerequisites: [numpy-arrays]
+objectives:
+  - "فهم الصورة الرقمية: شبكة pixels، والقنوات (RGB)، ونطاق القيم uint8 من 0 إلى 255."
+  - "التحويل بين Pillow Image وNumPy array (np.asarray وImage.fromarray)."
+  - "قص الصورة وقلبها وتحويلها إلى رمادي بعمليات على المصفوفة."
+  - "فهم خطر الـoverflow في uint8 وضرورة التحويل إلى float."
+  - "استخدام أدوات Pillow الجاهزة: resize وrotate وfilter."
+docs_url: "https://pillow.readthedocs.io/en/stable/handbook/tutorial.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [image, pixel, RGB, channel, uint8, Pillow, PIL, grayscale, crop, overflow]
+
+quizzes:
+  q-shape:
+    kind: concept
+    question: "صورة ملونة بعرض 640 وارتفاع 480. ما `shape` المصفوفة الناتجة من `np.asarray(img)`؟"
+    options: ["`(640, 480, 3)`", "`(480, 640, 3)`", "`(3, 640, 480)`"]
+    answer: 1
+    explanation: |
+      المصفوفة تُرتَّب **صفوفًا ثم أعمدة ثم قنوات**: (الارتفاع، العرض، 3). أما Pillow فيعطي `img.size`
+      بترتيب (العرض، الارتفاع) = `(640, 480)`: فرق مهم يسبب أخطاء كثيرة.
+  q-overflow:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      import numpy as np
+      px = np.array([250], dtype=np.uint8)
+      print(px + 10)
+    options: ["`[260]`", "`[4]`", "`[255]`"]
+    answer: 1
+    explanation: |
+      `uint8` يسع 0 إلى 255 فقط، والزيادة **تلتف (wrap around)**: 260 − 256 = 4. لذلك حوّل إلى
+      `float` قبل الحساب، ثم `np.clip(..., 0, 255).astype(np.uint8)` في النهاية.
+  q-exit:
+    kind: exit
+    question: "كيف تحصل على القناة الحمراء فقط من مصفوفة صورة RGB اسمها `a`؟"
+    options: ["`a[0]`", "`a[:, :, 0]`", "`a[..., 3]`"]
+    answer: 1
+    explanation: "`a[:, :, 0]` = كل الصفوف، كل الأعمدة، القناة 0 (R). أما `a[0]` فهو الصف الأول من الصورة."
+
+exercises:
+  ex-brighten:
+    title: "تفتيح صورة بأمان"
+    prompt: |
+      اكتب `brighten(a, amount)` تأخذ مصفوفة صورة `uint8` وتُعيد مصفوفة **`uint8` بنفس الشكل** كل قيمها
+      زادت بـ`amount`، **دون التفاف**: القيم التي تتجاوز 255 تُثبَّت على 255.
+
+      ثم اكتب `to_gray(a)` تحوّل صورة RGB بشكل `(h, w, 3)` إلى رمادي بشكل `(h, w)` نوعه `uint8` بالأوزان
+      `0.299 R + 0.587 G + 0.114 B` (مع التقريب `np.round`).
+    starter: |
+      import numpy as np
+
+
+      def brighten(a, amount):
+          return a + amount
+
+
+      def to_gray(a):
+          return a.mean(axis=2)
+
+
+      img = np.array([[[250, 10, 0], [100, 100, 100]]], dtype=np.uint8)
+      print(brighten(img, 10))
+      print(to_gray(img))
+    solution: |
+      import numpy as np
+
+
+      def brighten(a, amount):
+          out = a.astype(np.float64) + amount
+          return np.clip(out, 0, 255).astype(np.uint8)
+
+
+      def to_gray(a):
+          weights = np.array([0.299, 0.587, 0.114])
+          gray = a.astype(np.float64) @ weights
+          return np.round(gray).astype(np.uint8)
+
+
+      img = np.array([[[250, 10, 0], [100, 100, 100]]], dtype=np.uint8)
+      print(brighten(img, 10))
+      print(to_gray(img))
+    tests: |
+      import numpy as _np
+      _img = _np.array([[[250, 10, 0], [100, 100, 100]]], dtype=_np.uint8)
+      _b = brighten(_img, 10)
+      assert _b.dtype == _np.uint8, f"النوع يجب أن يكون uint8 وليس {_b.dtype}"
+      assert _b.shape == _img.shape
+      assert _b[0, 0].tolist() == [255, 20, 10], f"250+10 يجب أن تُثبَّت على 255، وجدت {_b[0, 0].tolist()}"
+      _g = to_gray(_img)
+      assert _g.shape == (1, 2) and _g.dtype == _np.uint8, f"to_gray يجب أن تعيد (h, w) من نوع uint8، وجدت {_g.shape} {_g.dtype}"
+      assert _g.tolist() == [[81, 100]], f"القيم الرمادية غير صحيحة: {_g.tolist()}"
+    hints:
+      - "حوّل أولًا: `a.astype(np.float64) + amount`، ثم `np.clip(out, 0, 255)`، ثم `.astype(np.uint8)`."
+      - "الرمادي: جداء القنوات بالأوزان `a.astype(float) @ np.array([0.299, 0.587, 0.114])` يعطي (h, w)."
+      - "لا تنسَ `np.round(...)` قبل `.astype(np.uint8)`."

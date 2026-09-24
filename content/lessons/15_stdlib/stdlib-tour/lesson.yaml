@@ -1,0 +1,91 @@
+id: stdlib-tour
+track: stdlib
+order: 1
+title_ar: "جولة في المكتبة القياسية: الأداة المناسبة لكل مهمة"
+title_en: "A tour of the standard library: the right module for each task"
+level: beginner_to_intermediate
+estimated_minutes: 45
+prerequisites: [modules-imports]
+objectives:
+  - "معرفة خريطة المكتبة القياسية حسب المهمة لا حسب الترتيب الأبجدي."
+  - "استخدام math وstatistics وrandom (مع seed) للحسابات."
+  - "التعامل مع التواريخ بـdatetime: الإنشاء، الفرق، التنسيق، والتحويل من نص."
+  - "استخدام itertools وfunctools لمهام شائعة، وtime/timeit للقياس."
+docs_url: "https://docs.python.org/3/library/index.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [standard library, math, statistics, random, seed, datetime, itertools, functools, timeit]
+
+quizzes:
+  q-seed:
+    kind: predict
+    question: "هل يطبع السطران القيمة نفسها؟"
+    code: |
+      import random
+      random.seed(42); a = random.random()
+      random.seed(42); b = random.random()
+      print(a == b)
+    options: ["`True`", "`False`", "يتغير في كل تشغيل"]
+    answer: 0
+    explanation: |
+      الأرقام «العشوائية» في الحاسوب **شبه عشوائية (pseudo-random)**: تُولَّد بخوارزمية من بذرة (seed).
+      البذرة نفسها تعطي السلسلة نفسها، وهذا أساس قابلية إعادة إنتاج المحاكاة.
+  q-dates:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      from datetime import date
+      print((date(2026, 3, 1) - date(2026, 2, 1)).days)
+    options: ["`30`", "`28`", "`31`"]
+    answer: 1
+    explanation: "فبراير 2026 فيه 28 يومًا. `datetime` يعرف التقويم، فلا تحسب الفروق يدويًا."
+  q-exit:
+    kind: exit
+    question: "أي module تستخدم للأرقام العشوائية في تطبيق أمني (كلمات مرور، tokens)؟"
+    options: ["`random`", "`secrets`", "`math`"]
+    answer: 1
+    explanation: |
+      `random` مصمم للمحاكاة والإحصاء وتسلسله قابل للتوقع. للأمان استخدم `secrets`.
+
+exercises:
+  ex-toolbox:
+    title: "صندوق أدوات صغير"
+    prompt: |
+      باستخدام المكتبة القياسية فقط:
+
+      - `sd`: الانحراف المعياري للعينة `sample` (بـ`statistics`)، مقرّبًا لمنزلتين.
+      - `days_left`: عدد الأيام من `2026-09-24` حتى `2026-12-31` (بـ`datetime.date`).
+      - `parsed`: تحويل النص `"15/03/2024"` إلى `date` بـ`datetime.strptime`.
+      - `pairs`: كل الأزواج الممكنة (بلا تكرار الترتيب) من `["a", "b", "c"]` بـ`itertools.combinations`، كقائمة.
+    starter: |
+      sample = [12, 15, 11, 18, 14]
+
+      sd = ...
+      days_left = ...
+      parsed = ...
+      pairs = ...
+
+      print(sd, days_left, parsed, pairs)
+    solution: |
+      import itertools
+      import statistics
+      from datetime import date, datetime
+
+      sample = [12, 15, 11, 18, 14]
+
+      sd = round(statistics.stdev(sample), 2)
+      days_left = (date(2026, 12, 31) - date(2026, 9, 24)).days
+      parsed = datetime.strptime("15/03/2024", "%d/%m/%Y").date()
+      pairs = list(itertools.combinations(["a", "b", "c"], 2))
+
+      print(sd, days_left, parsed, pairs)
+    tests: |
+      import datetime as _dt
+      assert sd == 2.74, f"sd يجب أن يكون 2.74 وليس {sd}"
+      assert days_left == 98, f"days_left يجب أن يكون 98 وليس {days_left}"
+      assert parsed == _dt.date(2024, 3, 15), f"parsed غير صحيح: {parsed!r}"
+      assert pairs == [("a", "b"), ("a", "c"), ("b", "c")], f"pairs غير صحيح: {pairs}"
+    hints:
+      - "`statistics.stdev` لانحراف العينة. وطرح تاريخين يعطي `timedelta` لها الخاصية `.days`."
+      - "`datetime.strptime(text, \"%d/%m/%Y\")` ثم `.date()`. و`itertools.combinations(xs, 2)` ثم `list(...)`."
+      - "`days_left = (date(2026, 12, 31) - date(2026, 9, 24)).days`"

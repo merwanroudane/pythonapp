@@ -1,0 +1,110 @@
+id: json-http-apis
+track: web
+order: 1
+title_ar: "بيانات الويب: HTTP وURLs وJSON وHTML"
+title_en: "Web data: HTTP, URLs, JSON and HTML"
+level: intermediate
+estimated_minutes: 50
+prerequisites: [files-reading-writing]
+objectives:
+  - "فهم دورة HTTP: request (method، URL، headers) ثم response (status، headers، body)."
+  - "تفكيك URL وبناء query string بأمان بـurllib.parse."
+  - "تحليل استجابة JSON متداخلة وتحويلها إلى جدول."
+  - "استخراج بيانات من HTML بـhtml.parser، ومعرفة متى تستخدم Beautiful Soup."
+  - "معرفة أخلاقيات جمع البيانات: الشروط، robots.txt، والتخفيف من الطلبات."
+docs_url: "https://docs.python.org/3/library/urllib.parse.html"
+last_verified: "2026-09-24"
+python_min: "3.11"
+tags: [HTTP, API, URL, JSON, HTML, requests, urllib, status code, scraping, pagination]
+
+quizzes:
+  q-status:
+    kind: concept
+    question: "استجابة API برمز الحالة `404`. ماذا يعني؟"
+    options:
+      - "نجح الطلب"
+      - "المورد المطلوب غير موجود (خطأ من جهة الطلب)"
+      - "الخادم معطّل"
+    answer: 1
+    explanation: |
+      رموز 2xx نجاح (200 OK)، و3xx إعادة توجيه، و4xx **خطأ في الطلب** (400 صياغة، 401/403 صلاحيات، 404
+      غير موجود، 429 طلبات كثيرة)، و5xx **خطأ في الخادم**.
+  q-urlencode:
+    kind: predict
+    question: "ماذا يطبع؟"
+    code: |
+      from urllib.parse import urlencode
+      print(urlencode({"q": "GDP growth", "page": 2}))
+    options: ["`q=GDP growth&page=2`", "`q=GDP+growth&page=2`", "`{q: GDP growth, page: 2}`"]
+    answer: 1
+    explanation: "`urlencode` يرمّز المسافات والرموز الخاصة (المسافة تصبح `+`) ويربط الأزواج بـ`&`. لا تركّب الـquery يدويًا."
+  q-exit:
+    kind: exit
+    question: "ما الفرق الجوهري بين API يُرجع JSON وصفحة HTML عند جمع البيانات؟"
+    options:
+      - "لا فرق"
+      - "الـAPI يعطي بيانات منظمة مخصصة للبرامج وثابتة الشكل؛ أما HTML فمخصص للعرض ويجب استخراج البيانات منه وقد يتغير شكله"
+      - "HTML أسرع دائمًا"
+    answer: 1
+    explanation: "إن وُجد API رسمي فاستخدمه أولًا: أوضح وأثبت وغالبًا مسموح صراحةً. الـscraping هو الخيار الأخير."
+
+exercises:
+  ex-api:
+    title: "من استجابة API إلى جدول"
+    prompt: |
+      `raw` نص JSON لاستجابة API لمؤشر اقتصادي، فيه `meta` و`data` (قائمة سجلات، بعضها قيمته `null`).
+
+      - `payload`: حوّل النص إلى Python objects.
+      - `rows`: قائمة tuples `(country, year, value)` للسجلات التي قيمتها **ليست** `None`، مرتبة حسب
+        `(country, year)`.
+      - `next_url`: رابط الصفحة التالية: القاعدة `payload["meta"]["base"]` مع query string فيه
+        `indicator` (من `meta`) و`page` = الصفحة الحالية + 1. استخدم `urlencode`.
+    starter: |
+      import json
+      from urllib.parse import urlencode
+
+      raw = """{
+        "meta": {"base": "https://api.example.org/v1/data", "indicator": "gdp_growth", "page": 1, "pages": 3},
+        "data": [
+          {"country": {"id": "TN", "name": "Tunisia"}, "year": 2023, "value": 0.4},
+          {"country": {"id": "DZ", "name": "Algeria"}, "year": 2023, "value": 4.1},
+          {"country": {"id": "DZ", "name": "Algeria"}, "year": 2022, "value": 3.6},
+          {"country": {"id": "MA", "name": "Morocco"}, "year": 2023, "value": null}
+        ]
+      }"""
+
+      payload = raw
+      rows = []
+      next_url = ""
+      print(rows, next_url, sep="\n")
+    solution: |
+      import json
+      from urllib.parse import urlencode
+
+      raw = """{
+        "meta": {"base": "https://api.example.org/v1/data", "indicator": "gdp_growth", "page": 1, "pages": 3},
+        "data": [
+          {"country": {"id": "TN", "name": "Tunisia"}, "year": 2023, "value": 0.4},
+          {"country": {"id": "DZ", "name": "Algeria"}, "year": 2023, "value": 4.1},
+          {"country": {"id": "DZ", "name": "Algeria"}, "year": 2022, "value": 3.6},
+          {"country": {"id": "MA", "name": "Morocco"}, "year": 2023, "value": null}
+        ]
+      }"""
+
+      payload = json.loads(raw)
+      rows = sorted(
+          (rec["country"]["id"], rec["year"], rec["value"])
+          for rec in payload["data"]
+          if rec["value"] is not None
+      )
+      meta = payload["meta"]
+      next_url = meta["base"] + "?" + urlencode({"indicator": meta["indicator"], "page": meta["page"] + 1})
+      print(rows, next_url, sep="\n")
+    tests: |
+      assert isinstance(payload, dict), "payload يجب أن يكون dict (استخدم json.loads)"
+      assert rows == [("DZ", 2022, 3.6), ("DZ", 2023, 4.1), ("TN", 2023, 0.4)], f"rows غير صحيح: {rows}"
+      assert next_url == "https://api.example.org/v1/data?indicator=gdp_growth&page=2", f"next_url غير صحيح: {next_url}"
+    hints:
+      - "`payload = json.loads(raw)` و`null` في JSON تصبح `None`."
+      - "السجلات المتداخلة: `rec[\"country\"][\"id\"]`. صفِّ بـ`if rec[\"value\"] is not None` ثم `sorted(...)`."
+      - "`meta[\"base\"] + \"?\" + urlencode({\"indicator\": ..., \"page\": meta[\"page\"] + 1})`"
