@@ -40,6 +40,10 @@ def _child_env(workdir: str) -> dict[str, str]:
             "PYTHONUTF8": "1",
             "PYTHONDONTWRITEBYTECODE": "1",
             "MPLBACKEND": "Agg",
+            # One thread for BLAS/OpenMP: predictable memory under the address-space cap.
+            "OPENBLAS_NUM_THREADS": "1",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
             "TEMP": workdir,
             "TMP": workdir,
             "HOME": workdir,
@@ -187,10 +191,17 @@ else:
         cpu = int(limits.timeout_s) + 1
 
         def apply_limits() -> None:
-            resource.setrlimit(resource.RLIMIT_AS, (mem, mem))
-            resource.setrlimit(resource.RLIMIT_FSIZE, (fsize, fsize))
-            resource.setrlimit(resource.RLIMIT_CPU, (cpu, cpu))
-            resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+            for which, value in (
+                (resource.RLIMIT_AS, mem),
+                (resource.RLIMIT_FSIZE, fsize),
+                (resource.RLIMIT_CPU, cpu),
+                (resource.RLIMIT_CORE, 0),
+            ):
+                # Never ask for more than the host's hard limit (e.g. inside containers),
+                # otherwise setrlimit fails and no run could ever start.
+                _, hard = resource.getrlimit(which)
+                capped = value if hard == resource.RLIM_INFINITY else min(value, hard)
+                resource.setrlimit(which, (capped, capped))
 
         proc = subprocess.Popen(
             cmd,
@@ -212,9 +223,7 @@ else:
         proc.wait()
 
     def _finish(proc, job) -> float | None:
-        peak_kb = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
-        scale = 1024 if sys.platform == "darwin" else 1  # macOS reports bytes
-        return round(peak_kb / scale / 1024, 1)
+        return None  # the harness reports its own peak (RUSAGE_SELF) on POSIX
 
 
 def run(job: dict, limits: Limits) -> RunResult:
@@ -226,7 +235,7 @@ def run(job: dict, limits: Limits) -> RunResult:
         cmd = [sys.executable, "-I", "-X", "utf8", str(HARNESS), str(job_path), str(result_path)]
         try:
             proc, handle = _launch(cmd, str(workdir), _child_env(str(workdir)), limits)
-        except OSError as exc:
+        except (OSError, subprocess.SubprocessError) as exc:
             return runner_error(f"Could not start the runner: {exc}", BACKEND)
         try:
             _, stderr = proc.communicate(timeout=limits.timeout_s)
@@ -243,5 +252,6 @@ def run(job: dict, limits: Limits) -> RunResult:
         data = json.loads(result_path.read_text(encoding="utf-8"))
     result = RunResult.model_validate(data)
     result.backend = BACKEND
-    result.memory_peak_mb = peak
+    if peak is not None:
+        result.memory_peak_mb = peak
     return result

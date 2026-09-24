@@ -12,7 +12,7 @@ Author: **Dr Merwan Roudane** — <https://github.com/merwanroudane>
 ```bash
 git clone https://github.com/merwanroudane/pythonapp.git
 cd pythonapp
-pip install -e ".[scientific,dev]"
+pip install -r requirements-dev.txt
 streamlit run streamlit_app.py
 ```
 

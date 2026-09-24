@@ -22,6 +22,11 @@ dev = [
   "ruff",
 ]
 
+# This is a Streamlit app, not an installable library: Poetry (used by Streamlit
+# Community Cloud when no requirements.txt exists) must only install dependencies.
+[tool.poetry]
+package-mode = false
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

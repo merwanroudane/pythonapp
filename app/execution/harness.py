@@ -296,6 +296,14 @@ def run(job: dict) -> dict:
         result["figures"] = []
     if tracer:
         result["trace"] = {"steps": tracer.steps, "truncated": tracer.truncated}
+    try:  # POSIX only: peak resident memory of this run's process
+        import resource
+
+        peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        per_mb = 1024 * 1024 if sys.platform == "darwin" else 1024  # macOS reports bytes
+        result["memory_peak_mb"] = round(peak / per_mb, 1)
+    except ImportError:
+        pass
     return result
 
 

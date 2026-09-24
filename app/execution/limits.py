@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import secrets
+import sys
 from dataclasses import asdict, dataclass
 
 from app.execution.models import RunResult
@@ -29,7 +30,9 @@ class Limits:
     def from_env(cls, timeout_s: float | None = None) -> Limits:
         return cls(
             timeout_s=timeout_s if timeout_s is not None else _env_float("PLL_TIMEOUT_S", 5.0),
-            memory_mb=int(_env_float("PLL_MEMORY_MB", 512)),
+            # Windows caps committed memory; POSIX caps *virtual* address space, which
+            # scientific imports (pandas / pyarrow) reserve generously, so allow more.
+            memory_mb=int(_env_float("PLL_MEMORY_MB", 512 if sys.platform == "win32" else 1024)),
         )
 
     def as_dict(self) -> dict:
